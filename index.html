@@ -3472,8 +3472,8 @@
       function addCrexPlayerJersey(name, imageUrl) {
         const key = normalizePlayerKey(
           String(name || "")
-            .replace(/\\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\\b/gi, " ")
-            .replace(/\\s+/g, " ")
+            .replace(/\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\b/gi, " ")
+            .replace(/\s+/g, " ")
             .trim(),
         );
         let url = getImageUrl(imageUrl);
@@ -3481,7 +3481,7 @@
         try {
           const parsed = new URL(url, "https://crex.com/");
           if (parsed.protocol !== "https:" || parsed.hostname.toLowerCase() !== "cricketvectors.akamaized.net") return;
-          if (!/\\/jersey\\/limited\\/org\\//i.test(parsed.pathname)) return;
+          if (!/\/jersey\/limited\/org\//i.test(parsed.pathname)) return;
           url = parsed.href;
         } catch (_) {
           return;
@@ -3516,15 +3516,15 @@
                 img.getAttribute("data-src"),
                 img.getAttribute("data-lazy-src"),
               ].filter(Boolean).join(" ");
-              return /cricketvectors\\.akamaized\\.net\\/players\\//i.test(raw) ||
-                /\\/players\\/(?:org|profile)\\//i.test(raw);
+              return /cricketvectors\.akamaized\.net\/players\//i.test(raw) ||
+                /\/players\/(?:org|profile)\//i.test(raw);
             }) || candidates.find((img) => {
               const label = (img.getAttribute("title") || img.getAttribute("alt") || "").trim();
               return label && !/jersey|jersy|shirt|uniform|logo/i.test(label);
             });
             if (portrait) {
               playerName = portrait.getAttribute("title") || portrait.getAttribute("alt") || "";
-              playerName = playerName.replace(/\\b(?:logo|photo|profile|headshot)\\b/gi, " ").replace(/\\s+/g, " ").trim();
+              playerName = playerName.replace(/\b(?:logo|photo|profile|headshot)\b/gi, " ").replace(/\s+/g, " ").trim();
               if (playerName) break;
             }
             // Do not climb out of a player-profile component into a parent that contains many players.
@@ -3535,14 +3535,14 @@
             playerName = jerseyImg.getAttribute("title") || jerseyImg.getAttribute("alt") || "";
           }
           const cleanName = String(playerName)
-            .replace(/\\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\\b/gi, " ")
-            .replace(/\\s+/g, " ")
+            .replace(/\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\b/gi, " ")
+            .replace(/\s+/g, " ")
             .trim();
           if (cleanName) addCrexPlayerJersey(cleanName, jerseyUrl);
           // The jersey's own alt text is also useful on CREX builds where the player image has no title.
           const jerseyLabel = String(jerseyImg.getAttribute("title") || jerseyImg.getAttribute("alt") || "")
-            .replace(/\\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\\b/gi, " ")
-            .replace(/\\s+/g, " ")
+            .replace(/\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\b/gi, " ")
+            .replace(/\s+/g, " ")
             .trim();
           if (jerseyLabel) addCrexPlayerJersey(jerseyLabel, jerseyUrl);
         }
@@ -8741,11 +8741,11 @@
     return String(value || "")
       .toLowerCase()
       .normalize("NFD")
-      .replace(/[\\u0300-\\u036f]/g, "")
-      .replace(/\\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\\b/gi, " ")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\b/gi, " ")
       .replace(/[^a-z0-9]+/g, " ")
       .trim()
-      .replace(/\\s+/g, " ");
+      .replace(/\s+/g, " ");
   }
 
   function jerseyForPlayer(playerName) {
