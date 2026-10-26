@@ -504,7 +504,7 @@
       .stat-divider { width: 1.5px; height: 25px; background: rgba(75, 137, 184, 0.48); }
 
       /* =========================================================
-         CREX 1:1 NATURAL PROPORTION BUST (HEAD + JERSEY COLLAR)
+         CREX 1:1 CALIBRATED BUST (HEAD: 60px | JERSEY: 58px)
       ========================================================= */
       .v9-player-deck {
         position: absolute;
@@ -542,7 +542,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        padding-left: 130px;
+        padding-left: 125px;
         padding-right: 12px;
         background: linear-gradient(90deg, #0877d5, #064b8f);
         color: #f7fbff;
@@ -563,20 +563,20 @@
       .v9-avatar-wrap {
         position: absolute;
         z-index: 8;
-        left: 8px;
+        left: 12px;
         bottom: 29px;
-        width: 120px;
-        height: 140px;
+        width: 86px;
+        height: 98px;
         overflow: visible;
         isolation: isolate;
       }
 
       .v9-avatar-wrap .player-avatar-initials {
         position: absolute;
-        left: 25px;
-        bottom: 30px;
-        width: 70px;
-        height: 70px;
+        left: 13px;
+        bottom: 20px;
+        width: 60px;
+        height: 60px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -584,18 +584,19 @@
         border: 2px solid #ffbe18;
         border-radius: 50%;
         color: #fff;
-        font-size: 24px;
+        font-size: 22px;
         font-weight: 900;
         z-index: 1;
       }
 
-      /* Head Cutout: positioned so chin and neck slide directly into the collar */
+      /* Head Cutout: 60px height, lowered so the neck slides inside the collar */
       .v9-avatar-wrap .player-avatar-photo[src] {
         position: absolute !important;
-        left: 0 !important;
-        bottom: 24px !important;
-        width: 120px !important;
-        height: 105px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        bottom: 20px !important; /* Drops chin right above the V-collar line */
+        width: 76px !important;
+        height: 60px !important;
         display: block !important;
         object-fit: contain !important;
         object-position: center bottom !important;
@@ -604,14 +605,15 @@
         -webkit-mask-image: none !important;
       }
 
-      /* Jersey Layer: sits in front so the V-neck collar naturally frames the neck */
+      /* Jersey Layer: 58px height, positioned at bottom with collar framing the neck */
       .v9-avatar-wrap .player-jersey-overlay {
         position: absolute !important;
-        left: 0 !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
         bottom: 0 !important;
-        width: 120px !important;
-        height: 78px !important;
-        z-index: 4 !important;
+        width: 76px !important;
+        height: 58px !important;
+        z-index: 3 !important;
         object-fit: contain !important;
         object-position: center bottom !important;
         pointer-events: none !important;
@@ -621,7 +623,7 @@
       .v9-player-name {
         position: absolute;
         z-index: 9;
-        left: 128px;
+        left: 110px;
         right: 8px;
         top: 8px;
         font-size: 23px;
@@ -636,7 +638,7 @@
       .v9-primary-metric {
         position: absolute;
         z-index: 9;
-        left: 128px;
+        left: 110px;
         right: 8px;
         top: 45px;
         display: flex;
@@ -648,7 +650,7 @@
       .v9-primary-metric:not(.v9-bowler-metric) > span:first-child { display: none; }
       .v9-primary-metric > strong { font-size: 50px; font-weight: 900; color: #ffce42; line-height: 0.92; }
 
-      .v9-bowler-metric { left: 128px; right: 8px; top: 48px; gap: 4px; }
+      .v9-bowler-metric { left: 110px; right: 8px; top: 48px; gap: 4px; }
       .v9-bowler-metric > span { font-size: 11px; }
       .v9-bowler-metric > strong { font-size: 32px; }
       .v9-bowler-metric > em { color: #4acff0; font-size: 18px; font-style: normal; }
@@ -1635,7 +1637,7 @@
             jersey.alt = "";
             jersey.setAttribute("aria-hidden", "true");
             jersey.loading = "eager";
-            wrap.appendChild(jersey);
+            wrap.insertBefore(jersey, photo);
           }
           return jersey;
         }
