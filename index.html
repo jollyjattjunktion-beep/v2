@@ -4168,5 +4168,32 @@ function setPlayerPortrait(photoId, initialsId, player, data, name) {
 })();
 </script>
 
+
+<style id="preetSportsCrexFullPortraitFix">
+/*
+ * CREX-style player cutouts:
+ * Keep the source portrait and its face intact, but fit the complete bust/jersey
+ * inside the existing frame instead of zoom-cropping the lower torso away.
+ * This is presentation-only; player names and portrait URL matching are unchanged.
+ */
+.v9-avatar-wrap .player-avatar-photo[src] {
+  display: block !important;
+  visibility: visible !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  image-rendering: auto !important;
+}
+.v9-avatar-wrap .player-avatar-photo[src] + .player-avatar-initials {
+  display: none !important;
+}
+</style>
+
 </body>
 </html>
