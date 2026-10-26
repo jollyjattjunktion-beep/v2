@@ -105,11 +105,12 @@ def build_portrait_map(html, page_url, live):
                 if not parent or not getattr(parent, "parent", None):
                     break
                 parent = parent.parent
-                text = parent.get_text(" ", strip=True)
-                key = normalize_name(text)
-                if key in names:
-                    # Exact whole-card text equality only; no substring/fuzzy guesses.
-                    associations.setdefault(key, {"name": names[key]["name"], "role": names[key]["role"], "image": url, "association": "exact-card-text", "source": "CREX", "source_url": page_url})
+                # Match an exact text node/line inside the compact player card, not a substring.
+                text_lines = [normalize_name(line) for line in parent.stripped_strings]
+                keys = [line for line in text_lines if line in names]
+                if len(keys) == 1:
+                    key = keys[0]
+                    associations.setdefault(key, {"name": names[key]["name"], "role": names[key]["role"], "image": url, "association": "exact-card-name", "source": "CREX", "source_url": page_url})
                     break
         candidates.append({"image": url, "alt": alt or None, "title": title or None})
     mapped = [associations[k] for k in names if k in associations]
