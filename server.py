@@ -85,6 +85,28 @@ def build_portrait_map(html, page_url, live):
     names = {normalize_name(p["name"]): p for p in players if normalize_name(p["name"])}
     associations = {}
     candidates = []
+
+    # Prefer image URLs explicitly attached to the exact named live-score player.
+    live_objects = {}
+    for key in ("batsman1", "batsman2", "bowler"):
+        obj = live.get(key)
+        if isinstance(obj, dict) and obj.get("name"):
+            live_objects.setdefault(normalize_name(obj["name"]), obj)
+
+    for key, player in names.items():
+        obj = live_objects.get(key) or {}
+        raw_image = obj.get("img") or obj.get("image") or obj.get("photo")
+        image_url = valid_image_url(raw_image, page_url)
+        if image_url:
+            associations[key] = {
+                "name": player["name"],
+                "role": player["role"],
+                "image": image_url,
+                "association": "exact-live-player-object",
+                "source": "CREX live-score payload",
+                "source_url": page_url,
+            }
+
     for img in soup.find_all("img"):
         raw = img.get("src") or img.get("data-src") or img.get("data-lazy-src") or img.get("data-original")
         url = valid_image_url(raw, page_url)
