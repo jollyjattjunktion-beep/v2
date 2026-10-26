@@ -24,6 +24,22 @@ PLACEHOLDER_RE = re.compile(r"(placeholder|default[-_ ]?(avatar|player)|no[-_ ]?
 BAD_IMAGE_EXTENSIONS = (".svg",)
 IMAGE_HOST_ALLOWLIST = {"cricketvectors.akamaized.net", "crex.com", "www.crex.com"}
 
+# Curated profile-page fallbacks. These are exact player-name associations, not fuzzy searches.
+PLAYER_PROFILE_URLS = {
+    "tim seifert": "https://crex.com/player/tim-seifert-JX",
+    "devon conway": "https://crex.com/player/devon-conway-4W",
+    "bevon john jacobs": "https://crex.com/player/bevon-john-jacobs-CZY",
+    "kl rahul": "https://www.sportskeeda.com/player/kl-rahul",
+    "yashasvi jaiswal": "https://www.sportskeeda.com/player/jaiswal-yashasvi",
+    "mitchell hay": "https://www.sportskeeda.com/player/mitchell-hay",
+}
+PROFILE_PAGE_HOSTS = {"crex.com", "www.crex.com", "sportskeeda.com", "www.sportskeeda.com"}
+PROFILE_IMAGE_HOSTS = {
+    "cricketvectors.akamaized.net", "crex.com", "www.crex.com",
+    "sportskeeda.com", "www.sportskeeda.com", "cdn.sportskeeda.com",
+    "staticg.sportskeeda.com", "images.sportskeeda.com",
+}
+
 def utc_now():
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
@@ -78,6 +94,52 @@ def player_names_from_score(data):
         unique.setdefault(normalize_name(p["name"]), p)
     return list(unique.values())
 
+def fetch_profile_portrait(player_name, page_url):
+    """Fetch an explicitly curated profile page and extract its real portrait URL."""
+    profile_url = PLAYER_PROFILE_URLS.get(normalize_name(player_name))
+    if not profile_url:
+        return None
+    try:
+        page = urlparse(profile_url)
+        if page.scheme != "https" or (page.hostname or "").lower() not in PROFILE_PAGE_HOSTS:
+            return None
+        response = requests.get(profile_url, headers=HEADERS, timeout=8)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+        image_candidates = []
+        for selector in (
+            ('meta', {'property': 'og:image'}),
+            ('meta', {'name': 'twitter:image'}),
+            ('meta', {'property': 'twitter:image'}),
+        ):
+            tag = soup.find(*selector)
+            if tag and tag.get("content"):
+                image_candidates.append(tag.get("content"))
+        expected = normalize_name(player_name)
+        for img in soup.find_all("img"):
+            label = normalize_name(img.get("alt") or img.get("title") or "")
+            if label == expected:
+                image_candidates.extend([
+                    img.get("src"), img.get("data-src"), img.get("data-lazy-src"),
+                    img.get("data-original")
+                ])
+        for raw in image_candidates:
+            if not raw or PLACEHOLDER_RE.search(str(raw)):
+                continue
+            url = urljoin(profile_url, str(raw).strip())
+            parsed = urlparse(url)
+            if (parsed.scheme == "https" and (parsed.hostname or "").lower() in PROFILE_IMAGE_HOSTS
+                    and not parsed.path.lower().endswith(BAD_IMAGE_EXTENSIONS)):
+                return {
+                    "image": url,
+                    "profile_url": profile_url,
+                    "source": parsed.hostname,
+                }
+    except Exception as exc:
+        logger.info("Profile portrait lookup failed for %s: %s", player_name, exc)
+    return None
+
+
 def build_portrait_map(html, page_url, live):
     """Only associates a portrait when the nearby DOM text matches a player name exactly."""
     soup = BeautifulSoup(html or "", "html.parser")
@@ -105,6 +167,18 @@ def build_portrait_map(html, page_url, live):
                 "association": "exact-live-player-object",
                 "source": "CREX live-score payload",
                 "source_url": page_url,
+            }
+
+    # Profile pages are a fallback only when the exact live-score object has no usable image.
+    for key, player in names.items():
+        if key in associations:
+            continue
+        profile = fetch_profile_portrait(player["name"], page_url)
+        if profile:
+            associations[key] = {
+                "name": player["name"], "role": player["role"],
+                "image": profile["image"], "association": "exact-curated-profile",
+                "source": profile["source"], "source_url": profile["profile_url"],
             }
 
     for img in soup.find_all("img"):
