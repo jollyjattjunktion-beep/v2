@@ -4192,5 +4192,212 @@ function setPlayerPortrait(photoId, initialsId, player, data, name) {
 }
 </style>
 
+
+<style id="preetSportsHDLowerThird">
+/*
+ * PREET SPORTS HD LOWER-THIRD — additive layout only.
+ * Keeps the existing navy/gold scoreboard theme and blue batter / red bowler cards.
+ * Images are real feed portraits; CSS does not synthesize or alter a player's face.
+ */
+.v9-player-deck {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+.v9-feature-card {
+  position: relative !important;
+  box-sizing: border-box !important;
+  height: 168px !important;
+  overflow: hidden !important;
+  border-radius: 12px !important;
+  isolation: isolate !important;
+}
+.v9-batter-card {
+  background: linear-gradient(125deg, #a20e20 0%, #680816 54%, #300813 100%) !important;
+  border: 2px solid #ffca36 !important;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.1), 0 7px 16px rgba(0,0,0,.4) !important;
+}
+.v9-bowler-card {
+  background: linear-gradient(125deg, #0b3970 0%, #08264d 54%, #06172e 100%) !important;
+  border: 2px solid #ffca36 !important;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.1), 0 7px 16px rgba(0,0,0,.4) !important;
+}
+.v9-card-kicker {
+  position: relative !important;
+  z-index: 5 !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  padding: 0 10px !important;
+  font-size: 14px !important;
+  letter-spacing: .55px !important;
+  background: linear-gradient(90deg, #161a24, #293344) !important;
+  border-bottom: 1px solid rgba(255,202,54,.75) !important;
+}
+.v9-batter-card .v9-card-kicker,
+.v9-bowler-card .v9-card-kicker {
+  background: linear-gradient(90deg, rgba(6,13,25,.98), rgba(23,36,53,.94)) !important;
+}
+.v9-live-dot { background: #ffca36 !important; }
+.v9-bowler-dot { background: #ffca36 !important; }
+
+.v9-feature-body {
+  position: relative !important;
+  display: block !important;
+  height: calc(100% - 26px) !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+/* Tall, bottom-aligned cutout: reveals more of the existing jersey/torso without face zoom. */
+.v9-avatar-wrap {
+  position: absolute !important;
+  z-index: 1 !important;
+  left: -3px !important;
+  top: -6px !important;
+  bottom: -1px !important;
+  width: 43% !important;
+  height: auto !important;
+  min-width: 0 !important;
+  flex: none !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.v9-avatar-wrap .player-avatar-photo[src] {
+  display: block !important;
+  visibility: visible !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  image-rendering: auto !important;
+}
+.v9-avatar-wrap .player-avatar-initials {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: linear-gradient(145deg,#1d679e,#071d34) !important;
+  font-size: 25px !important;
+}
+
+/* Keep the existing data IDs; reposition their live values into a clean broadcast hierarchy. */
+.v9-player-copy { display: contents !important; }
+.v9-player-name {
+  position: absolute !important;
+  z-index: 3 !important;
+  left: 35% !important;
+  right: 7px !important;
+  top: 9px !important;
+  width: auto !important;
+  max-width: none !important;
+  max-height: 36px !important;
+  color: #fff !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: 19px !important;
+  font-weight: 900 !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0 !important;
+  text-align: center !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,.7) !important;
+  white-space: normal !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.v9-primary-metric {
+  position: absolute !important;
+  z-index: 3 !important;
+  left: 36% !important;
+  right: 7px !important;
+  top: 49px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  white-space: nowrap !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,.7) !important;
+}
+.v9-primary-metric > span {
+  color: #d4efff !important;
+  font-size: 11px !important;
+  letter-spacing: .5px !important;
+}
+.v9-primary-metric > strong {
+  color: #ffdc4d !important;
+  font-size: 37px !important;
+  font-weight: 900 !important;
+  line-height: .95 !important;
+  letter-spacing: -.8px !important;
+}
+.v9-bowler-metric { gap: 4px !important; }
+.v9-bowler-metric > span { font-size: 10px !important; }
+.v9-bowler-metric > strong { font-size: 28px !important; letter-spacing: -.5px !important; }
+.v9-bowler-metric > em { font-size: 17px !important; }
+
+/* Broadcast-style stat rail, using the real ball/four/six/SR values already in the page. */
+.v9-stat-grid {
+  position: absolute !important;
+  z-index: 4 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 29px !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 2px !important;
+  align-items: center !important;
+  padding: 2px 7px !important;
+  border-top: 1px solid rgba(255,202,54,.9) !important;
+  background: linear-gradient(180deg, rgba(3,10,19,.91), rgba(1,6,13,.98)) !important;
+}
+.v9-stat-grid > span {
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: baseline !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  white-space: nowrap !important;
+}
+.v9-stat-grid b {
+  color: #ffdc4d !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+}
+.v9-stat-grid small {
+  color: #f2f5fa !important;
+  font-size: 9px !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+}
+.v9-bowler-stats { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+.v9-bowler-stats > span { gap: 4px !important; }
+.v9-bowler-stats b { font-size: 15px !important; }
+
+/* Slightly compress text at narrow browser widths without changing the artboard or theme. */
+@media (max-width: 1100px) {
+  .v9-player-name { font-size: 18px !important; }
+  .v9-primary-metric > strong { font-size: 34px !important; }
+  .v9-stat-grid { padding-left: 4px !important; padding-right: 4px !important; }
+  .v9-stat-grid b { font-size: 12px !important; }
+  .v9-stat-grid small { font-size: 8px !important; }
+}
+</style>
+
 </body>
 </html>
