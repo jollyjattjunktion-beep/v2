@@ -8511,5 +8511,99 @@
 }
 </style>
 
+
+<style id="preetSportsFullJerseyPortraitFit">
+/* Final portrait proportions: match the reference bust size without cropping the jersey. */
+.v9-player-deck {
+  top: 475px !important;
+  height: 168px !important;
+}
+.v9-feature-card {
+  overflow: visible !important;
+  isolation: isolate !important;
+}
+.v9-feature-body {
+  position: relative !important;
+  overflow: visible !important;
+}
+.v9-card-kicker {
+  position: relative !important;
+  z-index: 5 !important;
+  padding-left: 140px !important;
+}
+/* Smaller/narrower full-bust box: more jersey visible, less oversized face. */
+.v9-avatar-wrap {
+  position: absolute !important;
+  z-index: 8 !important;
+  left: -4px !important;
+  top: -48px !important;
+  bottom: auto !important;
+  width: 46% !important;
+  height: 188px !important;
+  min-width: 0 !important;
+  flex: none !important;
+  overflow: visible !important;
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.v9-avatar-wrap .player-avatar-photo[src] {
+  display: block !important;
+  visibility: visible !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 7%, #000 83%, rgba(0,0,0,.62) 93%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 7%, #000 83%, rgba(0,0,0,.62) 93%, transparent 100%);
+  image-rendering: auto !important;
+}
+.v9-avatar-wrap .player-avatar-initials {
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+}
+.v9-player-name {
+  z-index: 9 !important;
+  left: 42% !important;
+  right: 6px !important;
+}
+.v9-primary-metric {
+  z-index: 9 !important;
+  left: 42% !important;
+  right: 6px !important;
+}
+.v9-bowler-metric {
+  left: 39% !important;
+  right: 4px !important;
+}
+.v9-stat-grid {
+  position: absolute !important;
+  z-index: 10 !important;
+}
+#batter1Row .v9-card-kicker {
+  padding-left: 140px !important;
+  padding-right: 94px !important;
+}
+@media (max-width: 1100px) {
+  .v9-avatar-wrap { width: 46% !important; height: 188px !important; top: -48px !important; }
+  .v9-card-kicker { padding-left: 130px !important; }
+  #batter1Row .v9-card-kicker { padding-left: 130px !important; padding-right: 88px !important; }
+  .v9-player-name { left: 42% !important; font-size: 21px !important; }
+  .v9-primary-metric { left: 42% !important; }
+}
+</style>
+
 </body>
 </html>
