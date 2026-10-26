@@ -2529,6 +2529,8 @@ function renderScoreData(data) {
     document.getElementById("mainOversHero").textContent = battingOvers;
 
     // Current Over Balls
+    // Render only the ball sequence explicitly supplied for this poll.
+    // Empty/missing sequences clear old chips rather than showing stale balls.
     const activeBalls = Array.isArray(data.current_over?.balls) ? data.current_over.balls : [];
     renderCurrentOverBalls(activeBalls);
     renderLastTwoOvers(data, battingOvers);
@@ -2540,7 +2542,16 @@ function renderScoreData(data) {
     document.getElementById("valLastWkt").textContent = data.last_wicket || "--";
 
     // Batters
-    const b1 = data.batsman1 || data.batter1;
+    const b1 = data.batsman1 || data.batter1 || null;
+    // Clear old player values on every poll; never leave a previous batter visible
+    // when the latest CREX response omits that player.
+    if (!b1) {
+        document.getElementById("b1Name").textContent = "BATTER 1";
+        ["b1Runs","b1Balls","b1Fours","b1Sixes","b1SR"].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = "—"; });
+        document.getElementById("b1Runs").className = "";
+        const img=document.getElementById("b1Photo"); if(img) img.style.display="none";
+        const initials=document.getElementById("b1Initials"); if(initials) initials.style.display="flex";
+    }
     if (b1) {
         const b1Name = String(b1.short_name || b1.shortName || b1.name || "BATTER 1").toUpperCase();
         document.getElementById("b1Name").textContent = b1Name;
@@ -2554,7 +2565,14 @@ function renderScoreData(data) {
         else document.getElementById("b1Runs").className = "";
     }
 
-    const b2 = data.batsman2 || data.batter2;
+    const b2 = data.batsman2 || data.batter2 || null;
+    if (!b2) {
+        document.getElementById("b2Name").textContent = "BATTER 2";
+        ["b2Runs","b2Balls","b2Fours","b2Sixes","b2SR"].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = "—"; });
+        document.getElementById("b2Runs").className = "";
+        const img=document.getElementById("b2Photo"); if(img) img.style.display="none";
+        const initials=document.getElementById("b2Initials"); if(initials) initials.style.display="flex";
+    }
     if (b2) {
         const b2Name = String(b2.short_name || b2.shortName || b2.name || "BATTER 2").toUpperCase();
         document.getElementById("b2Name").textContent = b2Name;
@@ -2569,7 +2587,13 @@ function renderScoreData(data) {
     }
 
     // Bowler
-    const bowler = data.bowler;
+    const bowler = data.bowler || null;
+    if (!bowler) {
+        document.getElementById("bwlName").textContent = "BOWLER";
+        ["bwlOvers","bwlMaidens","bwlRuns","bwlWickets","bwlEco"].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = "—"; });
+        const img=document.getElementById("bwlPhoto"); if(img) img.style.display="none";
+        const initials=document.getElementById("bwlInitials"); if(initials) initials.style.display="flex";
+    }
     if (bowler) {
         const bowlerName = String(bowler.short_name || bowler.shortName || bowler.name || "BOWLER").toUpperCase();
         document.getElementById("bwlName").textContent = bowlerName;
