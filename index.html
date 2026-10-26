@@ -8348,5 +8348,122 @@
         }
       }
     </style>
-  </body>
+  
+<style id="preetSportsReferenceGroundAndStrikerFix">
+/* Match the reference composition: a clear cricket-ground band above the three player cards. */
+.stadium-background {
+  background-image:
+    linear-gradient(180deg,
+      rgba(4,13,26,.10) 0%,
+      rgba(4,13,26,.04) 35%,
+      rgba(4,13,26,.18) 62%,
+      rgba(4,13,26,.72) 100%),
+    linear-gradient(90deg,
+      rgba(4,13,26,.18) 0%,
+      transparent 20%,
+      transparent 80%,
+      rgba(4,13,26,.18) 100%),
+    url("https://images.unsplash.com/photo-1774167766011-004b8acb8e3b?auto=format&fit=crop&w=1800&q=85"),
+    url("https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1800&q=90") !important;
+  background-size: cover, cover, cover, cover !important;
+  background-position: center, center, center 50%, center 62% !important;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat !important;
+  filter: saturate(1.16) brightness(1.08) contrast(1.02) !important;
+  transform: none !important;
+}
+
+/* Drop the cards lower to open up the centre ground picture. */
+.v9-player-deck {
+  top: 475px !important;
+  height: 168px !important;
+  overflow: visible !important;
+}
+.v9-upcoming-band {
+  top: 648px !important;
+  height: 32px !important;
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+}
+.v9-upcoming-heading {
+  font-size: 18px !important;
+}
+
+/* Correct portrait geometry: full existing bust/jersey, no giant clipped face. */
+.v9-feature-card,
+.v9-feature-body {
+  overflow: visible !important;
+}
+.v9-avatar-wrap {
+  position: absolute !important;
+  z-index: 2 !important;
+  left: -4px !important;
+  top: -60px !important;
+  bottom: auto !important;
+  width: 58% !important;
+  height: 205px !important;
+  min-width: 0 !important;
+  flex: none !important;
+  overflow: visible !important;
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.v9-avatar-wrap .player-avatar-photo[src] {
+  display: block !important;
+  visibility: visible !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  /* Fade the hard rectangular source edge beside the head into the card background. */
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 78%, rgba(0,0,0,.72) 88%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 78%, rgba(0,0,0,.72) 88%, transparent 100%);
+  image-rendering: auto !important;
+}
+.v9-avatar-wrap .player-avatar-initials {
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+}
+
+/* Put the strike marker in the top-right corner of the striker's card. */
+#batter1Row .v9-card-kicker {
+  position: relative !important;
+  padding-right: 94px !important;
+}
+#batter1Row .v9-card-kicker::after {
+  content: "ON STRIKE";
+  position: absolute;
+  right: 8px;
+  top: 4px;
+  z-index: 9;
+  padding: 2px 6px;
+  border: 1px solid rgba(255,255,255,.6);
+  border-radius: 4px;
+  background: #ffca36;
+  color: #06172a;
+  font: 900 9px/1.35 'Montserrat', Arial, sans-serif;
+  letter-spacing: .45px;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,.32);
+}
+@media (max-width: 1100px) {
+  .v9-player-deck { top: 475px !important; }
+  .v9-avatar-wrap { width: 58% !important; height: 205px !important; }
+  #batter1Row .v9-card-kicker { padding-right: 88px !important; }
+  #batter1Row .v9-card-kicker::after { font-size: 8px; right: 5px; }
+}
+</style>
+
+</body>
 </html>
