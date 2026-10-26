@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;0,800;0,900;1,800;1,900&family=Rajdhani:wght@600;700;800;900&family=Teko:wght@600;700;800;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;0,800;0,900;1,800;1,900&amp;family=Rajdhani:wght@600;700;800;900&amp;family=Teko:wght@600;700;800;900&amp;display=swap"
       rel="stylesheet"
     />
 
@@ -52,7 +52,7 @@
         background: #000000;
       }
 
-      /* FLOATING URL CONTROL BAR */
+      /* FLOATING URL CONTROL BAR (Press 'H' or add ?hide=1 in OBS) */
       .url-control-bar {
         position: absolute;
         top: 8px;
@@ -237,26 +237,11 @@
         background: #fff;
         border: 3px solid #ffbe18;
         overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
       }
       .crest-shield img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-      }
-      .crest-shield-fallback {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #0a264a, #030f1e);
-        color: #ffbe18;
-        font-size: 26px;
-        font-weight: 900;
-        letter-spacing: 1px;
       }
 
       .team-hero-copy {
@@ -277,7 +262,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      .team-name-hero.long-team-name { font-size: 27px; }
+      .team-name-hero.long-team-name { font-size: 29px; }
 
       .team-hero-scoreline {
         display: flex;
@@ -366,7 +351,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 44px;
+        font-size: 46px;
         font-weight: 900;
         color: #07254a;
         clip-path: polygon(0% 0%, 82% 0%, 100% 100%, 0% 100%);
@@ -503,9 +488,7 @@
       .stat-metric .val { color: #ffce42; font-size: 20px; }
       .stat-divider { width: 1.5px; height: 25px; background: rgba(75, 137, 184, 0.48); }
 
-      /* =========================================================
-         CREX 1:1 CALIBRATED BUST (HEAD: 60px | JERSEY: 58px)
-      ========================================================= */
+      /* V9 PLAYER DECK & CARDS */
       .v9-player-deck {
         position: absolute;
         top: 475px;
@@ -542,7 +525,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        padding-left: 125px;
+        padding-left: 140px;
         padding-right: 12px;
         background: linear-gradient(90deg, #0877d5, #064b8f);
         color: #f7fbff;
@@ -559,76 +542,70 @@
         overflow: visible;
       }
 
-      /* Compact bust wrapper anchored to the bottom stat rail */
+      /* CUTOUT & LAYERED JERSEY DISPLAY */
       .v9-avatar-wrap {
         position: absolute;
         z-index: 8;
-        left: 12px;
-        bottom: 29px;
-        width: 86px;
-        height: 98px;
+        left: -4px;
+        top: -48px;
+        width: 46%;
+        height: 188px;
         overflow: visible;
         isolation: isolate;
       }
 
       .v9-avatar-wrap .player-avatar-initials {
         position: absolute;
-        left: 13px;
-        bottom: 20px;
-        width: 60px;
-        height: 60px;
+        inset: 0;
+        width: 100%;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(145deg, #1d679e, #071d34);
-        border: 2px solid #ffbe18;
-        border-radius: 50%;
+        background: transparent;
         color: #fff;
-        font-size: 22px;
+        font-size: 28px;
         font-weight: 900;
         z-index: 1;
       }
 
-      /* Head Cutout: 60px height, lowered so the neck slides inside the collar */
-      .v9-avatar-wrap .player-avatar-photo[src] {
-        position: absolute !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        bottom: 20px !important; /* Drops chin right above the V-collar line */
-        width: 76px !important;
-        height: 60px !important;
-        display: block !important;
-        object-fit: contain !important;
-        object-position: center bottom !important;
-        z-index: 2 !important;
-        mask-image: none !important;
-        -webkit-mask-image: none !important;
-      }
-
-      /* Jersey Layer: 58px height, positioned at bottom with collar framing the neck */
       .v9-avatar-wrap .player-jersey-overlay {
         position: absolute !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
+        left: 2% !important;
         bottom: 0 !important;
-        width: 76px !important;
-        height: 58px !important;
-        z-index: 3 !important;
+        width: 96% !important;
+        height: auto !important;
+        max-width: 100% !important;
+        z-index: 2 !important;
         object-fit: contain !important;
         object-position: center bottom !important;
         pointer-events: none !important;
+        transform: translateY(-4px) !important;
         display: none;
+      }
+
+      .v9-avatar-wrap .player-avatar-photo[src] {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        object-fit: contain !important;
+        object-position: center bottom !important;
+        z-index: 3 !important;
+        -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, 0.95) 75%, rgba(0, 0, 0, 0.3) 86%, transparent 92%) !important;
+        mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, 0.95) 75%, rgba(0, 0, 0, 0.3) 86%, transparent 92%) !important;
       }
 
       .v9-player-name {
         position: absolute;
         z-index: 9;
-        left: 110px;
-        right: 8px;
-        top: 8px;
+        left: 42%;
+        right: 6px;
+        top: 4px;
         font-size: 23px;
         font-weight: 900;
-        line-height: 1.05;
+        line-height: 1.03;
         text-align: center;
         white-space: nowrap;
         overflow: hidden;
@@ -638,21 +615,21 @@
       .v9-primary-metric {
         position: absolute;
         z-index: 9;
-        left: 110px;
-        right: 8px;
-        top: 45px;
+        left: 42%;
+        right: 6px;
+        top: 48px;
         display: flex;
         align-items: baseline;
         justify-content: center;
-        gap: 6px;
+        gap: 5px;
       }
       .v9-primary-metric > span { font-size: 15px; color: #9ddbff; font-weight: 900; }
       .v9-primary-metric:not(.v9-bowler-metric) > span:first-child { display: none; }
       .v9-primary-metric > strong { font-size: 50px; font-weight: 900; color: #ffce42; line-height: 0.92; }
 
-      .v9-bowler-metric { left: 110px; right: 8px; top: 48px; gap: 4px; }
-      .v9-bowler-metric > span { font-size: 11px; }
-      .v9-bowler-metric > strong { font-size: 32px; }
+      .v9-bowler-metric { left: 39%; right: 4px; top: 52px; gap: 3px; }
+      .v9-bowler-metric > span { font-size: 10px; }
+      .v9-bowler-metric > strong { font-size: 31px; }
       .v9-bowler-metric > em { color: #4acff0; font-size: 18px; font-style: normal; }
 
       .v9-balls-inline {
@@ -763,6 +740,7 @@
 
   <body>
     <div class="screen-wrapper">
+      <!-- CONTROL BAR -->
       <div class="url-control-bar" id="urlControlBar">
         <span>CREX MATCH:</span>
         <input type="text" id="crexUrlInput" placeholder="Paste CREX URL..." />
@@ -771,9 +749,11 @@
         <span class="status-indicator" id="statusIndicator">Ready</span>
       </div>
 
+      <!-- 1280x720 PRO SCOREBOARD -->
       <div class="scoreboard" id="scoreboardCanvas">
         <div class="stadium-background"></div>
 
+        <!-- TOP BRAND -->
         <div class="top-brand-wrap">
           <div class="brand-capsule">
             <span class="brand-white">PREET</span>
@@ -782,13 +762,14 @@
           <div class="live-badge" id="liveStatusBadge">LIVE</div>
         </div>
 
+        <!-- FIXTURE BAR -->
         <div class="match-fixture-bar">
           <div class="fixture-pod left-side">
-            <div class="crest-shield" id="team1HeroCrestWrap">
-              <img id="team1HeroCrest" alt="Team 1 Flag" src="https://flagcdn.com/w320/ae.png" />
+            <div class="crest-shield">
+              <img id="team1HeroCrest" alt="Team 1 Flag" src="https://flagcdn.com/w320/in.png" />
             </div>
             <div class="team-hero-copy left-copy">
-              <div class="team-name-hero" id="team1HeroName">ABU DHABI</div>
+              <div class="team-name-hero" id="team1HeroName">INDIA WOMEN</div>
               <div class="team-hero-scoreline">
                 <strong id="team1HeroScore">—</strong>
                 <span id="team1HeroOvers">— OV</span>
@@ -797,25 +778,26 @@
           </div>
           <div class="center-vs-trap">
             <span class="vs-text-gold">Vs</span>
-            <div class="sub-fixture-pill" id="matchSubTitle">15th T20</div>
+            <div class="sub-fixture-pill" id="matchSubTitle">2nd ODI</div>
           </div>
           <div class="fixture-pod right-side">
             <div class="team-hero-copy right-copy">
-              <div class="team-name-hero" id="team2HeroName">EMIRATES RED</div>
+              <div class="team-name-hero" id="team2HeroName">ZIMBABWE WOMEN</div>
               <div class="team-hero-scoreline">
                 <strong id="team2HeroScore">—</strong>
                 <span id="team2HeroOvers">— OV</span>
               </div>
             </div>
-            <div class="crest-shield" id="team2HeroCrestWrap">
-              <img id="team2HeroCrest" alt="Team 2 Flag" src="https://flagcdn.com/w320/ae.png" />
+            <div class="crest-shield">
+              <img id="team2HeroCrest" alt="Team 2 Flag" src="https://flagcdn.com/w320/zw.png" />
             </div>
           </div>
         </div>
 
+        <!-- LIVE SCORE ROW -->
         <div class="live-score-row">
           <div class="score-card-main">
-            <div class="score-team-tag" id="mainScoreTag">ABD</div>
+            <div class="score-team-tag" id="mainScoreTag">IND-W</div>
             <div class="score-digits-hero" id="mainScoreHero">—</div>
             <div class="overs-stack">
               <span class="overs-num" id="mainOversHero">—</span>
@@ -836,6 +818,7 @@
           </div>
         </div>
 
+        <!-- CONTEXT BAR -->
         <div class="match-context-bar">
           <div class="context-toss">
             <span class="context-label">TOSS:</span>
@@ -843,14 +826,15 @@
           </div>
           <div>
             <span class="context-label">BATTING:</span>
-            <strong id="battingNow">ABU DHABI</strong>
+            <strong id="battingNow">INDIA WOMEN</strong>
           </div>
           <div>
             <span class="context-label">BOWLING:</span>
-            <strong id="bowlingNow">EMIRATES RED</strong>
+            <strong id="bowlingNow">ZIMBABWE WOMEN</strong>
           </div>
         </div>
 
+        <!-- STATS BAR -->
         <div class="match-stats-bar">
           <div class="stat-metric">
             <span class="lbl">TARGET:</span>
@@ -873,6 +857,7 @@
           </div>
         </div>
 
+        <!-- V9 PLAYER DECK -->
         <div class="v9-player-deck">
           <!-- BATTER 1 -->
           <section class="v9-feature-card v9-batter-card" id="batter1Row">
@@ -939,6 +924,7 @@
           </section>
         </div>
 
+        <!-- UPCOMING PLAYERS -->
         <div class="v9-upcoming-band">
           <div class="v9-upcoming-heading">UP NEXT</div>
           <div class="v9-next-player" id="batter3Row">
@@ -964,6 +950,7 @@
           </div>
         </div>
 
+        <!-- TICKER -->
         <div class="bottom-meta-ribbon subscribe-marquee-ribbon">
           <div class="subscribe-marquee-viewport">
             <div class="subscribe-marquee-track">
@@ -985,6 +972,7 @@
       </div>
     </div>
 
+    <!-- MAIN ENGINE & CREX SCANNER SCRIPTS -->
     <script>
       function fitScoreboardToWindow() {
         const el = document.getElementById("scoreboardCanvas");
@@ -1014,23 +1002,16 @@
         PAK: "https://flagcdn.com/w320/pk.png",
         AUS: "https://flagcdn.com/w320/au.png",
         "AUS-W": "https://flagcdn.com/w320/au.png",
-        NZ: "https://flagcdn.com/w320/nz.png",
         "NZ-W": "https://flagcdn.com/w320/nz.png",
         ENG: "https://flagcdn.com/w320/gb-eng.png",
         SA: "https://flagcdn.com/w320/za.png",
+        NZ: "https://flagcdn.com/w320/nz.png",
         SL: "https://flagcdn.com/w320/lk.png",
         BAN: "https://flagcdn.com/w320/bd.png",
         AFG: "https://flagcdn.com/w320/af.png",
         ZIM: "https://flagcdn.com/w320/zw.png",
         "ZIM-W": "https://flagcdn.com/w320/zw.png",
-        IRE: "https://flagcdn.com/w320/ie.png",
-        UAE: "https://flagcdn.com/w320/ae.png",
-        ABD: "https://flagcdn.com/w320/ae.png",
-        EMR: "https://flagcdn.com/w320/ae.png",
-        DUB: "https://flagcdn.com/w320/ae.png",
-        SHA: "https://flagcdn.com/w320/ae.png",
-        FUJ: "https://flagcdn.com/w320/ae.png",
-        AJM: "https://flagcdn.com/w320/ae.png"
+        IRE: "https://flagcdn.com/w320/ie.png"
       };
 
       const TEAM_NAMES = {
@@ -1049,13 +1030,7 @@
         AFG: "AFGHANISTAN",
         ZIM: "ZIMBABWE",
         "ZIM-W": "ZIMBABWE WOMEN",
-        IRE: "IRELAND",
-        ABD: "ABU DHABI",
-        EMR: "EMIRATES RED",
-        DUB: "DUBAI",
-        SHA: "SHARJAH",
-        FUJ: "FUJAIRAH",
-        AJM: "AJMAN"
+        IRE: "IRELAND"
       };
 
       function firstUseful(...values) {
@@ -1080,120 +1055,21 @@
         return "";
       }
 
-      function cleanRawPlayerName(name) {
-        return String(name || "")
-          .replace(/\b(logo|photo|profile|headshot|picture|jersey|jersy|shirt|uniform|kit|image)\b/gi, " ")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/\b(jr|sr|ii|iii|iv)\b/gi, "")
-          .replace(/[^a-zA-Z0-9 ]/g, " ")
+      function normalizePlayerKey(value) {
+        return String(value || "")
+          .normalize("NFD")
+          .replace(/[̀-ͯ]/g, "")
+          .toLowerCase()
+          .replace(/(jr|sr|ii|iii|iv)/g, "")
+          .replace(/[^a-z0-9]+/g, " ")
           .trim()
           .replace(/\s+/g, " ");
       }
 
-      function normalizePlayerKey(value) {
-        return cleanRawPlayerName(value).toLowerCase();
-      }
-
-      function abbreviation(name) {
-        const n = String(name || "").trim().toUpperCase();
-        if (!n) return "-";
-        if (n.includes("ABD") || n.includes("ABU DHABI")) return "ABD";
-        if (n.includes("EMR") || n.includes("EMIRATES")) return "EMR";
-        if (n.includes("IND-W") || n.includes("INDIA WOMEN")) return "IND-W";
-        if (n.includes("ZIM-W") || n.includes("ZIMBABWE WOMEN")) return "ZIM-W";
-        if (n.includes("AUS-W") || n.includes("AUSTRALIA WOMEN")) return "AUS-W";
-        if (n.includes("NZ-W") || n.includes("NEW ZEALAND WOMEN")) return "NZ-W";
-        if (n.includes("WEST INDIES") || n === "WI") return "WI";
-        if (n.includes("INDIA") || n === "IND") return "IND";
-        if (n.includes("PAKISTAN") || n === "PAK") return "PAK";
-        if (n.includes("AUSTRALIA") || n === "AUS") return "AUS";
-        if (n.includes("ZIMBABWE") || n === "ZIM") return "ZIM";
-        return n.slice(0, 5);
-      }
-
-      function extractTeamsFromCrexUrl(url) {
-        if (!url) return null;
-        const clean = String(url).split(/[?#]/)[0].replace(/\.+$/, "");
-        const pathSlug = clean.split("/").filter(Boolean).pop() || "";
-        const separator = pathSlug.toLowerCase().indexOf("-vs-");
-        if (separator < 0) return null;
-
-        const leftSlug = pathSlug.slice(0, separator);
-        let rightSlug = pathSlug.slice(separator + 4);
-
-        let subTitle = "LIVE MATCH";
-        const formatMatch = pathSlug.match(/-(\d+(?:st|nd|rd|th)-(?:t\d{1,2}i?|odi|test))(?:-|$)/i);
-        if (formatMatch) {
-          subTitle = formatMatch[1].replace(/-/g, " ").toUpperCase();
-        }
-
-        const ordinal = rightSlug.match(/-\d+(?:st|nd|rd|th)-/i);
-        if (ordinal) {
-          rightSlug = rightSlug.slice(0, ordinal.index);
-        } else {
-          rightSlug = rightSlug.split(/-match-updates/i)[0];
-        }
-
-        const teamA = abbreviation(leftSlug.replace(/-/g, " "));
-        const teamB = abbreviation(rightSlug.replace(/-/g, " "));
-        return { teamA, teamB, subTitle };
-      }
-
-      function setTeamHeroCrest(crestWrapId, crestImgId, teamCode) {
-        const wrap = document.getElementById(crestWrapId);
-        const img = document.getElementById(crestImgId);
-        if (!wrap || !img) return;
-
-        const flagUrl = CDN_FLAGS[teamCode];
-        if (flagUrl) {
-          img.style.display = "block";
-          img.src = flagUrl;
-          const fallback = wrap.querySelector(".crest-shield-fallback");
-          if (fallback) fallback.remove();
-        } else {
-          img.style.display = "none";
-          let fallback = wrap.querySelector(".crest-shield-fallback");
-          if (!fallback) {
-            fallback = document.createElement("div");
-            fallback.className = "crest-shield-fallback";
-            wrap.appendChild(fallback);
-          }
-          fallback.textContent = teamCode.slice(0, 3);
-        }
-      }
-
-      function applyUrlFlagsImmediately(url) {
-        if (!url) return;
-        const parsed = extractTeamsFromCrexUrl(url);
-        if (parsed && parsed.teamA && parsed.teamB) {
-          const name1 = document.getElementById("team1HeroName");
-          const name2 = document.getElementById("team2HeroName");
-          const team1Full = TEAM_NAMES[parsed.teamA] || parsed.teamA;
-          const team2Full = TEAM_NAMES[parsed.teamB] || parsed.teamB;
-
-          if (name1) {
-            name1.textContent = team1Full;
-            name1.classList.toggle("long-team-name", team1Full.length > 11);
-          }
-          if (name2) {
-            name2.textContent = team2Full;
-            name2.classList.toggle("long-team-name", team2Full.length > 11);
-          }
-
-          document.getElementById("mainScoreTag").textContent = parsed.teamA;
-          document.getElementById("battingNow").textContent = team1Full;
-          document.getElementById("bowlingNow").textContent = team2Full;
-
-          setTeamHeroCrest("team1HeroCrestWrap", "team1HeroCrest", parsed.teamA);
-          setTeamHeroCrest("team2HeroCrestWrap", "team2HeroCrest", parsed.teamB);
-
-          const sub = document.getElementById("matchSubTitle");
-          if (sub && parsed.subTitle) sub.textContent = parsed.subTitle;
-        }
-      }
-
+      // Map to store primary and fallback jersey URLs per player
       const crexPlayerPhotoMap = new Map();
       const crexPlayerJerseyMap = new Map();
+      const crexImageCandidates = [];
       let crexAssetLookupUrl = "";
       let crexAssetLookupPromise = null;
       let latestScorePayloadForAssets = null;
@@ -1201,35 +1077,31 @@
       function addCrexPlayerPhoto(name, imageUrl) {
         const url = getImageUrl(imageUrl);
         const key = normalizePlayerKey(name);
-        if (url && key && key.length >= 2) {
-          crexPlayerPhotoMap.set(key, url);
-        }
+        if (url && key && key.length >= 3) crexPlayerPhotoMap.set(key, url);
       }
 
       function findCrexPlayerPhoto(name) {
         const key = normalizePlayerKey(name);
         if (!key) return "";
         if (crexPlayerPhotoMap.has(key)) return crexPlayerPhotoMap.get(key);
-
         const parts = key.split(" ").filter(Boolean);
         const surname = parts[parts.length - 1];
         const initial = parts[0] && parts[0][0];
-
         for (const [candidate, url] of crexPlayerPhotoMap.entries()) {
-          if (candidate === key) return url;
           const cParts = candidate.split(" ").filter(Boolean);
-          if (surname && cParts.length >= 2 && cParts[cParts.length - 1] === surname && initial && cParts[0][0] === initial) {
-            return url;
-          }
-          if (candidate.includes(key) || key.includes(candidate)) {
-            return url;
-          }
+          if (candidate === key) return url;
+          if (surname && cParts.length >= 2 && cParts[cParts.length - 1] === surname && initial && cParts[0][0] === initial) return url;
         }
         return "";
       }
 
       function addCrexPlayerJersey(name, primaryUrl, fallbackUrl = "") {
-        const key = normalizePlayerKey(name);
+        const key = normalizePlayerKey(
+          String(name || "")
+            .replace(/(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)/gi, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+        );
         if (!key) return;
 
         function sanitizeJerseyUrl(val) {
@@ -1262,6 +1134,7 @@
       function collectCrexPlayerJerseys(doc) {
         if (!doc) return;
 
+        // 1. Select any jersey image element
         const jerseyImgs = [
           ...doc.querySelectorAll(
             'img[src*="/jersey/"], img[data-src*="/jersey/"], img[onerror*="/jersey/"], img.mr-top, img[alt*="jersey" i], img[alt*="jersy" i], img[title*="jersey" i], img[title*="jersy" i]'
@@ -1275,6 +1148,7 @@
             jerseyImg.getAttribute("src") ||
             "";
 
+          // Extract fallback from onerror="src=`https://...`"
           let fallbackSrc = "";
           const onerrorAttr = jerseyImg.getAttribute("onerror") || "";
           const onerrorMatch = onerrorAttr.match(/https?:\/\/[^"'`\s)]+/);
@@ -1284,6 +1158,7 @@
 
           if (!primarySrc && !fallbackSrc) continue;
 
+          // Locate player name from the parent/sibling component
           let playerName = "";
           let node = jerseyImg;
           for (let depth = 0; node && depth < 6; depth++, node = node.parentElement) {
@@ -1305,6 +1180,7 @@
 
             if (portrait) {
               playerName = portrait.getAttribute("title") || portrait.getAttribute("alt") || "";
+              playerName = playerName.replace(/(?:logo|photo|profile|headshot)/gi, " ").replace(/\s+/g, " ").trim();
               if (playerName) break;
             }
             if (node.tagName && node.tagName.toLowerCase() === "app-player-profile-img") break;
@@ -1314,17 +1190,24 @@
             playerName = jerseyImg.getAttribute("title") || jerseyImg.getAttribute("alt") || "";
           }
 
-          if (playerName) {
-            addCrexPlayerJersey(playerName, primarySrc, fallbackSrc);
+          const clean = String(playerName)
+            .replace(/(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)/gi, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+          if (clean) {
+            addCrexPlayerJersey(clean, primarySrc, fallbackSrc);
           }
         }
 
+        // 2. Regex fallback scanning raw HTML text for unparsed Angular snippets
         const rawHtml = doc.documentElement ? doc.documentElement.innerHTML : String(doc);
-        const regexPattern = /<img[^>]+(?:src|data-src)=["']([^"']*\/players\/[^"']+)["'][^>]*alt=["']([^"']+)["'][^>]*>[\s\S]*?<img[^>]+(?:src|data-src)=["']([^"']*\/jersey\/[^"']+)["'][^>]*>/gi;
+        const regexPattern = /<img[^>]+src=["']([^"']*\/players\/[^"']+)["'][^>]*alt=["']([^"']+)["'][^>]*>[\s\S]*?<img[^>]+src=["']([^"']*\/jersey\/[^"']+)["'][^>]*>/gi;
         let match;
         while ((match = regexPattern.exec(rawHtml)) !== null) {
           const [, , pAlt, jSrc] = match;
-          if (pAlt && jSrc) addCrexPlayerJersey(pAlt, jSrc);
+          const name = pAlt.replace(/(?:logo|photo|profile|jersy|jersey)/gi, " ").trim();
+          if (name) addCrexPlayerJersey(name, jSrc);
         }
 
         const publicMap = Object.create(null);
@@ -1337,6 +1220,99 @@
             detail: { jerseys: publicMap, sourceUrl: crexAssetLookupUrl }
           })
         );
+      }
+
+            function extractCurrentOverBalls(data) {
+        if (!data || typeof data !== "object") return [];
+
+        if (Array.isArray(data.current_over?.balls) && data.current_over.balls.length > 0) return data.current_over.balls;
+        if (Array.isArray(data.current_over) && data.current_over.length > 0) return data.current_over;
+        if (Array.isArray(data.currentOver?.balls) && data.currentOver.balls.length > 0) return data.currentOver.balls;
+        if (Array.isArray(data.currentOver) && data.currentOver.length > 0) return data.currentOver;
+        if (Array.isArray(data.current_over_balls) && data.current_over_balls.length > 0) return data.current_over_balls;
+        if (Array.isArray(data.recent_balls) && data.recent_balls.length > 0) return data.recent_balls;
+        if (Array.isArray(data.balls) && data.balls.length > 0) return data.balls;
+
+        const historyLists = [
+          data.recent_overs,
+          data.recentOvers,
+          data.last_two_overs,
+          data.lastTwoOvers,
+          data.over_history,
+          data.overs_summary
+        ];
+        for (const list of historyLists) {
+          if (Array.isArray(list) && list.length > 0) {
+            const lastOver = list[list.length - 1];
+            if (lastOver) {
+              if (Array.isArray(lastOver.balls) && lastOver.balls.length > 0) return lastOver.balls;
+              if (Array.isArray(lastOver.deliveries) && lastOver.deliveries.length > 0) return lastOver.deliveries;
+            }
+          }
+        }
+
+        if (Array.isArray(window.__crexRecentBalls) && window.__crexRecentBalls.length > 0) {
+          return window.__crexRecentBalls;
+        }
+
+        return [];
+      }
+
+      function renderCurrentOverBalls(balls) {
+        const container = document.getElementById("currentOverBallsContainer");
+        if (!container) return;
+        container.innerHTML = "";
+
+        const ballArray = Array.isArray(balls) ? balls.slice(-6) : [];
+        for (let i = 0; i < 6; i++) {
+          const raw = ballArray[i];
+          const div = document.createElement("div");
+          div.className = "ball-circle";
+
+          if (raw !== undefined && raw !== null) {
+            const original = String(
+              typeof raw === "object" ? (raw.text ?? raw.value ?? raw.label ?? raw.result ?? "") : raw
+            ).trim();
+            const compact = original.replace(/\s+/g, "").replace(/[()]/g, "");
+            const low = compact.toLowerCase();
+
+            const isWicket = /^(w|wk|out|wicket)$/.test(low) || low.includes("wicket");
+            const isWide = low.includes("wd") || low.includes("wide");
+            const isNoBall = low.includes("nb") || low.includes("no-ball") || low.includes("noball");
+            const numericPrefix = (compact.match(/^\d+/) || [""])[0];
+
+            let display = compact || "•";
+            if (isWide || isNoBall) {
+              const suffix = isWide ? "WD" : "NB";
+              display = numericPrefix ? `${numericPrefix}${suffix}` : suffix;
+              div.classList.add("extra");
+              div.title = isWide ? `Wide: ${original}` : `No-ball: ${original}`;
+            } else if (isWicket) {
+              display = "W";
+              div.classList.add("wicket");
+              div.title = `Wicket: ${original}`;
+            } else if (/^4(?:\D|$)/.test(compact) || compact === "4") {
+              display = "4";
+              div.classList.add("four");
+            } else if (/^6(?:\D|$)/.test(compact) || compact === "6") {
+              display = "6";
+              div.classList.add("six");
+            } else if (/^(\.|0|dot|•)$/.test(low)) {
+              display = "•";
+              div.classList.add("dot");
+            }
+
+            div.textContent = display;
+            if (display.length > 2) {
+              div.style.fontSize = "18px";
+            }
+          } else {
+            div.textContent = "–";
+            div.classList.add("dot");
+            div.setAttribute("aria-hidden", "true");
+          }
+          container.appendChild(div);
+        }
       }
 
       function collectImagesFromCrexDocument(doc) {
@@ -1361,26 +1337,47 @@
           const [, pUrl, pName] = m;
           if (pName && pUrl) addCrexPlayerPhoto(pName, pUrl);
         }
+
+        // Parse recent over balls directly from CREX HTML text lines (e.g. "Over 19  4 4 0 4 0 6 = 18")
+        const textLines = (doc.body?.innerText || doc.body?.textContent || "")
+          .split(/\n+/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+        for (let i = 0; i < textLines.length; i++) {
+          const match = textLines[i].match(/^over\s+(\d+)\s*$/i);
+          if (match) {
+            const parsedBalls = [];
+            for (let j = i + 1; j < Math.min(textLines.length, i + 16); j++) {
+              const line = textLines[j].trim();
+              if (/^over\s+\d+/i.test(line) || /^player/i.test(line) || /^commentary/i.test(line)) break;
+              if (/^=\s*\d+$/.test(line)) break;
+              if (/^(?:\d+|\d+(?:wd|nb|b|lb)|wd|nb|lb|b|w|wk|out|0|\.)$/i.test(line)) {
+                parsedBalls.push(line);
+              }
+            }
+            if (parsedBalls.length > 0) {
+              window.__crexRecentBalls = parsedBalls;
+            }
+          }
+        }
+        if (window.__crexRecentBalls) {
+          renderCurrentOverBalls(window.__crexRecentBalls);
+        }
       }
 
       async function fetchCrexAssetsForMatch(url) {
-        const clean = (url || "").trim().split(/[?#]/)[0].replace(/\.+$/, "");
+        const clean = (url || "").trim().split(/[?#]/)[0];
         if (!clean || !/^https?:\/\/(?:www\.)?crex\.com\//i.test(clean)) return;
         if (crexAssetLookupUrl === clean && crexAssetLookupPromise) return crexAssetLookupPromise;
-
         crexAssetLookupUrl = clean;
         crexPlayerPhotoMap.clear();
         crexPlayerJerseyMap.clear();
         window.__preetSportsPlayerJerseys = Object.create(null);
 
-        applyUrlFlagsImmediately(clean);
-
         crexAssetLookupPromise = (async () => {
-          let htmlContent = "";
-
           try {
             const ctrl = new AbortController();
-            const timeout = setTimeout(() => ctrl.abort(), 4000);
+            const timeout = setTimeout(() => ctrl.abort(), 6000);
             const response = await fetch(`${API_BASE}/api/crex-assets?url=${encodeURIComponent(clean)}`, {
               cache: "no-store",
               signal: ctrl.signal
@@ -1388,34 +1385,29 @@
             clearTimeout(timeout);
             if (response.ok) {
               const payload = await response.json();
-              if (payload.html) htmlContent = payload.html;
+              if (payload.html) {
+                const doc = new DOMParser().parseFromString(payload.html, "text/html");
+                collectImagesFromCrexDocument(doc);
+              }
             }
           } catch (_) {}
 
-          if (!htmlContent) {
-            const proxies = [
-              `https://api.allorigins.win/raw?url=${encodeURIComponent(clean)}`,
-              `https://corsproxy.io/?url=${encodeURIComponent(clean)}`
-            ];
-            for (const pUrl of proxies) {
-              try {
-                const ctrl = new AbortController();
-                const timeout = setTimeout(() => ctrl.abort(), 6000);
-                const response = await fetch(pUrl, { cache: "no-store", signal: ctrl.signal });
-                clearTimeout(timeout);
-                if (response.ok) {
-                  htmlContent = await response.text();
-                  if (htmlContent && htmlContent.includes("cricketvectors")) break;
-                }
-              } catch (_) {}
-            }
+          if (!crexPlayerJerseyMap.size) {
+            try {
+              const ctrl = new AbortController();
+              const timeout = setTimeout(() => ctrl.abort(), 9000);
+              const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(clean)}`, {
+                cache: "no-store",
+                signal: ctrl.signal
+              });
+              clearTimeout(timeout);
+              if (response.ok) {
+                const body = await response.text();
+                const doc = new DOMParser().parseFromString(body, "text/html");
+                collectImagesFromCrexDocument(doc);
+              }
+            } catch (_) {}
           }
-
-          if (htmlContent) {
-            const doc = new DOMParser().parseFromString(htmlContent, "text/html");
-            collectImagesFromCrexDocument(doc);
-          }
-
           if (latestScorePayloadForAssets) {
             refreshPlayerPortraits(latestScorePayloadForAssets);
           }
@@ -1423,42 +1415,45 @@
         return crexAssetLookupPromise;
       }
 
+      function abbreviation(name) {
+        const n = String(name || "").trim().toUpperCase();
+        if (!n) return "-";
+        if (n.includes("IND-W") || n.includes("INDIA WOMEN")) return "IND-W";
+        if (n.includes("ZIM-W") || n.includes("ZIMBABWE WOMEN")) return "ZIM-W";
+        if (n.includes("AUS-W") || n.includes("AUSTRALIA WOMEN")) return "AUS-W";
+        if (n.includes("NZ-W") || n.includes("NEW ZEALAND WOMEN")) return "NZ-W";
+        if (n.includes("WEST INDIES") || n === "WI") return "WI";
+        if (n.includes("INDIA") || n === "IND") return "IND";
+        if (n.includes("PAKISTAN") || n === "PAK") return "PAK";
+        if (n.includes("AUSTRALIA") || n === "AUS") return "AUS";
+        if (n.includes("ZIMBABWE") || n === "ZIM") return "ZIM";
+        return n.slice(0, 5);
+      }
+
       function setPlayerPortrait(photoId, initialsId, player, name) {
         const img = document.getElementById(photoId);
         const initials = document.getElementById(initialsId);
         const label = String(name || (player && (player.short_name || player.name)) || "?").trim();
-
         if (initials) {
           initials.textContent =
-            cleanRawPlayerName(label)
-              .split(/\s+/)
-              .filter(Boolean)
-              .slice(0, 2)
-              .map((p) => p[0])
-              .join("")
-              .toUpperCase() || "•";
+            label.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]).join("").toUpperCase() || "•";
           initials.style.display = "flex";
         }
-
         if (!img) return;
-
-        const directUrl = player && (player.photo_url || player.player_photo_url || player.image || player.img);
-        const url = getImageUrl(directUrl) || findCrexPlayerPhoto(label);
-
+        const url = findCrexPlayerPhoto(label);
+        img.onload = () => {
+          img.style.display = "block";
+          if (initials) initials.style.display = "none";
+        };
+        img.onerror = () => {
+          img.style.display = "none";
+          if (initials) initials.style.display = "flex";
+        };
         if (url) {
-          img.onload = () => {
-            img.style.display = "block";
-            if (initials) initials.style.display = "none";
-          };
-          img.onerror = () => {
-            img.style.display = "none";
-            if (initials) initials.style.display = "flex";
-          };
           img.src = url;
         } else {
           img.removeAttribute("src");
           img.style.display = "none";
-          if (initials) initials.style.display = "flex";
         }
       }
 
@@ -1476,58 +1471,30 @@
         if (!data || data.success === false) return;
         latestScorePayloadForAssets = data;
 
-        const urlTeams = extractTeamsFromCrexUrl(activeTargetUrl) || {};
         const t1 = data.team1 || {};
         const t2 = data.team2 || {};
-        const t1Code = abbreviation(t1.short || t1.name || urlTeams.teamA || "ABD");
-        const t2Code = abbreviation(t2.short || t2.name || urlTeams.teamB || "EMR");
+        const t1Code = abbreviation(t1.short || t1.name || "IND-W");
+        const t2Code = abbreviation(t2.short || t2.name || "ZIM-W");
 
-        const t1FullName = t1.name || TEAM_NAMES[t1Code] || t1Code;
-        const t2FullName = t2.name || TEAM_NAMES[t2Code] || t2Code;
-
-        const hero1 = document.getElementById("team1HeroName");
-        const hero2 = document.getElementById("team2HeroName");
-        if (hero1) {
-          hero1.textContent = t1FullName;
-          hero1.classList.toggle("long-team-name", t1FullName.length > 11);
-        }
-        if (hero2) {
-          hero2.textContent = t2FullName;
-          hero2.classList.toggle("long-team-name", t2FullName.length > 11);
-        }
-
+        document.getElementById("team1HeroName").textContent = TEAM_NAMES[t1Code] || t1Code;
+        document.getElementById("team2HeroName").textContent = TEAM_NAMES[t2Code] || t2Code;
         document.getElementById("team1HeroScore").textContent = t1.score || "—";
         document.getElementById("team2HeroScore").textContent = t2.score || "—";
         document.getElementById("team1HeroOvers").textContent = t1.overs ? `${t1.overs} OV` : "—";
         document.getElementById("team2HeroOvers").textContent = t2.overs ? `${t2.overs} OV` : "—";
 
-        setTeamHeroCrest("team1HeroCrestWrap", "team1HeroCrest", t1Code);
-        setTeamHeroCrest("team2HeroCrestWrap", "team2HeroCrest", t2Code);
+        document.getElementById("mainScoreTag").textContent = t1Code;
+        document.getElementById("mainScoreHero").textContent = (t1.score || "—").replace("-", "/");
+        document.getElementById("mainOversHero").textContent = t1.overs || "—";
 
-        let battingCode = t1Code;
-        let battingScore = t1.score || "—";
-        let battingOvers = t1.overs || "—";
+        // Render current over balls
+        renderCurrentOverBalls(extractCurrentOverBalls(data));
 
-        const explicitBat = abbreviation(data.batting_team || data.battingTeam || "");
-        if (explicitBat === t2Code) {
-          battingCode = t2Code;
-          battingScore = t2.score || "—";
-          battingOvers = t2.overs || "—";
-        }
-
-        document.getElementById("mainScoreTag").textContent = battingCode;
-        document.getElementById("mainScoreHero").textContent = battingScore.replace("-", "/");
-        document.getElementById("mainOversHero").textContent = battingOvers;
-
-        document.getElementById("battingNow").textContent = battingCode === t1Code ? t1FullName : t2FullName;
-        document.getElementById("bowlingNow").textContent = battingCode === t1Code ? t2FullName : t1FullName;
 
         document.getElementById("valTarget").textContent = data.target || "--";
         document.getElementById("valPartnership").textContent = data.partnership || "--";
         document.getElementById("valRRR").textContent = data.rrr || "--";
         document.getElementById("valLastWkt").textContent = data.last_wicket || "—";
-
-        if (data.toss) document.getElementById("tossUpdate").textContent = String(data.toss).toUpperCase();
 
         const b1 = data.batsman1 || data.batter1;
         if (b1) {
@@ -1563,7 +1530,7 @@
       }
 
       const DEFAULT_MATCH_URL =
-        "https://crex.com/cricket-live-score/abd-vs-emr-15th-t20-emirates-d20-league-2026-match-updates-14YS";
+        "https://crex.com/cricket-live-score/ind-w-vs-zim-w-2nd-odi-zimbabwe-women-tour-of-india-2026-match-updates-1222";
       let activeTargetUrl = urlParams.get("match") || DEFAULT_MATCH_URL;
 
       const urlInput = document.getElementById("crexUrlInput");
@@ -1580,35 +1547,18 @@
         } catch (_) {}
       }
 
-      function loadNewMatch(url) {
-        if (!url) return;
-        activeTargetUrl = url.trim().replace(/\.+$/, "");
-        applyUrlFlagsImmediately(activeTargetUrl);
-
-        document.getElementById("mainScoreHero").textContent = "—";
-        document.getElementById("mainOversHero").textContent = "—";
-        document.getElementById("team1HeroScore").textContent = "—";
-        document.getElementById("team2HeroScore").textContent = "—";
-        document.getElementById("team1HeroOvers").textContent = "— OV";
-        document.getElementById("team2HeroOvers").textContent = "— OV";
-        document.getElementById("b1Name").textContent = "WAITING FOR FEED";
-        document.getElementById("b2Name").textContent = "WAITING FOR FEED";
-        document.getElementById("bwlName").textContent = "WAITING FOR FEED";
-
-        fetchCrexAssetsForMatch(activeTargetUrl);
-        fetchScores();
-      }
-
       document.getElementById("loadMatchUrlBtn").addEventListener("click", () => {
-        loadNewMatch(urlInput.value);
-      });
-
-      urlInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") loadNewMatch(urlInput.value);
+        const val = urlInput.value.trim();
+        if (val) {
+          activeTargetUrl = val;
+          fetchCrexAssetsForMatch(activeTargetUrl);
+          fetchScores();
+        }
       });
 
       window.addEventListener("load", () => {
-        loadNewMatch(activeTargetUrl);
+        fetchCrexAssetsForMatch(activeTargetUrl);
+        fetchScores();
         setInterval(fetchScores, 3500);
       });
     </script>
@@ -1623,7 +1573,14 @@
         ];
 
         function cleanName(value) {
-          return cleanRawPlayerName(value).toLowerCase();
+          return String(value || "")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[̀-ͯ]/g, "")
+            .replace(/(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)/gi, " ")
+            .replace(/[^a-z0-9]+/g, " ")
+            .trim()
+            .replace(/\s+/g, " ");
         }
 
         function ensureJerseyImage(photoId) {
@@ -1646,10 +1603,11 @@
           const jersey = ensureJerseyImage(photoId);
           if (!jersey) return;
 
-          const target = normalizePlayerKey(playerName);
+          const target = cleanName(playerName);
           const map = window.__preetSportsPlayerJerseys || {};
           let entry = map[target];
 
+          // Match by first initial + surname if direct key isn't matched
           if (!entry) {
             const words = target.split(" ").filter(Boolean);
             const surname = words[words.length - 1];
@@ -1677,6 +1635,7 @@
             jersey.dataset.jerseySource = primarySrc;
             jersey.onload = () => { jersey.style.display = "block"; };
             jersey.onerror = () => {
+              // Try fallback if primary fails
               if (fallbackSrc && jersey.src !== fallbackSrc) {
                 jersey.src = fallbackSrc;
               } else {
