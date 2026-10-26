@@ -8750,5 +8750,54 @@
 }
 </style>
 
+
+<style id="preetSportsNecklineBlendFix">
+/*
+ * Blend the lower neck into the transparent jersey collar:
+ * the portrait fades only near its bottom edge, while the shirt sits slightly higher.
+ * The player's face and identity remain unchanged.
+ */
+.v9-avatar-wrap .player-jersey-overlay {
+  left: 1% !important;
+  bottom: 0 !important;
+  width: 98% !important;
+  max-width: 100% !important;
+  transform: translateY(-5px) !important;
+  transform-origin: center bottom !important;
+  z-index: 2 !important;
+}
+.v9-avatar-wrap .player-avatar-photo[src] {
+  z-index: 3 !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  /* Fade the lowest neck pixels into the shirt instead of letting skin sit outside the collar. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 67%,
+    rgba(0,0,0,.96) 72%,
+    rgba(0,0,0,.72) 78%,
+    rgba(0,0,0,.28) 85%,
+    transparent 91%
+  ) !important;
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 67%,
+    rgba(0,0,0,.96) 72%,
+    rgba(0,0,0,.72) 78%,
+    rgba(0,0,0,.28) 85%,
+    transparent 91%
+  ) !important;
+}
+@media (max-width: 1100px) {
+  .v9-avatar-wrap .player-jersey-overlay {
+    left: 1% !important;
+    width: 98% !important;
+    transform: translateY(-4px) !important;
+  }
+}
+</style>
+
 </body>
 </html>
