@@ -4401,5 +4401,142 @@ function setPlayerPortrait(photoId, initialsId, player, data, name) {
 }
 </style>
 
+
+<style id="preetSportsPlayerCardTypographyFix">
+/* Corrected to match the reference broadcast lower-third hierarchy. */
+.v9-feature-card { overflow: hidden !important; }
+.v9-feature-body { overflow: visible !important; }
+
+/* Larger source portrait and more visible torso; clipped only by the card's outer edge. */
+.v9-avatar-wrap {
+  top: -30px !important;
+  bottom: -1px !important;
+  left: -4px !important;
+  width: 57% !important;
+  height: auto !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+}
+.v9-avatar-wrap .player-avatar-photo[src] {
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Player labels and score figures are intentionally stronger than the first revision. */
+.v9-player-name {
+  left: 37% !important;
+  right: 6px !important;
+  top: 4px !important;
+  font-size: 27px !important;
+  line-height: 1.02 !important;
+  max-height: 43px !important;
+  letter-spacing: -.2px !important;
+}
+.v9-primary-metric {
+  left: 37% !important;
+  right: 6px !important;
+  top: 48px !important;
+  justify-content: center !important;
+  gap: 5px !important;
+}
+.v9-primary-metric:not(.v9-bowler-metric) > span:first-child {
+  display: none !important;
+}
+.v9-primary-metric:not(.v9-bowler-metric) > strong {
+  font-size: 50px !important;
+  line-height: .92 !important;
+  letter-spacing: -.8px !important;
+}
+.v9-bowler-metric > span {
+  font-size: 12px !important;
+}
+.v9-bowler-metric > strong {
+  font-size: 35px !important;
+  line-height: .95 !important;
+}
+.v9-bowler-metric > em { font-size: 18px !important; }
+
+/* Render the existing balls-faced value beside runs, as "(26)", not as a tiny 4th stat. */
+.v9-balls-inline {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  color: #fff !important;
+  font-family: 'Rajdhani', 'Arial Narrow', Arial, sans-serif !important;
+  font-size: 19px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.6) !important;
+}
+.v9-balls-inline::before { content: "("; }
+.v9-balls-inline::after { content: ")"; }
+.v9-balls-inline > b {
+  color: #fff !important;
+  font-size: 19px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+}
+.v9-balls-inline > small { display: none !important; }
+
+/* Three larger, readable batting stat slots: 4s / 6s / strike rate. */
+.v9-stat-grid:not(.v9-bowler-stats) {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 3px !important;
+}
+.v9-stat-grid {
+  height: 29px !important;
+  padding: 2px 8px !important;
+}
+.v9-stat-grid > span {
+  justify-content: center !important;
+  gap: 4px !important;
+}
+.v9-stat-grid b {
+  font-size: 20px !important;
+  line-height: 1 !important;
+}
+.v9-stat-grid small {
+  font-size: 12px !important;
+  letter-spacing: 0 !important;
+}
+.v9-bowler-stats b { font-size: 20px !important; }
+.v9-bowler-stats small { font-size: 11px !important; }
+
+/* Preserve legibility on narrower canvases, but keep the score as the visual anchor. */
+@media (max-width: 1100px) {
+  .v9-player-name { font-size: 24px !important; }
+  .v9-primary-metric:not(.v9-bowler-metric) > strong { font-size: 45px !important; }
+  .v9-balls-inline, .v9-balls-inline > b { font-size: 18px !important; }
+  .v9-stat-grid b { font-size: 17px !important; }
+  .v9-stat-grid small { font-size: 10px !important; }
+}
+</style>
+
+<script id="preetSportsPlayerCardTypographyFixScript">
+(function preetSportsPlayerCardTypographyFix() {
+  // Preserve the live DOM IDs so regular scoreboard updates still update balls faced.
+  [
+    ["b1Balls", "batter1Row"],
+    ["b2Balls", "batter2Row"]
+  ].forEach(([ballsId, rowId]) => {
+    const balls = document.getElementById(ballsId);
+    const row = document.getElementById(rowId);
+    const metric = row && row.querySelector(".v9-primary-metric:not(.v9-bowler-metric)");
+    const ballSlot = balls && balls.closest(".v9-stat-grid > span");
+    if (balls && metric && ballSlot && !ballSlot.classList.contains("v9-balls-inline")) {
+      ballSlot.classList.add("v9-balls-inline");
+      ballSlot.setAttribute("aria-label", "Balls faced");
+      metric.appendChild(ballSlot);
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
