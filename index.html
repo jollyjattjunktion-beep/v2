@@ -1058,15 +1058,15 @@
       function normalizePlayerKey(value) {
         return String(value || "")
           .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[̀-ͯ]/g, "")
           .toLowerCase()
-          .replace(/\b(jr|sr|ii|iii|iv)\b/g, "")
+          .replace(/(jr|sr|ii|iii|iv)/g, "")
           .replace(/[^a-z0-9]+/g, " ")
           .trim()
           .replace(/\s+/g, " ");
       }
 
-      // Map to store primary and fallback jersey URLs per player[cite: 1]
+      // Map to store primary and fallback jersey URLs per player
       const crexPlayerPhotoMap = new Map();
       const crexPlayerJerseyMap = new Map();
       const crexImageCandidates = [];
@@ -1098,7 +1098,7 @@
       function addCrexPlayerJersey(name, primaryUrl, fallbackUrl = "") {
         const key = normalizePlayerKey(
           String(name || "")
-            .replace(/\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\b/gi, " ")
+            .replace(/(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)/gi, " ")
             .replace(/\s+/g, " ")
             .trim()
         );
@@ -1134,7 +1134,7 @@
       function collectCrexPlayerJerseys(doc) {
         if (!doc) return;
 
-        // 1. Select any jersey image element[cite: 1]
+        // 1. Select any jersey image element
         const jerseyImgs = [
           ...doc.querySelectorAll(
             'img[src*="/jersey/"], img[data-src*="/jersey/"], img[onerror*="/jersey/"], img.mr-top, img[alt*="jersey" i], img[alt*="jersy" i], img[title*="jersey" i], img[title*="jersy" i]'
@@ -1148,7 +1148,7 @@
             jerseyImg.getAttribute("src") ||
             "";
 
-          // Extract fallback from onerror="src=`https://...`"[cite: 1]
+          // Extract fallback from onerror="src=`https://...`"
           let fallbackSrc = "";
           const onerrorAttr = jerseyImg.getAttribute("onerror") || "";
           const onerrorMatch = onerrorAttr.match(/https?:\/\/[^"'`\s)]+/);
@@ -1158,7 +1158,7 @@
 
           if (!primarySrc && !fallbackSrc) continue;
 
-          // Locate player name from the parent/sibling component[cite: 1]
+          // Locate player name from the parent/sibling component
           let playerName = "";
           let node = jerseyImg;
           for (let depth = 0; node && depth < 6; depth++, node = node.parentElement) {
@@ -1180,7 +1180,7 @@
 
             if (portrait) {
               playerName = portrait.getAttribute("title") || portrait.getAttribute("alt") || "";
-              playerName = playerName.replace(/\b(?:logo|photo|profile|headshot)\b/gi, " ").replace(/\s+/g, " ").trim();
+              playerName = playerName.replace(/(?:logo|photo|profile|headshot)/gi, " ").replace(/\s+/g, " ").trim();
               if (playerName) break;
             }
             if (node.tagName && node.tagName.toLowerCase() === "app-player-profile-img") break;
@@ -1191,7 +1191,7 @@
           }
 
           const clean = String(playerName)
-            .replace(/\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\b/gi, " ")
+            .replace(/(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)/gi, " ")
             .replace(/\s+/g, " ")
             .trim();
 
@@ -1200,13 +1200,13 @@
           }
         }
 
-        // 2. Regex fallback scanning raw HTML text for unparsed Angular snippets[cite: 1]
+        // 2. Regex fallback scanning raw HTML text for unparsed Angular snippets
         const rawHtml = doc.documentElement ? doc.documentElement.innerHTML : String(doc);
         const regexPattern = /<img[^>]+src=["']([^"']*\/players\/[^"']+)["'][^>]*alt=["']([^"']+)["'][^>]*>[\s\S]*?<img[^>]+src=["']([^"']*\/jersey\/[^"']+)["'][^>]*>/gi;
         let match;
         while ((match = regexPattern.exec(rawHtml)) !== null) {
           const [, , pAlt, jSrc] = match;
-          const name = pAlt.replace(/\b(?:logo|photo|profile|jersy|jersey)\b/gi, " ").trim();
+          const name = pAlt.replace(/(?:logo|photo|profile|jersy|jersey)/gi, " ").trim();
           if (name) addCrexPlayerJersey(name, jSrc);
         }
 
@@ -1443,8 +1443,8 @@
           return String(value || "")
             .toLowerCase()
             .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\b/gi, " ")
+            .replace(/[̀-ͯ]/g, "")
+            .replace(/(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)/gi, " ")
             .replace(/[^a-z0-9]+/g, " ")
             .trim()
             .replace(/\s+/g, " ");
@@ -1474,7 +1474,7 @@
           const map = window.__preetSportsPlayerJerseys || {};
           let entry = map[target];
 
-          // Match by first initial + surname if direct key isn't matched[cite: 1]
+          // Match by first initial + surname if direct key isn't matched
           if (!entry) {
             const words = target.split(" ").filter(Boolean);
             const surname = words[words.length - 1];
@@ -1502,7 +1502,7 @@
             jersey.dataset.jerseySource = primarySrc;
             jersey.onload = () => { jersey.style.display = "block"; };
             jersey.onerror = () => {
-              // Try fallback if primary fails[cite: 1]
+              // Try fallback if primary fails
               if (fallbackSrc && jersey.src !== fallbackSrc) {
                 jersey.src = fallbackSrc;
               } else {
