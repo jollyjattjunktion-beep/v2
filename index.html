@@ -8605,5 +8605,119 @@
 }
 </style>
 
+
+<style id="preetSportsJerseyOverlayTest">
+/* Use the supplied CricketVectors shirt assets as a lower chest layer under each real player cutout. */
+.v9-avatar-wrap {
+  isolation: isolate !important;
+}
+.v9-avatar-wrap .player-jersey-overlay {
+  position: absolute !important;
+  left: -15% !important;
+  bottom: -1px !important;
+  width: 130% !important;
+  height: auto !important;
+  max-width: none !important;
+  display: none;
+  z-index: 4 !important;
+  pointer-events: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  background: transparent !important;
+}
+.v9-avatar-wrap .player-avatar-photo[src] {
+  position: absolute !important;
+  z-index: 3 !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+}
+</style>
+<script id="preetSportsJerseyOverlayTestScript">
+(function preetSportsJerseyOverlayTest() {
+  const JERSEYS = {
+    india: "https://cricketvectors.akamaized.net/jersey/limited/org/O.png",
+    newZealand: "https://cricketvectors.akamaized.net/jersey/limited/org/R.png",
+    england: "https://cricketvectors.akamaized.net/jersey/limited/org/S.png"
+  };
+
+  function cleanTeamName(value) {
+    return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  }
+
+  function jerseyForTeam(value) {
+    const name = cleanTeamName(value);
+    if (/\b(india|indian)\b/.test(name) || /\bind\b/.test(name)) return JERSEYS.india;
+    if (name.includes("new zealand") || name === "nz" || name.includes("nz women")) return JERSEYS.newZealand;
+    if (name.includes("england") || name === "eng" || name.includes("england women")) return JERSEYS.england;
+    return "";
+  }
+
+  function ensureJerseyImage(photoId) {
+    const photo = document.getElementById(photoId);
+    const wrap = photo && photo.closest(".v9-avatar-wrap");
+    if (!wrap) return null;
+    let jersey = wrap.querySelector(".player-jersey-overlay");
+    if (!jersey) {
+      jersey = document.createElement("img");
+      jersey.className = "player-jersey-overlay";
+      jersey.alt = "";
+      jersey.setAttribute("aria-hidden", "true");
+      jersey.loading = "eager";
+      wrap.insertBefore(jersey, photo);
+    }
+    return jersey;
+  }
+
+  function setJersey(photoId, teamName) {
+    const jersey = ensureJerseyImage(photoId);
+    if (!jersey) return;
+    const source = jerseyForTeam(teamName);
+    if (!source) {
+      jersey.style.display = "none";
+      jersey.removeAttribute("src");
+      delete jersey.dataset.jerseySource;
+      return;
+    }
+    if (jersey.dataset.jerseySource !== source) {
+      jersey.dataset.jerseySource = source;
+      jersey.onload = () => { jersey.style.display = "block"; };
+      jersey.onerror = () => { jersey.style.display = "none"; };
+      jersey.style.display = "block";
+      jersey.src = source;
+    }
+  }
+
+  function refreshJerseys() {
+    const batting = document.getElementById("battingNow")?.textContent || "";
+    const bowling = document.getElementById("bowlingNow")?.textContent || "";
+    // Both batters wear the active batting team's shirt; the current bowler wears the bowling team's shirt.
+    setJersey("b1Photo", batting);
+    setJersey("b2Photo", batting);
+    setJersey("bwlPhoto", bowling);
+  }
+
+  function start() {
+    refreshJerseys();
+    ["battingNow", "bowlingNow"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el && window.MutationObserver) {
+        const observer = new MutationObserver(refreshJerseys);
+        observer.observe(el, { childList: true, subtree: true, characterData: true });
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start, { once: true });
+  } else {
+    start();
+  }
+})();
+</script>
+
 </body>
 </html>
