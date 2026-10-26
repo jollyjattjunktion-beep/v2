@@ -504,7 +504,7 @@
       .stat-divider { width: 1.5px; height: 25px; background: rgba(75, 137, 184, 0.48); }
 
       /* =========================================================
-         CREX 1:1 PROPORTION PLAYER BUST (HEAD + JERSEY COLLAR)
+         CREX 1:1 NATURAL PROPORTION BUST (HEAD + JERSEY COLLAR)
       ========================================================= */
       .v9-player-deck {
         position: absolute;
@@ -542,7 +542,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        padding-left: 125px;
+        padding-left: 130px;
         padding-right: 12px;
         background: linear-gradient(90deg, #0877d5, #064b8f);
         color: #f7fbff;
@@ -559,22 +559,22 @@
         overflow: visible;
       }
 
-      /* Compact bust container anchored to top of bottom stat bar */
+      /* Compact bust wrapper anchored to the bottom stat rail */
       .v9-avatar-wrap {
         position: absolute;
         z-index: 8;
-        left: 10px;
+        left: 8px;
         bottom: 29px;
-        width: 110px;
-        height: 125px;
+        width: 120px;
+        height: 140px;
         overflow: visible;
         isolation: isolate;
       }
 
       .v9-avatar-wrap .player-avatar-initials {
         position: absolute;
-        left: 20px;
-        top: 25px;
+        left: 25px;
+        bottom: 30px;
         width: 70px;
         height: 70px;
         display: flex;
@@ -589,30 +589,29 @@
         z-index: 1;
       }
 
-      /* CREX Head Cutout: sits above collar */
+      /* Head Cutout: positioned so chin and neck slide directly into the collar */
       .v9-avatar-wrap .player-avatar-photo[src] {
         position: absolute !important;
         left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        height: 84px !important;
+        bottom: 24px !important;
+        width: 120px !important;
+        height: 105px !important;
         display: block !important;
         object-fit: contain !important;
-        object-position: center top !important;
-        z-index: 3 !important;
-        -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 78%, rgba(0, 0, 0, 0.9) 85%, transparent 96%) !important;
-        mask-image: linear-gradient(to bottom, #000 0%, #000 78%, rgba(0, 0, 0, 0.9) 85%, transparent 96%) !important;
+        object-position: center bottom !important;
+        z-index: 2 !important;
+        mask-image: none !important;
+        -webkit-mask-image: none !important;
       }
 
-      /* CREX Jersey: shoulders & torso fill bottom edge cleanly */
+      /* Jersey Layer: sits in front so the V-neck collar naturally frames the neck */
       .v9-avatar-wrap .player-jersey-overlay {
         position: absolute !important;
         left: 0 !important;
         bottom: 0 !important;
-        width: 100% !important;
-        height: auto !important;
-        max-height: 74px !important;
-        z-index: 2 !important;
+        width: 120px !important;
+        height: 78px !important;
+        z-index: 4 !important;
         object-fit: contain !important;
         object-position: center bottom !important;
         pointer-events: none !important;
@@ -622,10 +621,10 @@
       .v9-player-name {
         position: absolute;
         z-index: 9;
-        left: 125px;
+        left: 128px;
         right: 8px;
         top: 8px;
-        font-size: 24px;
+        font-size: 23px;
         font-weight: 900;
         line-height: 1.05;
         text-align: center;
@@ -637,7 +636,7 @@
       .v9-primary-metric {
         position: absolute;
         z-index: 9;
-        left: 125px;
+        left: 128px;
         right: 8px;
         top: 45px;
         display: flex;
@@ -649,7 +648,7 @@
       .v9-primary-metric:not(.v9-bowler-metric) > span:first-child { display: none; }
       .v9-primary-metric > strong { font-size: 50px; font-weight: 900; color: #ffce42; line-height: 0.92; }
 
-      .v9-bowler-metric { left: 125px; right: 8px; top: 48px; gap: 4px; }
+      .v9-bowler-metric { left: 128px; right: 8px; top: 48px; gap: 4px; }
       .v9-bowler-metric > span { font-size: 11px; }
       .v9-bowler-metric > strong { font-size: 32px; }
       .v9-bowler-metric > em { color: #4acff0; font-size: 18px; font-style: normal; }
@@ -1636,7 +1635,7 @@
             jersey.alt = "";
             jersey.setAttribute("aria-hidden", "true");
             jersey.loading = "eager";
-            wrap.insertBefore(jersey, photo);
+            wrap.appendChild(jersey);
           }
           return jersey;
         }
