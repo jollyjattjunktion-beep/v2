@@ -4538,5 +4538,115 @@ function setPlayerPortrait(photoId, initialsId, player, data, name) {
 })();
 </script>
 
+
+<style id="preetSportsLowerThirdJerseyPositionFix">
+/* Match the reference: portrait cutouts rise above the three lower cards. */
+.v9-player-deck {
+  top: 430px !important;
+  height: 168px !important;
+  overflow: visible !important;
+}
+.v9-feature-card {
+  overflow: visible !important;
+  isolation: isolate !important;
+}
+.v9-feature-body {
+  overflow: visible !important;
+}
+
+/*
+ * The feed images are not face-reconstructed: display the full existing source image.
+ * A taller box plus bottom alignment lets the torso remain visible down to the stat rail,
+ * while overflow-visible lets the head/shoulders sit above the card like the reference.
+ */
+.v9-avatar-wrap {
+  z-index: 1 !important;
+  left: -4px !important;
+  top: -93px !important;
+  bottom: 0 !important;
+  width: 58% !important;
+  height: auto !important;
+  min-width: 0 !important;
+  flex: none !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.v9-avatar-wrap .player-avatar-photo[src] {
+  display: block !important;
+  visibility: visible !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  image-rendering: auto !important;
+}
+.v9-avatar-wrap .player-avatar-initials {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: linear-gradient(145deg,#1D679E,#071D34) !important;
+}
+.v9-player-name {
+  left: 44% !important;
+  right: 6px !important;
+  top: 4px !important;
+  font-size: 23px !important;
+  line-height: 1.03 !important;
+  max-height: 42px !important;
+  text-align: center !important;
+}
+.v9-primary-metric {
+  left: 44% !important;
+  right: 6px !important;
+  top: 48px !important;
+  justify-content: center !important;
+  gap: 5px !important;
+}
+.v9-primary-metric:not(.v9-bowler-metric) > strong {
+  font-size: 50px !important;
+  line-height: .92 !important;
+}
+.v9-balls-inline,
+.v9-balls-inline > b {
+  font-size: 19px !important;
+}
+.v9-bowler-metric {
+  left: 39% !important;
+  right: 4px !important;
+  top: 52px !important;
+  gap: 3px !important;
+}
+.v9-bowler-metric > span { font-size: 10px !important; }
+.v9-bowler-metric > strong { font-size: 31px !important; }
+.v9-bowler-metric > em { font-size: 16px !important; }
+.v9-stat-grid {
+  border-radius: 0 0 10px 10px !important;
+  z-index: 4 !important;
+}
+.v9-upcoming-band {
+  top: 603px !important;
+}
+@media (max-width: 1100px) {
+  .v9-player-name { font-size: 21px !important; }
+  .v9-primary-metric:not(.v9-bowler-metric) > strong { font-size: 45px !important; }
+  .v9-balls-inline,
+  .v9-balls-inline > b { font-size: 17px !important; }
+  .v9-bowler-metric > strong { font-size: 28px !important; }
+}
+</style>
+
 </body>
 </html>
