@@ -12,8 +12,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="referrer" content="no-referrer" />
-    <title>PREET SPORTS | Broadcast Scoreboard</title>
+    <title>PREET SPORTS | V6 Mobile Broadcast Scoreboard</title>
 
+    <!-- ULTRA-HD BROADCAST TYPOGRAPHY -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
     <link
@@ -51,6 +52,7 @@
         background: #000000;
       }
 
+      /* FLOATING URL CONTROL BAR */
       .url-control-bar {
         position: absolute;
         top: 8px;
@@ -111,6 +113,7 @@
         white-space: nowrap;
       }
 
+      /* 1280 x 720 CANVAS */
       .scoreboard {
         position: relative;
         width: 1280px;
@@ -500,6 +503,9 @@
       .stat-metric .val { color: #ffce42; font-size: 20px; }
       .stat-divider { width: 1.5px; height: 25px; background: rgba(75, 137, 184, 0.48); }
 
+      /* =========================================================
+         CREX 1:1 PROPORTION PLAYER BUST (HEAD + JERSEY COLLAR)
+      ========================================================= */
       .v9-player-deck {
         position: absolute;
         top: 475px;
@@ -536,7 +542,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        padding-left: 140px;
+        padding-left: 125px;
         padding-right: 12px;
         background: linear-gradient(90deg, #0877d5, #064b8f);
         color: #f7fbff;
@@ -553,70 +559,75 @@
         overflow: visible;
       }
 
+      /* Compact bust container anchored to top of bottom stat bar */
       .v9-avatar-wrap {
         position: absolute;
         z-index: 8;
-        left: -4px;
-        top: -48px;
-        width: 46%;
-        height: 188px;
+        left: 10px;
+        bottom: 29px;
+        width: 110px;
+        height: 125px;
         overflow: visible;
         isolation: isolate;
       }
 
       .v9-avatar-wrap .player-avatar-initials {
         position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
+        left: 20px;
+        top: 25px;
+        width: 70px;
+        height: 70px;
         display: flex;
         align-items: center;
         justify-content: center;
         background: linear-gradient(145deg, #1d679e, #071d34);
-        border-radius: 10px;
+        border: 2px solid #ffbe18;
+        border-radius: 50%;
         color: #fff;
-        font-size: 28px;
+        font-size: 24px;
         font-weight: 900;
         z-index: 1;
       }
 
+      /* CREX Head Cutout: sits above collar */
+      .v9-avatar-wrap .player-avatar-photo[src] {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: 84px !important;
+        display: block !important;
+        object-fit: contain !important;
+        object-position: center top !important;
+        z-index: 3 !important;
+        -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 78%, rgba(0, 0, 0, 0.9) 85%, transparent 96%) !important;
+        mask-image: linear-gradient(to bottom, #000 0%, #000 78%, rgba(0, 0, 0, 0.9) 85%, transparent 96%) !important;
+      }
+
+      /* CREX Jersey: shoulders & torso fill bottom edge cleanly */
       .v9-avatar-wrap .player-jersey-overlay {
         position: absolute !important;
-        left: 2% !important;
+        left: 0 !important;
         bottom: 0 !important;
-        width: 96% !important;
+        width: 100% !important;
         height: auto !important;
-        max-width: 100% !important;
+        max-height: 74px !important;
         z-index: 2 !important;
         object-fit: contain !important;
         object-position: center bottom !important;
         pointer-events: none !important;
-        transform: translateY(-4px) !important;
         display: none;
-      }
-
-      .v9-avatar-wrap .player-avatar-photo {
-        position: absolute !important;
-        inset: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        display: none;
-        object-fit: contain !important;
-        object-position: center bottom !important;
-        z-index: 3 !important;
-        -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, 0.95) 75%, rgba(0, 0, 0, 0.3) 86%, transparent 92%) !important;
-        mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, 0.95) 75%, rgba(0, 0, 0, 0.3) 86%, transparent 92%) !important;
       }
 
       .v9-player-name {
         position: absolute;
         z-index: 9;
-        left: 42%;
-        right: 6px;
-        top: 4px;
-        font-size: 23px;
+        left: 125px;
+        right: 8px;
+        top: 8px;
+        font-size: 24px;
         font-weight: 900;
-        line-height: 1.03;
+        line-height: 1.05;
         text-align: center;
         white-space: nowrap;
         overflow: hidden;
@@ -626,21 +637,21 @@
       .v9-primary-metric {
         position: absolute;
         z-index: 9;
-        left: 42%;
-        right: 6px;
-        top: 48px;
+        left: 125px;
+        right: 8px;
+        top: 45px;
         display: flex;
         align-items: baseline;
         justify-content: center;
-        gap: 5px;
+        gap: 6px;
       }
       .v9-primary-metric > span { font-size: 15px; color: #9ddbff; font-weight: 900; }
       .v9-primary-metric:not(.v9-bowler-metric) > span:first-child { display: none; }
       .v9-primary-metric > strong { font-size: 50px; font-weight: 900; color: #ffce42; line-height: 0.92; }
 
-      .v9-bowler-metric { left: 39%; right: 4px; top: 52px; gap: 3px; }
-      .v9-bowler-metric > span { font-size: 10px; }
-      .v9-bowler-metric > strong { font-size: 31px; }
+      .v9-bowler-metric { left: 125px; right: 8px; top: 48px; gap: 4px; }
+      .v9-bowler-metric > span { font-size: 11px; }
+      .v9-bowler-metric > strong { font-size: 32px; }
       .v9-bowler-metric > em { color: #4acff0; font-size: 18px; font-style: normal; }
 
       .v9-balls-inline {
@@ -723,6 +734,7 @@
       .v9-next-avatar span { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 9px; color: #fff; font-weight: 900; }
       .v9-next-name { color: #edf7ff; font-size: 15px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+      /* BOTTOM TICKER */
       .bottom-meta-ribbon.subscribe-marquee-ribbon {
         position: absolute;
         left: 0;
@@ -861,6 +873,7 @@
         </div>
 
         <div class="v9-player-deck">
+          <!-- BATTER 1 -->
           <section class="v9-feature-card v9-batter-card" id="batter1Row">
             <div class="v9-card-kicker">STRIKING BATTER</div>
             <div class="v9-feature-body">
@@ -881,6 +894,7 @@
             </div>
           </section>
 
+          <!-- BATTER 2 -->
           <section class="v9-feature-card v9-batter-card" id="batter2Row">
             <div class="v9-card-kicker">NON-STRIKING BATTER</div>
             <div class="v9-feature-body">
@@ -901,6 +915,7 @@
             </div>
           </section>
 
+          <!-- BOWLER -->
           <section class="v9-feature-card v9-bowler-card" id="bowlerRow">
             <div class="v9-card-kicker">CURRENT BOWLER</div>
             <div class="v9-feature-body">
@@ -1597,6 +1612,7 @@
       });
     </script>
 
+    <!-- JERSEY LAYER RENDERER -->
     <script id="preetSportsJerseyOverlayScript">
       (function preetSportsJerseyOverlayEngine() {
         const PLAYER_IDS = [
@@ -1604,6 +1620,10 @@
           ["b2Photo", "b2Name"],
           ["bwlPhoto", "bwlName"]
         ];
+
+        function cleanName(value) {
+          return cleanRawPlayerName(value).toLowerCase();
+        }
 
         function ensureJerseyImage(photoId) {
           const photo = document.getElementById(photoId);
@@ -1634,7 +1654,7 @@
             const surname = words[words.length - 1];
             const initial = words[0] && words[0][0];
             for (const [candidate, data] of Object.entries(map)) {
-              const c = candidate.split(" ").filter(Boolean);
+              const c = cleanName(candidate).split(" ").filter(Boolean);
               if (c.length >= 2 && c[c.length - 1] === surname && c[0][0] === initial) {
                 entry = data;
                 break;
