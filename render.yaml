@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: preet-sports-v2
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn server:app --bind 0.0.0.0:$PORT
+    healthCheckPath: /api/health
+    autoDeploy: true
