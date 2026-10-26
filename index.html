@@ -3318,6 +3318,7 @@
       // CREX match page once per match. Browser CORS often blocks direct page reads, so try the backend
       // route when present and then a public raw-page proxy. All failures gracefully leave initials.
       const crexPlayerPhotoMap = new Map();
+      const crexPlayerJerseyMap = new Map();
       const crexImageCandidates = [];
       let crexAssetLookupUrl = "";
       let crexAssetLookupPromise = null;
@@ -3468,8 +3469,95 @@
           ),
         ];
       }
+      function addCrexPlayerJersey(name, imageUrl) {
+        const key = normalizePlayerKey(
+          String(name || "")
+            .replace(/\\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\\b/gi, " ")
+            .replace(/\\s+/g, " ")
+            .trim(),
+        );
+        let url = getImageUrl(imageUrl);
+        if (!key || !url) return;
+        try {
+          const parsed = new URL(url, "https://crex.com/");
+          if (parsed.protocol !== "https:" || parsed.hostname.toLowerCase() !== "cricketvectors.akamaized.net") return;
+          if (!/\\/jersey\\/limited\\/org\\//i.test(parsed.pathname)) return;
+          url = parsed.href;
+        } catch (_) {
+          return;
+        }
+        crexPlayerJerseyMap.set(key, url);
+      }
+
+      function collectCrexPlayerJerseys(doc) {
+        if (!doc) return;
+        const jerseyImgs = [...doc.querySelectorAll(
+          'img.mr-top, img[alt*="jersey" i], img[alt*="jersy" i], img[title*="jersey" i], img[title*="jersy" i]',
+        )];
+        for (const jerseyImg of jerseyImgs) {
+          const jerseyUrl = getImageUrl(
+            jerseyImg.getAttribute("data-src") ||
+            jerseyImg.getAttribute("data-lazy-src") ||
+            jerseyImg.getAttribute("src") ||
+            "",
+          );
+          if (!jerseyUrl) continue;
+
+          // CREX pairs player and shirt images inside app-player-profile-img/playerProfileDefault.
+          // Search the closest component first so another player's shirt can never be borrowed.
+          let playerName = "";
+          let node = jerseyImg;
+          for (let depth = 0; node && depth < 7; depth++, node = node.parentElement) {
+            const candidates = [...(node.querySelectorAll ? node.querySelectorAll("img") : [])]
+              .filter((img) => img !== jerseyImg && !img.classList.contains("mr-top"));
+            const portrait = candidates.find((img) => {
+              const raw = [
+                img.getAttribute("src"),
+                img.getAttribute("data-src"),
+                img.getAttribute("data-lazy-src"),
+              ].filter(Boolean).join(" ");
+              return /cricketvectors\\.akamaized\\.net\\/players\\//i.test(raw) ||
+                /\\/players\\/(?:org|profile)\\//i.test(raw);
+            }) || candidates.find((img) => {
+              const label = (img.getAttribute("title") || img.getAttribute("alt") || "").trim();
+              return label && !/jersey|jersy|shirt|uniform|logo/i.test(label);
+            });
+            if (portrait) {
+              playerName = portrait.getAttribute("title") || portrait.getAttribute("alt") || "";
+              playerName = playerName.replace(/\\b(?:logo|photo|profile|headshot)\\b/gi, " ").replace(/\\s+/g, " ").trim();
+              if (playerName) break;
+            }
+            // Do not climb out of a player-profile component into a parent that contains many players.
+            if (node.tagName && node.tagName.toLowerCase() === "app-player-profile-img") break;
+          }
+
+          if (!playerName) {
+            playerName = jerseyImg.getAttribute("title") || jerseyImg.getAttribute("alt") || "";
+          }
+          const cleanName = String(playerName)
+            .replace(/\\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\\b/gi, " ")
+            .replace(/\\s+/g, " ")
+            .trim();
+          if (cleanName) addCrexPlayerJersey(cleanName, jerseyUrl);
+          // The jersey's own alt text is also useful on CREX builds where the player image has no title.
+          const jerseyLabel = String(jerseyImg.getAttribute("title") || jerseyImg.getAttribute("alt") || "")
+            .replace(/\\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\\b/gi, " ")
+            .replace(/\\s+/g, " ")
+            .trim();
+          if (jerseyLabel) addCrexPlayerJersey(jerseyLabel, jerseyUrl);
+        }
+
+        const publicMap = Object.create(null);
+        for (const [name, url] of crexPlayerJerseyMap.entries()) publicMap[name] = url;
+        window.__preetSportsPlayerJerseys = publicMap;
+        window.dispatchEvent(new CustomEvent("preet-sports-jerseys-updated", {
+          detail: { jerseys: publicMap, sourceUrl: crexAssetLookupUrl }
+        }));
+      }
+
       function collectImagesFromCrexDocument(doc) {
         if (!doc) return;
+        collectCrexPlayerJerseys(doc);
         const images = [...doc.querySelectorAll("img")];
         for (const img of images) {
           const candidates = [
@@ -3548,8 +3636,13 @@
         if (crexAssetLookupUrl === clean && crexAssetLookupPromise) return crexAssetLookupPromise;
         crexAssetLookupUrl = clean;
         crexPlayerPhotoMap.clear();
+        crexPlayerJerseyMap.clear();
         crexImageCandidates.length = 0;
         crexRecentOvers = [];
+        window.__preetSportsPlayerJerseys = Object.create(null);
+        window.dispatchEvent(new CustomEvent("preet-sports-jerseys-updated", {
+          detail: { jerseys: {}, sourceUrl: clean }
+        }));
         crexAssetLookupPromise = (async () => {
           // Preferred future-proof path: a same-origin backend route can return {html, players, overs}.
           // If the route isn't installed on the current backend, continue to the page proxy fallback.
@@ -8638,21 +8731,39 @@
 </style>
 <script id="preetSportsJerseyOverlayTestScript">
 (function preetSportsJerseyOverlayTest() {
-  const JERSEYS = {
-    india: "https://cricketvectors.akamaized.net/jersey/limited/org/O.png",
-    newZealand: "https://cricketvectors.akamaized.net/jersey/limited/org/R.png",
-    england: "https://cricketvectors.akamaized.net/jersey/limited/org/S.png"
-  };
+  const PLAYER_IDS = [
+    ["b1Photo", "b1Name"],
+    ["b2Photo", "b2Name"],
+    ["bwlPhoto", "bwlName"]
+  ];
 
-  function cleanTeamName(value) {
-    return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  function cleanName(value) {
+    return String(value || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\\u0300-\\u036f]/g, "")
+      .replace(/\\b(?:jersey|jersy|shirt|uniform|kit|logo|photo|profile)\\b/gi, " ")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim()
+      .replace(/\\s+/g, " ");
   }
 
-  function jerseyForTeam(value) {
-    const name = cleanTeamName(value);
-    if (/\b(india|indian)\b/.test(name) || /\bind\b/.test(name)) return JERSEYS.india;
-    if (name.includes("new zealand") || name === "nz" || name.includes("nz women")) return JERSEYS.newZealand;
-    if (name.includes("england") || name === "eng" || name.includes("england women")) return JERSEYS.england;
+  function jerseyForPlayer(playerName) {
+    const map = window.__preetSportsPlayerJerseys || {};
+    const target = cleanName(playerName);
+    if (!target) return "";
+    if (map[target]) return map[target];
+
+    // CREX sometimes shows an initial plus surname in the scoreboard, but the profile HTML
+    // may use the player's full first name. Match only if both first initial and surname agree.
+    const words = target.split(" ").filter(Boolean);
+    const surname = words[words.length - 1];
+    const initial = words[0] && words[0][0];
+    if (!surname || !initial) return "";
+    for (const [candidate, url] of Object.entries(map)) {
+      const c = cleanName(candidate).split(" ").filter(Boolean);
+      if (c.length >= 2 && c[c.length - 1] === surname && c[0][0] === initial) return url;
+    }
     return "";
   }
 
@@ -8672,10 +8783,10 @@
     return jersey;
   }
 
-  function setJersey(photoId, teamName) {
+  function setJersey(photoId, playerName) {
     const jersey = ensureJerseyImage(photoId);
     if (!jersey) return;
-    const source = jerseyForTeam(teamName);
+    const source = jerseyForPlayer(playerName);
     if (!source) {
       jersey.style.display = "none";
       jersey.removeAttribute("src");
@@ -8692,22 +8803,27 @@
   }
 
   function refreshJerseys() {
-    const batting = document.getElementById("battingNow")?.textContent || "";
-    const bowling = document.getElementById("bowlingNow")?.textContent || "";
-    // Both batters wear the active batting team's shirt; the current bowler wears the bowling team's shirt.
-    setJersey("b1Photo", batting);
-    setJersey("b2Photo", batting);
-    setJersey("bwlPhoto", bowling);
+    for (const [photoId, nameId] of PLAYER_IDS) {
+      const name = document.getElementById(nameId)?.textContent || "";
+      setJersey(photoId, name);
+    }
   }
 
   function start() {
     refreshJerseys();
-    ["battingNow", "bowlingNow"].forEach((id) => {
-      const el = document.getElementById(id);
+    window.addEventListener("preet-sports-jerseys-updated", refreshJerseys);
+    PLAYER_IDS.forEach(([, nameId]) => {
+      const el = document.getElementById(nameId);
       if (el && window.MutationObserver) {
         const observer = new MutationObserver(refreshJerseys);
         observer.observe(el, { childList: true, subtree: true, characterData: true });
       }
+    });
+    const loadButton = document.getElementById("loadMatchUrlBtn");
+    if (loadButton) loadButton.addEventListener("click", () => {
+      // Remove old fixture shirts immediately; the new match scan will add verified per-player jerseys.
+      window.__preetSportsPlayerJerseys = Object.create(null);
+      refreshJerseys();
     });
   }
 
