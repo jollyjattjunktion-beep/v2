@@ -1892,6 +1892,30 @@
         }
 
         refreshPlayerPortraits(data);
+
+        // Update the result indicator from the SAME live score packet every poll.
+        const resultVal = document.getElementById("teamResultVal");
+        const resultDescription = document.getElementById("teamResultDescription");
+        const resultBall = document.getElementById("teamResultBall");
+        const resultBox = document.getElementById("teamResultBox");
+        const resultNumber = data.team_result;
+        const resultText = data.team_result_description || data.team_result_text || data.result_description || "";
+        const ballText = data.team_result_ball || data.result_ball || "";
+        if (resultVal && resultNumber !== undefined && resultNumber !== null && String(resultNumber).trim() !== "") {
+          resultVal.textContent = String(resultNumber).trim();
+        }
+        if (resultDescription) {
+          resultDescription.textContent = String(resultText || "").trim();
+          resultDescription.classList.toggle("is-visible", Boolean(String(resultText || "").trim()));
+        }
+        if (resultBall) {
+          resultBall.textContent = String(ballText || "").trim();
+          resultBall.classList.toggle("is-visible", Boolean(String(ballText || "").trim()));
+        }
+        if (resultBox) resultBox.classList.toggle("has-details", Boolean(String(resultText || "").trim() || String(ballText || "").trim()));
+
+        // Refresh shirts immediately in the same update that changes the striker/non-striker/bowler.
+        window.dispatchEvent(new CustomEvent("preet-sports-player-data-updated", { detail: { data } }));
       }
 
       const DEFAULT_MATCH_URL =
@@ -1952,6 +1976,20 @@
         document.getElementById("team2HeroScore").textContent = "—";
         document.getElementById("team1HeroOvers").textContent = "— OV";
         document.getElementById("team2HeroOvers").textContent = "— OV";
+        const resultValReset = document.getElementById("teamResultVal");
+        const resultDescriptionReset = document.getElementById("teamResultDescription");
+        const resultBallReset = document.getElementById("teamResultBall");
+        const resultBoxReset = document.getElementById("teamResultBox");
+        if (resultValReset) resultValReset.textContent = "0";
+        if (resultDescriptionReset) {
+          resultDescriptionReset.textContent = "";
+          resultDescriptionReset.classList.remove("is-visible");
+        }
+        if (resultBallReset) {
+          resultBallReset.textContent = "";
+          resultBallReset.classList.remove("is-visible");
+        }
+        if (resultBoxReset) resultBoxReset.classList.remove("has-details");
         const resultVal = document.getElementById("teamResultVal");
         const resultDescription = document.getElementById("teamResultDescription");
         const resultBall = document.getElementById("teamResultBall");
@@ -2071,13 +2109,26 @@
           const primarySrc = entry ? (typeof entry === "string" ? entry : entry.src) : "";
           const fallbackSrc = entry && typeof entry === "object" ? entry.fallback : "";
 
+          const teamLabel = photoId === "bwlPhoto"
+            ? (document.getElementById("bowlingNow")?.textContent || "")
+            : (document.getElementById("battingNow")?.textContent || "");
+          const teamKey = normalizePlayerKey(teamLabel);
+
           if (!primarySrc) {
+            // A new bowler often has no individual shirt in the match HTML captured at load.
+            // Keep the last verified shirt only when this player slot still represents the same team.
+            if (jersey.dataset.jerseySource && jersey.dataset.jerseyTeam === teamKey && jersey.src) {
+              jersey.style.display = "block";
+              return;
+            }
             jersey.style.display = "none";
             jersey.removeAttribute("src");
             delete jersey.dataset.jerseySource;
+            delete jersey.dataset.jerseyTeam;
             return;
           }
 
+          jersey.dataset.jerseyTeam = teamKey;
           if (jersey.dataset.jerseySource !== primarySrc) {
             jersey.dataset.jerseySource = primarySrc;
             jersey.onload = () => { jersey.style.display = "block"; };
@@ -2101,6 +2152,7 @@
         }
 
         window.addEventListener("preet-sports-jerseys-updated", refreshJerseys);
+        window.addEventListener("preet-sports-player-data-updated", refreshJerseys);
 
         PLAYER_IDS.forEach(([, nameId]) => {
           const el = document.getElementById(nameId);
@@ -2116,5 +2168,42 @@
         });
       })();
     </script>
-  </body>
+  <style id="preetSportsLivePacketResultRefresh">
+/* Keep the CREX score/result badge compact inside the existing blue second-row panel. */
+#teamResultBox {
+  max-width: 126px !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+}
+#teamResultDescription,
+#teamResultBall {
+  display: none;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.05;
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 900;
+}
+#teamResultDescription.is-visible {
+  display: block;
+  color: #f6fbff;
+  font-size: 11px;
+}
+#teamResultBall.is-visible {
+  display: block;
+  color: #6fe7ff;
+  font-size: 10px;
+}
+#teamResultBox.has-details {
+  min-width: 68px !important;
+  max-width: 126px !important;
+  padding: 4px 7px !important;
+}
+</style>
+
+</body>
 </html>
