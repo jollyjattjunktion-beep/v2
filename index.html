@@ -395,11 +395,14 @@
         background: rgba(3, 16, 33, 0.85);
         border: 1.5px solid #24ddf7;
         border-radius: 7px;
-        padding: 3px 10px;
+        padding: 3px 8px;
         min-width: 32px;
+        max-width: 126px;
         display: inline-flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
+        gap: 2px;
         box-shadow: inset 0 0 8px rgba(36, 221, 247, 0.25);
       }
       .team-result .result-box .font1 {
@@ -408,6 +411,32 @@
         font-weight: 900;
         color: #ffffff;
         line-height: 1;
+      }
+      .team-result .result-box .font3,
+      .team-result .result-box .font2 {
+        display: none;
+        max-width: 110px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 1.05;
+        font-family: "Rajdhani", sans-serif;
+        font-weight: 900;
+      }
+      .team-result .result-box .font3.is-visible {
+        display: block;
+        font-size: 11px;
+        color: #f6fbff;
+      }
+      .team-result .result-box .font2.is-visible {
+        display: block;
+        font-size: 10px;
+        color: #6fe7ff;
+      }
+      .team-result .result-box.has-details {
+        min-width: 68px;
+        max-width: 126px;
+        padding: 4px 7px;
       }
 
       .score-digits-hero {
@@ -868,8 +897,10 @@
             
             <!-- REQUESTED POINT 2: CREX TEAM RESULT BOX -->
             <div class="team-result" id="teamResultContainer">
-              <div class="result-box">
+              <div class="result-box" id="teamResultBox">
                 <span class="font1" id="teamResultVal">0</span>
+                <span class="font3" id="teamResultDescription"></span>
+                <span class="font2" id="teamResultBall"></span>
               </div>
             </div>
 
@@ -1528,13 +1559,30 @@
       function extractTossAndResultFromHtml(doc) {
         if (!doc || !doc.body) return;
 
-        // 1. Extract Result Box Value (e.g. 0, 1) for the second row blue box
-        const resBox = doc.querySelector(".team-result .result-box, .result-box");
+        // 1. Extract CREX result details as distinct fields: number (.font1), dismissal (.font3), ball label (.font2).
+        const resBox = doc.querySelector(".d-flex .team-result .result-box, .team-result .result-box");
         if (resBox) {
-          const val = resBox.textContent.trim();
-          if (val) {
-            document.getElementById("teamResultVal").textContent = val;
+          const valueNode = resBox.querySelector(".font1");
+          const descriptionNode = resBox.querySelector(".font3");
+          const ballNode = resBox.querySelector(".font2");
+          const value = valueNode ? valueNode.textContent.trim() : "";
+          const description = descriptionNode ? descriptionNode.textContent.trim() : "";
+          const ballLabel = ballNode ? ballNode.textContent.trim() : "";
+
+          const valueTarget = document.getElementById("teamResultVal");
+          const descriptionTarget = document.getElementById("teamResultDescription");
+          const ballTarget = document.getElementById("teamResultBall");
+          if (valueTarget && value) valueTarget.textContent = value;
+          if (descriptionTarget) {
+            descriptionTarget.textContent = description;
+            descriptionTarget.classList.toggle("is-visible", Boolean(description));
           }
+          if (ballTarget) {
+            ballTarget.textContent = ballLabel;
+            ballTarget.classList.toggle("is-visible", Boolean(ballLabel));
+          }
+          const targetBox = document.getElementById("teamResultBox");
+          if (targetBox) targetBox.classList.toggle("has-details", Boolean(description || ballLabel));
         }
 
         // 2. Extract Real Toss
@@ -1889,6 +1937,20 @@
         document.getElementById("team2HeroScore").textContent = "—";
         document.getElementById("team1HeroOvers").textContent = "— OV";
         document.getElementById("team2HeroOvers").textContent = "— OV";
+        const resultVal = document.getElementById("teamResultVal");
+        const resultDescription = document.getElementById("teamResultDescription");
+        const resultBall = document.getElementById("teamResultBall");
+        const resultBox = document.getElementById("teamResultBox");
+        if (resultVal) resultVal.textContent = "0";
+        if (resultDescription) {
+          resultDescription.textContent = "";
+          resultDescription.classList.remove("is-visible");
+        }
+        if (resultBall) {
+          resultBall.textContent = "";
+          resultBall.classList.remove("is-visible");
+        }
+        if (resultBox) resultBox.classList.remove("has-details");
         document.getElementById("b1Name").textContent = "WAITING FOR FEED";
         document.getElementById("b2Name").textContent = "WAITING FOR FEED";
         document.getElementById("bwlName").textContent = "WAITING FOR FEED";
