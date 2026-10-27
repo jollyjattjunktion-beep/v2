@@ -3,6 +3,8 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import logging
+import time
+from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("crex_scraper")
@@ -12,7 +14,7 @@ HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.9",
     "Referer": "https://crex.com/",
-    "Cache-Control": "no-cache",
+    "Cache-Control": "no-cache, no-store, max-age=0",
     "Pragma": "no-cache",
 }
 
@@ -132,7 +134,14 @@ def scrape_crex_match(url: str):
     logger.info(f"Scraping live Crex URL: {url}")
 
     try:
-        resp = requests.get(url, headers=HEADERS, timeout=12)
+        # Preserve the true match URL in returned data, but vary the request URL to avoid
+        # an intermediary reusing an old cached HTML snapshot for the same live match path.
+        parsed_url = urlparse(url)
+        query = [(key, value) for key, value in parse_qsl(parsed_url.query, keep_blank_values=True)
+                 if key.lower() not in {"_ps_refresh"}]
+        query.append(("_ps_refresh", str(int(time.time() * 1000))))
+        fresh_request_url = urlunparse(parsed_url._replace(query=urlencode(query)))
+        resp = requests.get(fresh_request_url, headers=HEADERS, timeout=12)
         resp.raise_for_status()
         html = resp.text
     except Exception as e:
