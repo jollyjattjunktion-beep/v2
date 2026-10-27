@@ -1559,9 +1559,9 @@
         const description = String(
           data && (data.team_result_description || data.team_result_text || data.result_description) || ""
         ).trim();
-        const resultValue = String(
-          data && (data.team_result !== undefined && data.team_result !== null ? data.team_result : data.center_digit) || ""
-        ).trim();
+        const rawResultValue = data ? (data.team_result ?? data.center_digit ?? "") : "";
+        // Nullish fallback preserves the valid numeric value 0.
+        const resultValue = String(rawResultValue).trim();
         const resultStatus = String(data && (data.status || data.match_status) || "").trim();
         const isEventStatus = /caught|bowled|run.?out|stumped|lbw|hit wicket|drinks|lunch|tea|innings break|rain|delay|abandon|no result/i.test(resultStatus);
         const primaryText = description || resultValue || (isEventStatus ? resultStatus : "");
@@ -1578,6 +1578,8 @@
         );
         hero.classList.add("is-live-result-message");
         hero.classList.remove("is-live-over-feed");
+        hero.classList.toggle("is-long-result", primaryText.length > 18);
+        hero.classList.toggle("is-short-result", Boolean(primaryText) && primaryText.length <= 6 && !description);
       }
 
       function renderCurrentOverBalls(balls) {
@@ -2087,6 +2089,7 @@
         }
         if (mainScoreHeroReset) {
           mainScoreHeroReset.setAttribute("aria-label", "CREX result message waiting");
+          mainScoreHeroReset.classList.remove("is-long-result", "is-short-result");
         }
         document.getElementById("mainOversHero").textContent = "—";
         document.getElementById("team1HeroScore").textContent = "—";
@@ -2481,6 +2484,9 @@ html.ps-obs-mode #scoreboardCanvas {
   width: 100% !important;
   text-align: center !important;
   text-wrap: balance;
+}
+#mainScoreHero.is-live-result-message.is-short-result #mainScoreResultText {
+  font-size: 76px !important;
 }
 #mainScoreHero.is-live-result-message.is-long-result #mainScoreResultText {
   font-size: 42px !important;
