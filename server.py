@@ -21,7 +21,7 @@ logger = logging.getLogger("preet_sports_v2")
 SCORE_CACHE_TTL_SECONDS = 0.75
 SCORE_REFRESH_RETRY_SECONDS = 2.0
 SCORE_POLL_INTERVAL_SECONDS = 0.60
-SCORE_CLIENT_IDLE_SECONDS = 300.0
+SCORE_CLIENT_IDLE_SECONDS = 21600.0
 _SCORE_CACHE = {}
 _SCORE_REFRESHING = set()
 _SCORE_REFRESH_FAILED_AT = {}
@@ -54,10 +54,10 @@ def _fetch_and_cache_score(url):
     return data
 
 def _score_poll_worker(url):
-    """Keep refreshing a match for five minutes after a client stops polling.
+    """Keep refreshing a match for up to six hours after a client stops polling.
 
-    The longer lease tolerates browser background-tab timer throttling, so the feed
-    does not go idle just because the page is not foregrounded.
+    This is deliberately longer than browser/OBS background-tab timer throttling, so
+    scores can continue refreshing while the scoreboard page is not foregrounded.
     """
     while True:
         with _SCORE_CACHE_LOCK:
