@@ -1188,7 +1188,8 @@
 
       function cleanCrexUrl(url) {
         if (!url) return "";
-        let clean = String(url).trim().replace(/\.+$/, "");
+        // Links copied from escaped Markdown sometimes carry a stray backslash before &obs/&hide.
+        let clean = String(url).trim().replace(/\\&/g, "&").replace(/[\\]+$/, "").replace(/\.+$/, "");
         clean = clean.split("#")[0];
         clean = clean.split("?")[0];
         return clean.trim();
@@ -1931,7 +1932,7 @@
 
       const DEFAULT_MATCH_URL =
         "https://crex.com/cricket-live-score/mw-vs-tk-6th-t20-global-t20-canada-2026-match-updates-14ZS";
-      let activeTargetUrl = urlParams.get("match") || DEFAULT_MATCH_URL;
+      let activeTargetUrl = cleanCrexUrl(urlParams.get("match") || DEFAULT_MATCH_URL);
 
       const urlInput = document.getElementById("crexUrlInput");
       if (urlInput) urlInput.value = activeTargetUrl;
@@ -2034,24 +2035,17 @@
 
       document.getElementById("generateObsBtn").addEventListener("click", async () => {
         const crexUrl = cleanCrexUrl(urlInput.value.trim() || activeTargetUrl);
-        let obsUrl = "";
-        try {
-          const response = await fetch(`${API_BASE}/api/obs-token`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url: crexUrl }),
-          });
-          if (response.ok) {
-            const data = await response.json();
-            if (data && data.token) {
-              obsUrl = `${window.location.origin}${window.location.pathname}?token=${encodeURIComponent(data.token)}&hide=1`;
-            }
-          }
-        } catch (_) {}
-
-        if (!obsUrl) {
-          obsUrl = `${window.location.origin}${window.location.pathname}?match=${encodeURIComponent(crexUrl)}&obs=1&hide=1`;
+        if (!/^https:\/\/(?:www\.)?crex\.com\//i.test(crexUrl)) {
+          alert("Please load a valid CREX match URL first.");
+          return;
         }
+
+        // Direct match URLs are supported by /api/scrape; do not depend on an unimplemented token endpoint.
+        const obsLink = new URL(window.location.origin + window.location.pathname);
+        obsLink.searchParams.set("match", crexUrl);
+        obsLink.searchParams.set("obs", "1");
+        obsLink.searchParams.set("hide", "1");
+        const obsUrl = obsLink.toString();
 
         try {
           await navigator.clipboard.writeText(obsUrl);
@@ -2219,6 +2213,25 @@
   min-width: 68px !important;
   max-width: 126px !important;
   padding: 4px 7px !important;
+}
+</style>
+
+
+<style id="preetSportsObsUrlFix">
+/* OBS mode must hide controls but keep the full broadcast canvas visible. */
+html.ps-obs-mode body,
+html.ps-obs-mode .screen-wrapper {
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+html.ps-obs-mode .url-control-bar {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+html.ps-obs-mode #scoreboardCanvas {
+  flex-shrink: 0 !important;
 }
 </style>
 
