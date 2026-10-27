@@ -206,6 +206,8 @@ def scrape_crex_match(url: str):
     }
     status = ""
     center_digit = ""
+    team_result_description = ""
+    team_result_ball = ""
 
     if card:
         t1_div = card.find("div", class_="team-inning")
@@ -225,17 +227,24 @@ def scrape_crex_match(url: str):
                 team1["score"] = runs_txt
                 team1["overs"] = overs_txt
 
-        # Prefer the exact value used by CREX in .team-result .result-box .font1.
-        result_value_el = card.select_one(".team-result .result-box .font1")
-        if result_value_el:
-            center_digit = result_value_el.get_text(" ", strip=True)
+        # Read CREX's live result fields separately so Drinks Break/Caught Out/Ball
+        # can be updated by the scoreboard on every score refresh.
+        result_box = card.select_one(".team-result .result-box") or card.find(class_=re.compile("result-box|team-result"))
+        if result_box:
+            result_value_el = result_box.select_one(".font1")
+            result_description_el = result_box.select_one(".font3")
+            result_ball_el = result_box.select_one(".font2")
+            if result_value_el:
+                center_digit = result_value_el.get_text(" ", strip=True)
+            if result_description_el:
+                team_result_description = result_description_el.get_text(" ", strip=True)
+            if result_ball_el:
+                team_result_ball = result_ball_el.get_text(" ", strip=True)
 
-        res_box = card.find(class_=re.compile("result-box|team-result"))
-        if res_box:
-            txt = res_box.get_text(" ", strip=True)
+            txt = result_box.get_text(" ", strip=True)
             if not center_digit and len(txt) <= 3 and any(c.isdigit() or c in "WwNnBb" for c in txt):
                 center_digit = txt
-            elif txt and not center_digit:
+            elif txt and not (team_result_description or team_result_ball) and not center_digit:
                 status = txt
 
         t2_div = card.find("div", class_=re.compile("second-inning"))
@@ -518,6 +527,8 @@ def scrape_crex_match(url: str):
         "team1": team1,
         "team2": team2,
         "team_result": center_digit or None,
+        "team_result_description": team_result_description or None,
+        "team_result_ball": team_result_ball or None,
         "status": status,
         "equation": equation,
         "crr": crr,
