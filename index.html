@@ -1572,7 +1572,10 @@
           const valueTarget = document.getElementById("teamResultVal");
           const descriptionTarget = document.getElementById("teamResultDescription");
           const ballTarget = document.getElementById("teamResultBall");
-          if (valueTarget && value) valueTarget.textContent = value;
+          if (valueTarget) {
+            valueTarget.textContent = value;
+            valueTarget.classList.toggle("is-empty", !value);
+          }
           if (descriptionTarget) {
             descriptionTarget.textContent = description;
             descriptionTarget.classList.toggle("is-visible", Boolean(description));
@@ -1582,7 +1585,9 @@
             ballTarget.classList.toggle("is-visible", Boolean(ballLabel));
           }
           const targetBox = document.getElementById("teamResultBox");
+          const targetContainer = document.getElementById("teamResultContainer");
           if (targetBox) targetBox.classList.toggle("has-details", Boolean(description || ballLabel));
+          if (targetContainer) targetContainer.classList.toggle("is-empty", !value && !description && !ballLabel);
         }
 
         // 2. Extract Real Toss
@@ -1901,18 +1906,24 @@
         const resultNumber = data.team_result;
         const resultText = data.team_result_description || data.team_result_text || data.result_description || "";
         const ballText = data.team_result_ball || data.result_ball || "";
-        if (resultVal && resultNumber !== undefined && resultNumber !== null && String(resultNumber).trim() !== "") {
-          resultVal.textContent = String(resultNumber).trim();
+        const resultNumberText = resultNumber === null || resultNumber === undefined ? "" : String(resultNumber).trim();
+        const resultDescriptionText = String(resultText || "").trim();
+        const resultBallText = String(ballText || "").trim();
+        if (resultVal) {
+          resultVal.textContent = resultNumberText;
+          resultVal.classList.toggle("is-empty", !resultNumberText);
         }
         if (resultDescription) {
-          resultDescription.textContent = String(resultText || "").trim();
-          resultDescription.classList.toggle("is-visible", Boolean(String(resultText || "").trim()));
+          resultDescription.textContent = resultDescriptionText;
+          resultDescription.classList.toggle("is-visible", Boolean(resultDescriptionText));
         }
         if (resultBall) {
-          resultBall.textContent = String(ballText || "").trim();
-          resultBall.classList.toggle("is-visible", Boolean(String(ballText || "").trim()));
+          resultBall.textContent = resultBallText;
+          resultBall.classList.toggle("is-visible", Boolean(resultBallText));
         }
-        if (resultBox) resultBox.classList.toggle("has-details", Boolean(String(resultText || "").trim() || String(ballText || "").trim()));
+        if (resultBox) resultBox.classList.toggle("has-details", Boolean(resultDescriptionText || resultBallText));
+        const resultContainer = document.getElementById("teamResultContainer");
+        if (resultContainer) resultContainer.classList.toggle("is-empty", !resultNumberText && !resultDescriptionText && !resultBallText);
 
         // Refresh shirts immediately in the same update that changes the striker/non-striker/bowler.
         window.dispatchEvent(new CustomEvent("preet-sports-player-data-updated", { detail: { data } }));
@@ -2187,6 +2198,12 @@
   line-height: 1.05;
   font-family: "Rajdhani", sans-serif;
   font-weight: 900;
+}
+#teamResultVal.is-empty {
+  display: none !important;
+}
+#teamResultContainer.is-empty {
+  display: none !important;
 }
 #teamResultDescription.is-visible {
   display: block;
