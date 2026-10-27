@@ -1564,7 +1564,9 @@
         const resultValue = String(rawResultValue).trim();
         const resultStatus = String(data && (data.status || data.match_status) || "").trim();
         const isEventStatus = /caught|bowled|run.?out|stumped|lbw|hit wicket|drinks|lunch|tea|innings break|rain|delay|abandon|no result/i.test(resultStatus);
-        const primaryText = description || resultValue || (isEventStatus ? resultStatus : "");
+        const latestBall = String(data && (data.last_ball ?? data.lastBall ?? "") || "").trim();
+        // Fallback order is source text -> source result value -> real last-ball value; never fabricate a score.
+        const primaryText = description || resultValue || (isEventStatus ? resultStatus : "") || latestBall;
         const ballLabel = String(
           data && (data.team_result_ball || data.result_ball) || ""
         ).trim();
