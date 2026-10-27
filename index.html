@@ -1997,6 +1997,11 @@
         document.getElementById("team2HeroScore").textContent = "—";
         document.getElementById("team1HeroOvers").textContent = "— OV";
         document.getElementById("team2HeroOvers").textContent = "— OV";
+        const staleResultChip = document.getElementById("crexTeamResultChip");
+        if (staleResultChip) {
+          staleResultChip.textContent = "";
+          staleResultChip.classList.remove("is-visible");
+        }
         document.getElementById("b1Name").textContent = "WAITING FOR FEED";
         document.getElementById("b2Name").textContent = "WAITING FOR FEED";
         document.getElementById("bwlName").textContent = "WAITING FOR FEED";
