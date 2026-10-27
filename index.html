@@ -2061,7 +2061,18 @@
         currentObsToken = ""; // Clear old token so polling immediately switches to the new URL
         applyUrlMatchInfoImmediately(activeTargetUrl);
 
-        document.getElementById("mainScoreHero").textContent = "—";
+        const mainScoreHeroReset = document.getElementById("mainScoreHero");
+        const mainScoreResultTextReset = document.getElementById("mainScoreResultText");
+        const mainScoreResultBallReset = document.getElementById("mainScoreResultBall");
+        // Reset child spans without replacing mainScoreHero's markup.
+        if (mainScoreResultTextReset) mainScoreResultTextReset.textContent = "—";
+        if (mainScoreResultBallReset) {
+          mainScoreResultBallReset.textContent = "";
+          mainScoreResultBallReset.classList.remove("is-visible");
+        }
+        if (mainScoreHeroReset) {
+          mainScoreHeroReset.setAttribute("aria-label", "CREX result message waiting");
+        }
         document.getElementById("mainOversHero").textContent = "—";
         document.getElementById("team1HeroScore").textContent = "—";
         document.getElementById("team2HeroScore").textContent = "—";
