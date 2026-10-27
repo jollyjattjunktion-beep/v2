@@ -2233,5 +2233,49 @@
 }
 </style>
 
+
+<style id="preetSportsResultBadgeVisibilityFix">
+/* Explicit ID-level score colors keep the existing broadcast scores white, never black. */
+#team1HeroScore,
+#team2HeroScore,
+#mainScoreHero {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow: 0 2px 6px rgba(0,0,0,.62) !important;
+}
+/* Make CREX .team-result .result-box .font1 visible inside the blue second-row score panel,
+   clear of the overs stack. This is a small indicator, not a redesign of the score box. */
+#crexTeamResultChip {
+  position: absolute !important;
+  top: 50% !important;
+  right: 82px !important;
+  left: auto !important;
+  transform: translateY(-50%) !important;
+  min-width: 34px !important;
+  width: auto !important;
+  height: 34px !important;
+  padding: 0 8px !important;
+  border-radius: 50px !important;
+  border: 2px solid #35d9ff !important;
+  background: linear-gradient(180deg,#0d4779 0%,#041b34 100%) !important;
+  color: #ffcf45 !important;
+  -webkit-text-fill-color: #ffcf45 !important;
+  font: 900 19px/1 "Montserrat",sans-serif !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,.75) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.14) !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 12 !important;
+}
+#crexTeamResultChip.is-visible {
+  display: inline-flex !important;
+}
+/* Preserve the circular backing behind each player's head. */
+.v9-avatar-wrap::before {
+  border-radius: 50% !important;
+  pointer-events: none !important;
+}
+</style>
+
 </body>
 </html>
