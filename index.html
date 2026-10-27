@@ -1554,20 +1554,27 @@
         const ballNode = document.getElementById("mainScoreResultBall");
         if (!hero || !messageNode || !ballNode) return;
 
-        // Use CREX's own .font3 result message; .font2 is the optional secondary label.
+        // Prefer CREX .font3 status text (Caught Out, Drinks Break, etc.).
+        // When no description exists, show .font1 (e.g. 4) instead of leaving the panel blank.
         const description = String(
           data && (data.team_result_description || data.team_result_text || data.result_description) || ""
         ).trim();
+        const resultValue = String(
+          data && (data.team_result !== undefined && data.team_result !== null ? data.team_result : data.center_digit) || ""
+        ).trim();
+        const resultStatus = String(data && (data.status || data.match_status) || "").trim();
+        const isEventStatus = /caught|bowled|run.?out|stumped|lbw|hit wicket|drinks|lunch|tea|innings break|rain|delay|abandon|no result/i.test(resultStatus);
+        const primaryText = description || resultValue || (isEventStatus ? resultStatus : "");
         const ballLabel = String(
           data && (data.team_result_ball || data.result_ball) || ""
         ).trim();
 
-        messageNode.textContent = description || "—";
-        ballNode.textContent = ballLabel && description ? ballLabel : "";
-        ballNode.classList.toggle("is-visible", Boolean(ballLabel && description));
+        messageNode.textContent = primaryText || "—";
+        ballNode.textContent = ballLabel && primaryText ? ballLabel : "";
+        ballNode.classList.toggle("is-visible", Boolean(ballLabel && primaryText));
         hero.setAttribute(
           "aria-label",
-          description ? (ballLabel ? description + " " + ballLabel : description) : "CREX result message unavailable"
+          primaryText ? (ballLabel ? primaryText + " " + ballLabel : primaryText) : "CREX result unavailable"
         );
         hero.classList.add("is-live-result-message");
         hero.classList.remove("is-live-over-feed");
@@ -2055,6 +2062,14 @@
         }
       }
 
+      // Background tabs may throttle timers; the server poller continues refreshing independently.
+      // Fetch immediately when the page becomes visible/focused again to paint the newest cached snapshot.
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) fetchScores();
+      });
+      window.addEventListener("focus", fetchScores);
+      window.addEventListener("online", fetchScores);
+
       function loadNewMatch(url) {
         if (!url) return;
         activeTargetUrl = cleanCrexUrl(url);
@@ -2451,6 +2466,28 @@ html.ps-obs-mode #scoreboardCanvas {
   .score-card-main { padding: 0 10px !important; }
   #mainScoreHero.is-live-result-message { font-size: 46px !important; }
   #mainScoreResultBall { font-size: 20px !important; }
+}
+</style>
+
+
+<style id="preetSportsVisibilityRefresh">
+/* Keep event text highly legible; longer CREX statuses shrink slightly without clipping. */
+#mainScoreHero.is-live-result-message {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: 56px !important;
+}
+#mainScoreResultText {
+  width: 100% !important;
+  text-align: center !important;
+  text-wrap: balance;
+}
+#mainScoreHero.is-live-result-message.is-long-result #mainScoreResultText {
+  font-size: 42px !important;
+}
+@media (max-width: 1100px) {
+  #mainScoreHero.is-live-result-message { font-size: 46px !important; }
+  #mainScoreHero.is-live-result-message.is-long-result #mainScoreResultText { font-size: 34px !important; }
 }
 </style>
 
