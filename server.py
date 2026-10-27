@@ -408,8 +408,8 @@ def api_scrape():
             if age <= SCORE_CACHE_TTL_SECONDS:
                 return _score_response(entry["data"], age, refreshing=(url in _SCORE_REFRESHING))
 
-            last_failed = _SCORE_REFRESH_FAILED_AT.get(url, 0.0)
-            retry_allowed = (now - last_failed) >= SCORE_REFRESH_RETRY_SECONDS
+            last_failed = _SCORE_REFRESH_FAILED_AT.get(url)
+            retry_allowed = last_failed is None or (now - last_failed) >= SCORE_REFRESH_RETRY_SECONDS
             if url not in _SCORE_REFRESHING and retry_allowed:
                 _SCORE_REFRESHING.add(url)
                 should_start_background_refresh = True
