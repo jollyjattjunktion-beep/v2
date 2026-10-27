@@ -1901,7 +1901,12 @@
       const urlInput = document.getElementById("crexUrlInput");
       if (urlInput) urlInput.value = activeTargetUrl;
 
+      let scoreFetchInFlight = false;
+
       async function fetchScores() {
+        // Avoid queued/overlapping requests when CREX or the Render instance is slow.
+        if (scoreFetchInFlight) return;
+        scoreFetchInFlight = true;
         try {
           let fetchEndpoint = "";
           if (currentObsToken) {
@@ -1915,14 +1920,24 @@
           const res = await fetch(fetchEndpoint, {
             method: "GET",
             cache: "no-store",
-            mode: "cors"
+            mode: "cors",
+            headers: { "Cache-Control": "no-cache", "Pragma": "no-cache" }
           });
           if (res.ok) {
             const data = await res.json();
             renderScoreData(data);
-            document.getElementById("statusIndicator").textContent = "LIVE • SYNCED";
+            const refreshState = res.headers.get("X-Score-Refresh-Status") || "";
+            document.getElementById("statusIndicator").textContent =
+              refreshState === "refreshing" ? "LIVE • UPDATING" : "LIVE • SYNCED";
+          } else {
+            document.getElementById("statusIndicator").textContent = "RETRYING…";
           }
-        } catch (_) {}
+        } catch (_) {
+          const status = document.getElementById("statusIndicator");
+          if (status) status.textContent = "RETRYING…";
+        } finally {
+          scoreFetchInFlight = false;
+        }
       }
 
       function loadNewMatch(url) {
@@ -1999,7 +2014,7 @@
 
       window.addEventListener("load", () => {
         loadNewMatch(activeTargetUrl);
-        setInterval(fetchScores, 3500);
+        setInterval(fetchScores, 1000);
       });
     </script>
 
