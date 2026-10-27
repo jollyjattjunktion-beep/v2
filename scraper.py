@@ -141,7 +141,7 @@ def scrape_crex_match(url: str):
                  if key.lower() not in {"_ps_refresh"}]
         query.append(("_ps_refresh", str(int(time.time() * 1000))))
         fresh_request_url = urlunparse(parsed_url._replace(query=urlencode(query)))
-        resp = requests.get(fresh_request_url, headers=HEADERS, timeout=12)
+        resp = requests.get(fresh_request_url, headers=HEADERS, timeout=(3, 5))
         resp.raise_for_status()
         html = resp.text
     except Exception as e:
