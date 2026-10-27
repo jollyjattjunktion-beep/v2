@@ -904,7 +904,10 @@
               </div>
             </div>
 
-            <div class="score-digits-hero" id="mainScoreHero">—</div>
+            <div class="score-digits-hero" id="mainScoreHero">
+              <span id="mainScoreResultText">—</span>
+              <span id="mainScoreResultBall"></span>
+            </div>
             <div class="overs-stack">
               <span class="overs-num" id="mainOversHero">—</span>
               <span class="overs-text">OVERS</span>
@@ -1545,23 +1548,29 @@
         return { balls, total: String(total) };
       }
 
-      function renderLiveOverFeedHero(balls) {
+      function renderLiveCrexResultHero(data) {
         const hero = document.getElementById("mainScoreHero");
-        if (!hero) return;
-        const values = (Array.isArray(balls) ? balls : []).slice(-6).map((raw) => {
-          const original = String(typeof raw === "object"
-            ? (raw.text ?? raw.value ?? raw.label ?? raw.result ?? "")
-            : raw).trim().replace(/\s+/g, "").replace(/[()]/g, "");
-          const low = original.toLowerCase();
-          if (!original || /^(\.|0|dot|•)$/.test(low)) return "0";
-          if (/^(w|wk|out|wicket)$/.test(low) || low.includes("wicket")) return "W";
-          if (low.includes("wide")) return (original.match(/^\d+/) || ["1"])[0] + "WD";
-          if (low.includes("no-ball") || low.includes("noball")) return (original.match(/^\d+/) || ["1"])[0] + "NB";
-          return original;
-        });
-        hero.textContent = values.length ? values.join("   ") : "—";
-        hero.setAttribute("aria-label", values.length ? "Current over live feed: " + values.join(", ") : "Current over feed unavailable");
-        hero.classList.add("is-live-over-feed");
+        const messageNode = document.getElementById("mainScoreResultText");
+        const ballNode = document.getElementById("mainScoreResultBall");
+        if (!hero || !messageNode || !ballNode) return;
+
+        // Use CREX's own .font3 result message; .font2 is the optional secondary label.
+        const description = String(
+          data && (data.team_result_description || data.team_result_text || data.result_description) || ""
+        ).trim();
+        const ballLabel = String(
+          data && (data.team_result_ball || data.result_ball) || ""
+        ).trim();
+
+        messageNode.textContent = description || "—";
+        ballNode.textContent = ballLabel && description ? ballLabel : "";
+        ballNode.classList.toggle("is-visible", Boolean(ballLabel && description));
+        hero.setAttribute(
+          "aria-label",
+          description ? (ballLabel ? description + " " + ballLabel : description) : "CREX result message unavailable"
+        );
+        hero.classList.add("is-live-result-message");
+        hero.classList.remove("is-live-over-feed");
       }
 
       function renderCurrentOverBalls(balls) {
@@ -1894,12 +1903,13 @@
         }
 
         document.getElementById("mainScoreTag").textContent = battingCode;
-        document.getElementById("mainScoreHero").textContent = battingScore.replace("-", "/");
+        // Intentionally do not place the innings score or overs in the second-row blue box.
+        // The team banners above continue to show the score and overs.
         document.getElementById("mainOversHero").textContent = battingOvers;
 
-        // Use the second-row blue panel for the large live-ball feed, not duplicate innings score/overs.
+        // Put CREX's live result text in the blue box; current-over balls remain in their own panel.
+        renderLiveCrexResultHero(data);
         const overInfo = extractCurrentOverInfo(data);
-        renderLiveOverFeedHero(overInfo.balls);
         renderCurrentOverBalls(overInfo.balls);
         const currentOverTotal = document.getElementById("currentOverTotal");
         if (currentOverTotal) currentOverTotal.textContent =
@@ -2368,6 +2378,68 @@ html.ps-obs-mode #scoreboardCanvas {
   .over-card-header { padding: 0 8px !important; }
   .current-over-heading { font-size: 17px !important; }
   .current-over-total { font-size: 13px !important; }
+}
+</style>
+
+
+<style id="preetSportsCrexResultHeroFix">
+/* The second-row blue panel is reserved for CREX result text, not duplicated score or overs. */
+#mainScoreTag,
+#teamResultContainer,
+.score-card-main .overs-stack {
+  display: none !important;
+}
+.score-card-main {
+  justify-content: center !important;
+  padding: 0 18px !important;
+}
+#mainScoreHero.is-live-result-message {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  overflow: hidden !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: 56px !important;
+  font-weight: 900 !important;
+  line-height: .96 !important;
+  letter-spacing: .4px !important;
+  text-align: center !important;
+  text-shadow: 0 2px 7px rgba(0,0,0,.72) !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
+#mainScoreResultText {
+  display: block !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: inherit !important;
+  font-weight: 900 !important;
+  line-height: .98 !important;
+}
+#mainScoreResultBall {
+  display: none;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: 1px !important;
+}
+#mainScoreResultBall.is-visible {
+  display: block !important;
+}
+@media (max-width: 1100px) {
+  .score-card-main { padding: 0 10px !important; }
+  #mainScoreHero.is-live-result-message { font-size: 46px !important; }
+  #mainScoreResultBall { font-size: 20px !important; }
 }
 </style>
 
