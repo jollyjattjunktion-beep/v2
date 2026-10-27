@@ -990,6 +990,7 @@
               <span class="overs-num" id="mainOversHero">—</span>
               <span class="overs-text">OVERS</span>
             </div>
+            <span class="crex-result-chip" id="crexTeamResultChip" title="Value read from CREX .team-result .result-box .font1">0</span>
           </div>
 
           <div class="current-over-card">
@@ -1879,6 +1880,16 @@
         document.getElementById("mainScoreHero").textContent = battingScore.replace("-", "/");
         document.getElementById("mainOversHero").textContent = battingOvers;
 
+        // The number comes directly from CREX: .team-result .result-box .font1.
+        const crexResultValue = firstUseful(data.team_result, data.center_digit, data.centerDigit, "");
+        const crexResultChip = document.getElementById("crexTeamResultChip");
+        if (crexResultChip) {
+          const resultText = crexResultValue === null || crexResultValue === undefined ? "" : String(crexResultValue).trim();
+          crexResultChip.textContent = resultText;
+          crexResultChip.classList.toggle("is-visible", resultText !== "");
+          crexResultChip.setAttribute("aria-label", resultText ? `CREX result value ${resultText}` : "CREX result value unavailable");
+        }
+
         renderCurrentOverBalls(extractCurrentOverBalls(data));
 
         const activeBattingFull = (battingCode === t1Code) ? t1FullName : t2FullName;
@@ -2136,5 +2147,86 @@
         });
       })();
     </script>
-  </body>
+  
+<style id="preetSportsScoreColorAndResultChipFix">
+/* Restore broadcast score contrast: never let scores inherit black text on blue/red panels. */
+.fixture-pod .team-hero-scoreline strong {
+  color: #ffffff !important;
+  text-shadow: 0 2px 5px rgba(0,0,0,.55) !important;
+}
+.fixture-pod .team-hero-scoreline span {
+  color: #e5f5ff !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,.5) !important;
+}
+.score-card-main .score-digits-hero {
+  color: #ffffff !important;
+  text-shadow: 0 2px 6px rgba(0,0,0,.6) !important;
+}
+/* Show the scraped CREX team-result number inside the blue second-row score box. */
+.score-card-main {
+  position: relative !important;
+}
+.crex-result-chip {
+  display: none !important;
+  position: absolute !important;
+  right: 12px !important;
+  top: 5px !important;
+  z-index: 8 !important;
+  min-width: 26px !important;
+  height: 23px !important;
+  padding: 0 7px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(117,231,255,.95) !important;
+  border-radius: 7px !important;
+  background: linear-gradient(180deg,#0c4778,#062746) !important;
+  color: #ffcf45 !important;
+  font: 900 15px/1 "Montserrat",sans-serif !important;
+  box-shadow: 0 2px 7px rgba(0,0,0,.38) !important;
+}
+.crex-result-chip.is-visible {
+  display: inline-flex !important;
+}
+/* Persistent CREX-style circular backing behind each player's head, independent of initials fallback. */
+.v9-avatar-wrap {
+  position: absolute !important;
+  isolation: isolate !important;
+}
+.v9-avatar-wrap::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 20px !important;
+  transform: translateX(-50%) !important;
+  width: 68px !important;
+  height: 68px !important;
+  border-radius: 50% !important;
+  border: 2px solid var(--v9-gold, #ffbe18) !important;
+  background: radial-gradient(circle at 35% 25%, rgba(35,101,154,.98), rgba(4,19,36,.99) 72%) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.12) !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+.v9-avatar-wrap .player-avatar-initials {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 20px !important;
+  transform: translateX(-50%) !important;
+  width: 68px !important;
+  height: 68px !important;
+  border: 0 !important;
+  background: transparent !important;
+  z-index: 1 !important;
+}
+.v9-avatar-wrap .player-avatar-photo[src] {
+  z-index: 2 !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+}
+.v9-avatar-wrap .player-jersey-overlay {
+  z-index: 3 !important;
+}
+</style>
+
+</body>
 </html>
