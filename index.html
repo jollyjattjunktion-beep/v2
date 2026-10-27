@@ -1083,9 +1083,9 @@
 
       function cleanRawPlayerName(name) {
         return String(name || "")
-          .replace(/\b(logo|photo|profile|headshot|picture|jersey|jersy|shirt|uniform|kit|image)\b/gi, " ")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/\b(jr|sr|ii|iii|iv)\b/gi, "")
+          .replace(/(logo|photo|profile|headshot|picture|jersey|jersy|shirt|uniform|kit|image)/gi, " ")
+          .replace(/[̀-ͯ]/g, "")
+          .replace(/(jr|sr|ii|iii|iv)/gi, "")
           .replace(/[^a-zA-Z0-9 ]/g, " ")
           .trim()
           .replace(/\s+/g, " ");
@@ -1492,7 +1492,7 @@
             }
             const alt = (tImg.getAttribute("alt") || tImg.getAttribute("title") || "").trim();
             if (alt) {
-              const cleanAlt = alt.replace(/\b(?:logo|team|flag|crest)\b/gi, "").trim().toUpperCase();
+              const cleanAlt = alt.replace(/(?:logo|team|flag|crest)/gi, "").trim().toUpperCase();
               if (cleanAlt) window.__crexTeamLogos.set(cleanAlt, src);
             }
           }
