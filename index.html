@@ -912,7 +912,10 @@
           </div>
 
           <div class="current-over-card">
-            <div class="over-card-header">CURRENT OVER</div>
+            <div class="over-card-header">
+              <span class="current-over-heading">CURRENT OVER</span>
+              <span id="currentOverTotal" class="current-over-total">TOTAL: —</span>
+            </div>
             <div class="over-card-balls" id="currentOverBallsContainer">
               <div class="ball-circle dot">–</div>
               <div class="ball-circle dot">–</div>
@@ -1500,6 +1503,67 @@
         return [];
       }
 
+      function extractCurrentOverInfo(data) {
+        const sources = [
+          data && data.current_over,
+          data && data.currentOver,
+          data && data.current_over_data,
+          data && data.currentOverData
+        ];
+        let selected = null;
+        for (const item of sources) {
+          if (item && !Array.isArray(item) && typeof item === "object" &&
+              (Array.isArray(item.balls) || Array.isArray(item.deliveries) || item.total !== undefined)) {
+            selected = item;
+            break;
+          }
+        }
+        if (!selected && Array.isArray(data && data.structured_overs) && data.structured_overs.length) {
+          selected = data.structured_overs[data.structured_overs.length - 1];
+        }
+        const balls = extractCurrentOverBalls(data);
+        const explicitTotal = selected && (selected.total ?? selected.runs ?? selected.run_total ?? selected.over_total);
+        if (explicitTotal !== undefined && explicitTotal !== null && String(explicitTotal).trim() !== "") {
+          const match = String(explicitTotal).match(/-?\d+(?:\.\d+)?/g);
+          if (match && match.length) return { balls, total: match[match.length - 1] };
+        }
+
+        // Fallback: estimate from the actual ball labels if CREX did not expose its over total.
+        // Wides/no-balls include their one-run penalty; wicket/dot balls add zero.
+        let total = 0;
+        for (const raw of balls) {
+          const original = String(typeof raw === "object"
+            ? (raw.text ?? raw.value ?? raw.label ?? raw.result ?? "")
+            : raw).trim().toLowerCase().replace(/\s+/g, "");
+          if (!original || /^(\.|0|dot|•|w|wk|out|wicket)$/.test(original)) continue;
+          const n = Number((original.match(/^\d+/) || [""])[0] || 0);
+          if (/^(wd|wide)/.test(original)) total += (n || 0) + 1;
+          else if (/^(nb|no-ball|noball)/.test(original)) total += (n || 0) + 1;
+          else if (/^\d/.test(original)) total += n;
+          else if (/^(b|lb)/.test(original)) total += n;
+        }
+        return { balls, total: String(total) };
+      }
+
+      function renderLiveOverFeedHero(balls) {
+        const hero = document.getElementById("mainScoreHero");
+        if (!hero) return;
+        const values = (Array.isArray(balls) ? balls : []).slice(-6).map((raw) => {
+          const original = String(typeof raw === "object"
+            ? (raw.text ?? raw.value ?? raw.label ?? raw.result ?? "")
+            : raw).trim().replace(/\s+/g, "").replace(/[()]/g, "");
+          const low = original.toLowerCase();
+          if (!original || /^(\.|0|dot|•)$/.test(low)) return "0";
+          if (/^(w|wk|out|wicket)$/.test(low) || low.includes("wicket")) return "W";
+          if (low.includes("wide")) return (original.match(/^\d+/) || ["1"])[0] + "WD";
+          if (low.includes("no-ball") || low.includes("noball")) return (original.match(/^\d+/) || ["1"])[0] + "NB";
+          return original;
+        });
+        hero.textContent = values.length ? values.join("   ") : "—";
+        hero.setAttribute("aria-label", values.length ? "Current over live feed: " + values.join(", ") : "Current over feed unavailable");
+        hero.classList.add("is-live-over-feed");
+      }
+
       function renderCurrentOverBalls(balls) {
         const container = document.getElementById("currentOverBallsContainer");
         if (!container) return;
@@ -1540,7 +1604,7 @@
               display = "6";
               div.classList.add("six");
             } else if (/^(\.|0|dot|•)$/.test(low)) {
-              display = "•";
+              display = "0";
               div.classList.add("dot");
             }
 
@@ -1833,8 +1897,13 @@
         document.getElementById("mainScoreHero").textContent = battingScore.replace("-", "/");
         document.getElementById("mainOversHero").textContent = battingOvers;
 
-        // Render current over balls
-        renderCurrentOverBalls(extractCurrentOverBalls(data));
+        // Use the second-row blue panel for the large live-ball feed, not duplicate innings score/overs.
+        const overInfo = extractCurrentOverInfo(data);
+        renderLiveOverFeedHero(overInfo.balls);
+        renderCurrentOverBalls(overInfo.balls);
+        const currentOverTotal = document.getElementById("currentOverTotal");
+        if (currentOverTotal) currentOverTotal.textContent =
+          overInfo.balls.length ? `TOTAL: ${overInfo.total}` : "TOTAL: —";
 
         // Update Dynamic Batting / Bowling Context bar
         const activeBattingFull = (battingCode === t1Code) ? t1FullName : t2FullName;
@@ -2232,6 +2301,73 @@ html.ps-obs-mode .url-control-bar {
 }
 html.ps-obs-mode #scoreboardCanvas {
   flex-shrink: 0 !important;
+}
+</style>
+
+
+<style id="preetSportsLiveOverFeedDisplayFix">
+/* The second-row blue panel is now a large white live-over feed, not duplicate score/overs. */
+#mainScoreTag {
+  display: none !important;
+}
+.score-card-main {
+  justify-content: flex-start !important;
+  gap: 0 !important;
+}
+#teamResultContainer {
+  flex: 0 0 auto !important;
+  margin-left: 10px !important;
+  margin-right: 10px !important;
+}
+#mainScoreHero.is-live-over-feed {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  overflow: hidden !important;
+  text-align: center !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: 68px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: 2px !important;
+  text-shadow: 0 2px 6px rgba(0,0,0,.6) !important;
+  white-space: nowrap !important;
+  font-variant-numeric: tabular-nums !important;
+}
+.score-card-main .overs-stack {
+  display: none !important;
+}
+/* Keep the over total visible without changing the gold header's existing theme. */
+.over-card-header {
+  justify-content: space-between !important;
+  gap: 8px !important;
+  padding: 0 14px !important;
+  letter-spacing: .8px !important;
+}
+.current-over-heading {
+  color: #101622 !important;
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+.current-over-total {
+  color: #06172a !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+  letter-spacing: .2px !important;
+}
+.ball-circle.dot {
+  color: #ffffff !important;
+  font-size: 28px !important;
+}
+@media (max-width: 1100px) {
+  #mainScoreHero.is-live-over-feed { font-size: 59px !important; letter-spacing: 1px !important; }
+  #teamResultContainer { margin-left: 6px !important; margin-right: 6px !important; }
+  .over-card-header { padding: 0 8px !important; }
+  .current-over-heading { font-size: 17px !important; }
+  .current-over-total { font-size: 13px !important; }
 }
 </style>
 
