@@ -216,12 +216,17 @@ def scrape_crex_match(url: str):
                 team1["score"] = runs_txt
                 team1["overs"] = overs_txt
 
+        # Prefer the exact value used by CREX in .team-result .result-box .font1.
+        result_value_el = card.select_one(".team-result .result-box .font1")
+        if result_value_el:
+            center_digit = result_value_el.get_text(" ", strip=True)
+
         res_box = card.find(class_=re.compile("result-box|team-result"))
         if res_box:
             txt = res_box.get_text(" ", strip=True)
-            if len(txt) <= 3 and any(c.isdigit() or c in "WwNnBb" for c in txt):
+            if not center_digit and len(txt) <= 3 and any(c.isdigit() or c in "WwNnBb" for c in txt):
                 center_digit = txt
-            elif txt:
+            elif txt and not center_digit:
                 status = txt
 
         t2_div = card.find("div", class_=re.compile("second-inning"))
@@ -503,6 +508,7 @@ def scrape_crex_match(url: str):
         "full_header": header_text,
         "team1": team1,
         "team2": team2,
+        "team_result": center_digit or None,
         "status": status,
         "equation": equation,
         "crr": crr,
