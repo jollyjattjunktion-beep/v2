@@ -80,7 +80,13 @@ def _score_poll_worker(url):
                 time.sleep(SCORE_REFRESH_RETRY_SECONDS)
                 continue
 
-        time.sleep(SCORE_POLL_INTERVAL_SECONDS)
+        # Hot loop while any client is actively viewing this match. Background tabs are
+        # throttled by Chromium, so keep refreshing more gently instead of stopping.
+        with _SCORE_CACHE_LOCK:
+            last_requested = _SCORE_LAST_REQUESTED.get(url, 0.0)
+        client_idle_seconds = max(0.0, time.monotonic() - last_requested)
+        poll_delay = SCORE_POLL_INTERVAL_SECONDS if client_idle_seconds < 5.0 else 2.5
+        time.sleep(poll_delay)
 
 
 def _score_response(data, cache_age_seconds=0.0, refreshing=False, status_code=200):
