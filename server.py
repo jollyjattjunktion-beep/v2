@@ -20,9 +20,13 @@ logger = logging.getLogger("preet_sports_v2")
 # A stale snapshot is returned immediately while one background refresh runs per match URL.
 SCORE_CACHE_TTL_SECONDS = 0.75
 SCORE_REFRESH_RETRY_SECONDS = 2.0
+SCORE_POLL_INTERVAL_SECONDS = 0.60
+SCORE_CLIENT_IDLE_SECONDS = 15.0
 _SCORE_CACHE = {}
 _SCORE_REFRESHING = set()
 _SCORE_REFRESH_FAILED_AT = {}
+_SCORE_POLL_WORKERS = set()
+_SCORE_LAST_REQUESTED = {}
 _SCORE_CACHE_LOCK = threading.Lock()
 
 def _fetch_and_cache_score(url):
@@ -48,6 +52,31 @@ def _fetch_and_cache_score(url):
             _SCORE_REFRESH_FAILED_AT[url] = now
         _SCORE_REFRESHING.discard(url)
     return data
+
+def _score_poll_worker(url):
+    """Continuously refresh one active match while any browser/OBS client is polling it."""
+    while True:
+        with _SCORE_CACHE_LOCK:
+            last_requested = _SCORE_LAST_REQUESTED.get(url)
+            if last_requested is None or (time.monotonic() - last_requested) > SCORE_CLIENT_IDLE_SECONDS:
+                _SCORE_POLL_WORKERS.discard(url)
+                _SCORE_LAST_REQUESTED.pop(url, None)
+                return
+
+            # A cold-start request or another route may currently be fetching this URL.
+            should_fetch = url not in _SCORE_REFRESHING
+            if should_fetch:
+                _SCORE_REFRESHING.add(url)
+
+        if should_fetch:
+            data = _fetch_and_cache_score(url)
+            # If CREX is down/blocked, back off instead of hammering it.
+            if not data.get("success"):
+                time.sleep(SCORE_REFRESH_RETRY_SECONDS)
+                continue
+
+        time.sleep(SCORE_POLL_INTERVAL_SECONDS)
+
 
 def _score_response(data, cache_age_seconds=0.0, refreshing=False, status_code=200):
     response = jsonify(data)
@@ -400,47 +429,51 @@ def api_scrape():
         return jsonify({"success": False, "error": "Provide an HTTPS CREX match URL on crex.com"}), 400
 
     now = time.monotonic()
-    should_start_background_refresh = False
+    cached_data = None
+    cached_age = 0.0
+    refreshing = False
+    start_worker = False
+    cold_fetch = False
+
     with _SCORE_CACHE_LOCK:
+        _SCORE_LAST_REQUESTED[url] = now
         entry = _SCORE_CACHE.get(url)
+
         if entry:
-            age = max(0.0, now - entry["fetched_at"])
-            if age <= SCORE_CACHE_TTL_SECONDS:
-                return _score_response(entry["data"], age, refreshing=(url in _SCORE_REFRESHING))
-
-            last_failed = _SCORE_REFRESH_FAILED_AT.get(url)
-            retry_allowed = last_failed is None or (now - last_failed) >= SCORE_REFRESH_RETRY_SECONDS
-            if url not in _SCORE_REFRESHING and retry_allowed:
-                _SCORE_REFRESHING.add(url)
-                should_start_background_refresh = True
             cached_data = entry["data"]
-            cached_age = age
-            refresh_in_progress = url in _SCORE_REFRESHING
+            cached_age = max(0.0, now - entry["fetched_at"])
+            refreshing = url in _SCORE_REFRESHING
+            if url not in _SCORE_POLL_WORKERS:
+                _SCORE_POLL_WORKERS.add(url)
+                start_worker = True
+        elif url in _SCORE_REFRESHING:
+            response, code = _score_response(
+                {"success": False, "error": "Initial score snapshot is being fetched; retry shortly", "url": url},
+                refreshing=True,
+                status_code=503,
+            )
+            return response, code
         else:
-            # A cold start needs one real snapshot. Other simultaneous clients should retry
-            # shortly instead of launching duplicate CREX requests.
-            if url in _SCORE_REFRESHING:
-                response, code = _score_response(
-                    {"success": False, "error": "Initial score snapshot is being fetched; retry shortly", "url": url},
-                    refreshing=True,
-                    status_code=503,
-                )
-                return response, code
+            # Only the first call for a match waits for its first valid snapshot.
             _SCORE_REFRESHING.add(url)
-            cached_data = None
-            cached_age = 0.0
-            refresh_in_progress = True
+            cold_fetch = True
 
-    if cached_data is None:
+    if cold_fetch:
         data = _fetch_and_cache_score(url)
+        with _SCORE_CACHE_LOCK:
+            _SCORE_LAST_REQUESTED[url] = time.monotonic()
+            if url not in _SCORE_POLL_WORKERS:
+                _SCORE_POLL_WORKERS.add(url)
+                start_worker = True
+        if start_worker:
+            threading.Thread(target=_score_poll_worker, args=(url,), daemon=True, name="crex-live-poll").start()
         return _score_response(data, 0.0, refreshing=False, status_code=(200 if data.get("success") else 502))
 
-    if should_start_background_refresh:
-        worker = threading.Thread(target=_fetch_and_cache_score, args=(url,), daemon=True, name="crex-score-refresh")
-        worker.start()
+    if start_worker:
+        threading.Thread(target=_score_poll_worker, args=(url,), daemon=True, name="crex-live-poll").start()
 
-    # Serve the last known good score immediately while CREX is being refreshed in the background.
-    return _score_response(cached_data, cached_age, refreshing=refresh_in_progress)
+    # Serve the latest completed score immediately; the shared poller updates this cache in the background.
+    return _score_response(cached_data, cached_age, refreshing=(refreshing and cached_age > 1.5))
 
 @app.route("/api/crex-assets")
 def api_crex_assets():
