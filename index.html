@@ -505,7 +505,7 @@
       .stat-divider { width: 1.5px; height: 25px; background: rgba(75, 137, 184, 0.48); }
 
       /* =========================================================
-         CREX 1:1 CALIBRATED BUST (HEAD: 60px | JERSEY: 58px)
+         CREX BUST (SCALED +10px: HEAD 70px | JERSEY 68px)
       ========================================================= */
       .v9-player-deck {
         position: absolute;
@@ -564,20 +564,21 @@
       .v9-avatar-wrap {
         position: absolute;
         z-index: 8;
-        left: 12px;
+        left: 10px;
         bottom: 29px;
-        width: 86px;
-        height: 98px;
+        width: 96px;
+        height: 108px;
         overflow: visible;
         isolation: isolate;
       }
 
       .v9-avatar-wrap .player-avatar-initials {
         position: absolute;
-        left: 13px;
+        left: 50%;
+        transform: translateX(-50%);
         bottom: 20px;
-        width: 60px;
-        height: 60px;
+        width: 68px;
+        height: 68px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -585,19 +586,19 @@
         border: 2px solid #ffbe18;
         border-radius: 50%;
         color: #fff;
-        font-size: 22px;
+        font-size: 24px;
         font-weight: 900;
         z-index: 1;
       }
 
-      /* Head Cutout: 60px height, lowered so the neck slides inside the collar */
+      /* Head Cutout: +10px (width: 86px, height: 70px), neck securely inside collar */
       .v9-avatar-wrap .player-avatar-photo[src] {
         position: absolute !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        bottom: 20px !important;
-        width: 76px !important;
-        height: 60px !important;
+        bottom: 23px !important;
+        width: 86px !important;
+        height: 70px !important;
         display: block !important;
         object-fit: contain !important;
         object-position: center bottom !important;
@@ -606,14 +607,14 @@
         -webkit-mask-image: none !important;
       }
 
-      /* Jersey Layer: 58px height, positioned at bottom with collar framing the neck */
+      /* Jersey Layer: +10px (width: 86px, height: 68px), positioned at bottom */
       .v9-avatar-wrap .player-jersey-overlay {
         position: absolute !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
         bottom: 0 !important;
-        width: 76px !important;
-        height: 58px !important;
+        width: 86px !important;
+        height: 68px !important;
         z-index: 3 !important;
         object-fit: contain !important;
         object-position: center bottom !important;
@@ -624,7 +625,7 @@
       .v9-player-name {
         position: absolute;
         z-index: 9;
-        left: 110px;
+        left: 118px;
         right: 8px;
         top: 8px;
         font-size: 23px;
@@ -639,7 +640,7 @@
       .v9-primary-metric {
         position: absolute;
         z-index: 9;
-        left: 110px;
+        left: 118px;
         right: 8px;
         top: 45px;
         display: flex;
@@ -651,7 +652,7 @@
       .v9-primary-metric:not(.v9-bowler-metric) > span:first-child { display: none; }
       .v9-primary-metric > strong { font-size: 50px; font-weight: 900; color: #ffce42; line-height: 0.92; }
 
-      .v9-bowler-metric { left: 110px; right: 8px; top: 48px; gap: 4px; }
+      .v9-bowler-metric { left: 118px; right: 8px; top: 48px; gap: 4px; }
       .v9-bowler-metric > span { font-size: 11px; }
       .v9-bowler-metric > strong { font-size: 32px; }
       .v9-bowler-metric > em { color: #4acff0; font-size: 18px; font-style: normal; }
@@ -1082,9 +1083,9 @@
 
       function cleanRawPlayerName(name) {
         return String(name || "")
-          .replace(/\b(logo|photo|profile|headshot|picture|jersey|jersy|shirt|uniform|kit|image)\b/gi, " ")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/\b(jr|sr|ii|iii|iv)\b/gi, "")
+          .replace(/(logo|photo|profile|headshot|picture|jersey|jersy|shirt|uniform|kit|image)/gi, " ")
+          .replace(/[̀-ͯ]/g, "")
+          .replace(/(jr|sr|ii|iii|iv)/gi, "")
           .replace(/[^a-zA-Z0-9 ]/g, " ")
           .trim()
           .replace(/\s+/g, " ");
@@ -1462,7 +1463,8 @@
       function extractTossFromHtml(doc) {
         if (!doc || !doc.body) return "";
         const text = doc.body.innerText || doc.body.textContent || "";
-        const lines = text.split(/\n+/).map(s => s.trim()).filter(Boolean);
+        const lines = text.split(/
++/).map(s => s.trim()).filter(Boolean);
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i];
           if (/(?:won (?:the )?toss|opt(?:ed)? to (?:bat|bowl)|elect(?:ed)? to (?:bat|bowl)|chose to (?:bat|bowl))/i.test(line)) {
@@ -1490,7 +1492,7 @@
             }
             const alt = (tImg.getAttribute("alt") || tImg.getAttribute("title") || "").trim();
             if (alt) {
-              const cleanAlt = alt.replace(/\b(?:logo|team|flag|crest)\b/gi, "").trim().toUpperCase();
+              const cleanAlt = alt.replace(/(?:logo|team|flag|crest)/gi, "").trim().toUpperCase();
               if (cleanAlt) window.__crexTeamLogos.set(cleanAlt, src);
             }
           }
@@ -1527,7 +1529,8 @@
 
         // 5. Parse recent over balls from CREX HTML text
         const textLines = (doc.body?.innerText || doc.body?.textContent || "")
-          .split(/\n+/)
+          .split(/
++/)
           .map((s) => s.trim())
           .filter(Boolean);
         for (let i = 0; i < textLines.length; i++) {
@@ -1827,7 +1830,9 @@
       document.getElementById("generateObsBtn").addEventListener("click", () => {
         const obsUrl = `${window.location.origin}${window.location.pathname}?match=${encodeURIComponent(activeTargetUrl)}&obs=1`;
         navigator.clipboard.writeText(obsUrl).then(() => {
-          alert("OBS Browser Source URL copied to clipboard:\n\n" + obsUrl);
+          alert("OBS Browser Source URL copied to clipboard:
+
+" + obsUrl);
         });
       });
 
