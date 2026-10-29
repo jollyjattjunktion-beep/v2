@@ -2822,5 +2822,77 @@ html.ps-obs-mode #scoreboardCanvas {
 }
 </style>
 
+
+<style id="preetSportsJerseyNeckBlendFix">
+/* Use the exact jersey paired to each portrait in CREX's playerProfileDefault markup.
+   Keep the head cutout sharp, fade only its lower neck edge, and bring the shirt collar in front. */
+.v9-avatar-wrap {
+  position: absolute !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+.v9-avatar-wrap .player-avatar-photo[src] {
+  z-index: 5 !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 61%,
+    rgba(0,0,0,.97) 66%,
+    rgba(0,0,0,.78) 72%,
+    rgba(0,0,0,.42) 79%,
+    rgba(0,0,0,.12) 85%,
+    transparent 89%
+  ) !important;
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 61%,
+    rgba(0,0,0,.97) 66%,
+    rgba(0,0,0,.78) 72%,
+    rgba(0,0,0,.42) 79%,
+    rgba(0,0,0,.12) 85%,
+    transparent 89%
+  ) !important;
+}
+.v9-avatar-wrap .player-jersey-overlay {
+  left: 50% !important;
+  bottom: -1px !important;
+  transform: translateX(-50%) !important;
+  width: 96px !important;
+  height: 86px !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  z-index: 6 !important;
+  display: block !important;
+  pointer-events: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.28)) !important;
+}
+@media (max-width: 1100px) {
+  .v9-avatar-wrap .player-avatar-photo[src] {
+    -webkit-mask-image: linear-gradient(
+      to bottom, #000 0%, #000 61%, rgba(0,0,0,.97) 66%,
+      rgba(0,0,0,.78) 72%, rgba(0,0,0,.42) 79%,
+      rgba(0,0,0,.12) 85%, transparent 89%
+    ) !important;
+    mask-image: linear-gradient(
+      to bottom, #000 0%, #000 61%, rgba(0,0,0,.97) 66%,
+      rgba(0,0,0,.78) 72%, rgba(0,0,0,.42) 79%,
+      rgba(0,0,0,.12) 85%, transparent 89%
+    ) !important;
+  }
+  .v9-avatar-wrap .player-jersey-overlay {
+    width: 92px !important;
+    height: 83px !important;
+  }
+}
+</style>
+
 </body>
 </html>
