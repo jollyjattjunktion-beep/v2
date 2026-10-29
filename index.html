@@ -1098,6 +1098,18 @@
       function fitScoreboardToWindow() {
         const el = document.getElementById("scoreboardCanvas");
         if (!el) return;
+        const isPortraitPhone =
+          window.matchMedia &&
+          window.matchMedia("(max-width: 600px) and (orientation: portrait)").matches &&
+          !document.documentElement.classList.contains("ps-obs-mode");
+
+        /* Mobile portrait uses a natural-flow layout; only the broadcast/desktop canvas scales. */
+        if (isPortraitPhone) {
+          el.style.transform = "none";
+          el.style.transformOrigin = "top center";
+          return;
+        }
+
         const targetW = 1280;
         const targetH = 720;
         const winW = window.innerWidth || document.documentElement.clientWidth || 1280;
@@ -3201,6 +3213,562 @@ html.ps-obs-mode #scoreboardCanvas {
   }
   .v9-ball-icon { width: 19px !important; height: 19px !important; right: 6px !important; }
   .v9-bowler-card .v9-player-name { right: 31px !important; }
+}
+</style>
+
+
+<style id="preetSportsPortraitMobileLayout">
+/* Genuine phone portrait layout: content reflows and scrolls instead of shrinking the 16:9 canvas.
+   OBS mode and the desktop/broadcast layout intentionally remain untouched. */
+@media screen and (max-width: 600px) and (orientation: portrait) {
+  html:not(.ps-obs-mode),
+  html:not(.ps-obs-mode) body {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    background: #020811 !important;
+  }
+  html:not(.ps-obs-mode) .screen-wrapper {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    overflow: visible !important;
+    padding: 1px 0 12px !important;
+    background: #020811 !important;
+  }
+  html:not(.ps-obs-mode) .url-control-bar {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: calc(100% - 16px) !important;
+    max-width: none !important;
+    margin: 7px auto 10px !important;
+    padding: 8px !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  html:not(.ps-obs-mode) .url-control-bar span:not(.status-indicator) {
+    font-size: 11px !important;
+    letter-spacing: .2px !important;
+  }
+  html:not(.ps-obs-mode) .url-control-bar input {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 14px !important;
+    padding: 8px 10px !important;
+  }
+  html:not(.ps-obs-mode) .url-control-bar button {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    white-space: normal !important;
+    font-size: 11px !important;
+    line-height: 1.15 !important;
+    padding: 8px 6px !important;
+  }
+  html:not(.ps-obs-mode) .url-control-bar .status-indicator {
+    display: none !important;
+  }
+
+  html:not(.ps-obs-mode) #scoreboardCanvas {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    flex: none !important;
+    flex-shrink: 1 !important;
+    transform: none !important;
+    transform-origin: top center !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    gap: 9px !important;
+    padding: 12px 10px 8px !important;
+    background: #040d1a !important;
+    box-shadow: none !important;
+  }
+  html:not(.ps-obs-mode) #scoreboardCanvas .stadium-background {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: .25 !important;
+    pointer-events: none !important;
+  }
+
+  /* Brand header */
+  html:not(.ps-obs-mode) #scoreboardCanvas .top-brand-wrap {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    flex: none !important;
+    gap: 8px !important;
+    margin: 0 0 1px !important;
+    z-index: 30 !important;
+  }
+  html:not(.ps-obs-mode) .brand-capsule {
+    padding: 4px 12px !important;
+    gap: 5px !important;
+    border-radius: 8px !important;
+  }
+  html:not(.ps-obs-mode) .brand-capsule .brand-white,
+  html:not(.ps-obs-mode) .brand-capsule .brand-gold {
+    font-size: 19px !important;
+    letter-spacing: .3px !important;
+  }
+  html:not(.ps-obs-mode) .live-badge {
+    padding: 4px 12px !important;
+    font-size: 14px !important;
+    letter-spacing: .5px !important;
+  }
+
+  /* Team fixtures become two full-width rows instead of three cramped columns. */
+  html:not(.ps-obs-mode) #scoreboardCanvas .match-fixture-bar {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    flex: none !important;
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) !important;
+    gap: 6px !important;
+    padding: 0 !important;
+    z-index: 20 !important;
+  }
+  html:not(.ps-obs-mode) #scoreboardCanvas .fixture-pod {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 68px !important;
+    min-height: 68px !important;
+    flex: none !important;
+    gap: 10px !important;
+    padding: 6px 9px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,.35) !important;
+  }
+  html:not(.ps-obs-mode) #scoreboardCanvas .fixture-pod.left-side { grid-row: 1 !important; }
+  html:not(.ps-obs-mode) #scoreboardCanvas .center-vs-trap {
+    grid-row: 2 !important;
+    position: relative !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 23px !important;
+    min-height: 23px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    clip-path: none !important;
+    border: 0 !important;
+    background: rgba(3,12,24,.9) !important;
+    z-index: 31 !important;
+  }
+  html:not(.ps-obs-mode) #scoreboardCanvas .fixture-pod.right-side { grid-row: 3 !important; }
+  html:not(.ps-obs-mode) .vs-text-gold {
+    font-size: 18px !important;
+    line-height: 1 !important;
+  }
+  html:not(.ps-obs-mode) .sub-fixture-pill {
+    position: relative !important;
+    left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    padding: 2px 8px !important;
+    border-radius: 5px !important;
+    font-size: 10px !important;
+    line-height: 1.1 !important;
+  }
+  html:not(.ps-obs-mode) .crest-shield {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    border-width: 2px !important;
+  }
+  html:not(.ps-obs-mode) .team-hero-copy {
+    min-width: 0 !important;
+    gap: 2px !important;
+  }
+  html:not(.ps-obs-mode) .team-name-hero,
+  html:not(.ps-obs-mode) .team-name-hero.long-team-name {
+    max-width: 100% !important;
+    font-size: clamp(17px, 5vw, 22px) !important;
+    line-height: 1 !important;
+  }
+  html:not(.ps-obs-mode) .team-hero-scoreline {
+    gap: 8px !important;
+    line-height: 1 !important;
+  }
+  html:not(.ps-obs-mode) .team-hero-scoreline strong,
+  html:not(.ps-obs-mode) #team1HeroScore,
+  html:not(.ps-obs-mode) #team2HeroScore {
+    font-size: 24px !important;
+  }
+  html:not(.ps-obs-mode) .team-hero-scoreline span,
+  html:not(.ps-obs-mode) #team1HeroOvers,
+  html:not(.ps-obs-mode) #team2HeroOvers {
+    font-size: 13px !important;
+  }
+
+  /* Live hero and over-by-over feed stack; ball icons remain large enough to scan. */
+  html:not(.ps-obs-mode) #scoreboardCanvas .live-score-row {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    flex: none !important;
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) !important;
+    gap: 8px !important;
+    padding: 0 !important;
+    z-index: 18 !important;
+  }
+  html:not(.ps-obs-mode) .score-card-main {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 88px !important;
+    height: 88px !important;
+    flex: none !important;
+    padding: 0 8px !important;
+    border-radius: 10px !important;
+  }
+  html:not(.ps-obs-mode) #mainScoreHero.is-live-result-message {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 8px !important;
+    font-size: clamp(29px, 8vw, 38px) !important;
+    line-height: 1.02 !important;
+    text-align: center !important;
+  }
+  html:not(.ps-obs-mode) #mainScoreHero.is-live-result-message.is-short-result #mainScoreResultText {
+    font-size: clamp(34px, 9vw, 44px) !important;
+  }
+  html:not(.ps-obs-mode) #mainScoreHero.is-live-result-message.is-long-result #mainScoreResultText {
+    font-size: clamp(22px, 6vw, 29px) !important;
+  }
+  html:not(.ps-obs-mode) #scoreboardCanvas .current-over-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 94px !important;
+    min-height: 94px !important;
+    flex: none !important;
+    border-radius: 10px !important;
+  }
+  html:not(.ps-obs-mode) .over-card-header {
+    height: 29px !important;
+    min-height: 29px !important;
+    padding: 0 8px !important;
+    font-size: 15px !important;
+    letter-spacing: .6px !important;
+  }
+  html:not(.ps-obs-mode) .over-card-balls {
+    grid-template-columns: repeat(6,minmax(0,1fr)) !important;
+    gap: 4px !important;
+    padding: 4px 8px !important;
+  }
+  html:not(.ps-obs-mode) .ball-circle {
+    width: clamp(31px, 9vw, 38px) !important;
+    height: clamp(31px, 9vw, 38px) !important;
+    border-radius: 9px !important;
+    font-size: 20px !important;
+    border-width: 1.5px !important;
+  }
+
+  /* Match context: toss full-width, batting and bowling side-by-side. */
+  html:not(.ps-obs-mode) #scoreboardCanvas .match-context-bar {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    flex: none !important;
+    display: grid !important;
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+    gap: 7px 8px !important;
+    padding: 8px !important;
+    border-radius: 9px !important;
+    z-index: 20 !important;
+  }
+  html:not(.ps-obs-mode) .match-context-bar > div {
+    min-width: 0 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: baseline !important;
+    justify-content: flex-start !important;
+    gap: 3px 5px !important;
+    white-space: normal !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    padding: 0 !important;
+  }
+  html:not(.ps-obs-mode) .match-context-bar > .context-toss {
+    grid-column: 1 / -1 !important;
+  }
+  html:not(.ps-obs-mode) .context-label {
+    font-size: 11px !important;
+    line-height: 1.15 !important;
+    letter-spacing: .2px !important;
+  }
+  html:not(.ps-obs-mode) .match-context-bar strong {
+    min-width: 0 !important;
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+  html:not(.ps-obs-mode) #tossUpdate {
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+    overflow: hidden !important;
+  }
+
+  /* Two-column compact stats blocks are more legible than the single squeezed ribbon. */
+  html:not(.ps-obs-mode) #scoreboardCanvas .match-stats-bar {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    flex: none !important;
+    display: grid !important;
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+    gap: 7px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    z-index: 20 !important;
+  }
+  html:not(.ps-obs-mode) .match-stats-bar > .stat-divider { display: none !important; }
+  html:not(.ps-obs-mode) .match-stats-bar .stat-metric {
+    min-width: 0 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    gap: 3px 5px !important;
+    padding: 8px !important;
+    border: 1px solid rgba(255,190,24,.45) !important;
+    border-radius: 7px !important;
+    background: rgba(2,11,22,.96) !important;
+    white-space: normal !important;
+  }
+  html:not(.ps-obs-mode) .match-stats-bar .stat-metric .lbl {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+  html:not(.ps-obs-mode) .match-stats-bar .stat-metric .val {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+  html:not(.ps-obs-mode) #valLastWkt {
+    max-width: 100% !important;
+    white-space: normal !important;
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+    overflow: hidden !important;
+  }
+
+  /* Player cards become one readable vertical stack; the live player's portraits stay on the left. */
+  html:not(.ps-obs-mode) #scoreboardCanvas .v9-player-deck {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    flex: none !important;
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) !important;
+    gap: 9px !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    z-index: 22 !important;
+  }
+  html:not(.ps-obs-mode) .v9-feature-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 160px !important;
+    min-height: 160px !important;
+    overflow: hidden !important;
+    border-radius: 8px !important;
+  }
+  html:not(.ps-obs-mode) .v9-feature-body {
+    height: calc(100% - 28px) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  html:not(.ps-obs-mode) .v9-card-kicker {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding-left: 102px !important;
+    padding-right: 7px !important;
+    font-size: 0 !important;
+  }
+  html:not(.ps-obs-mode) .v9-card-kicker::before {
+    left: 102px !important;
+    right: 7px !important;
+    font-size: 16px !important;
+  }
+  html:not(.ps-obs-mode) .v9-avatar-wrap {
+    left: 4px !important;
+    bottom: 28px !important;
+    width: 94px !important;
+    height: 104px !important;
+    overflow: hidden !important;
+  }
+  html:not(.ps-obs-mode) .v9-avatar-wrap .player-avatar-photo[src] {
+    width: 92px !important;
+    height: 102px !important;
+    object-position: center bottom !important;
+    -webkit-mask-image: linear-gradient(to bottom,#000 0%,#000 76%,rgba(0,0,0,.94) 82%,rgba(0,0,0,.68) 88%,rgba(0,0,0,.25) 94%,transparent 100%) !important;
+    mask-image: linear-gradient(to bottom,#000 0%,#000 76%,rgba(0,0,0,.94) 82%,rgba(0,0,0,.68) 88%,rgba(0,0,0,.25) 94%,transparent 100%) !important;
+  }
+  html:not(.ps-obs-mode) .v9-avatar-wrap .player-jersey-overlay {
+    width: 92px !important;
+    height: 72px !important;
+    object-fit: contain !important;
+    object-position: center bottom !important;
+    z-index: 6 !important;
+  }
+  html:not(.ps-obs-mode) .v9-player-name {
+    left: 101px !important;
+    right: 7px !important;
+    top: 7px !important;
+    min-height: 27px !important;
+    padding: 1px 4px 0 !important;
+    font-size: clamp(19px, 5.2vw, 24px) !important;
+    line-height: 1 !important;
+  }
+  html:not(.ps-obs-mode) .v9-primary-metric {
+    left: 101px !important;
+    right: 6px !important;
+    top: 43px !important;
+    gap: 4px !important;
+  }
+  html:not(.ps-obs-mode) .v9-primary-metric:not(.v9-bowler-metric) > strong {
+    font-size: clamp(39px, 11vw, 48px) !important;
+    line-height: .85 !important;
+  }
+  html:not(.ps-obs-mode) .v9-balls-inline,
+  html:not(.ps-obs-mode) .v9-balls-inline > b {
+    font-size: 25px !important;
+    line-height: .9 !important;
+  }
+  html:not(.ps-obs-mode) .v9-bowler-metric {
+    left: 100px !important;
+    right: 6px !important;
+    top: 46px !important;
+    gap: 3px !important;
+  }
+  html:not(.ps-obs-mode) .v9-bowler-metric > span {
+    font-size: 12px !important;
+  }
+  html:not(.ps-obs-mode) .v9-bowler-metric > strong {
+    font-size: clamp(27px, 8vw, 34px) !important;
+  }
+  html:not(.ps-obs-mode) .v9-bowler-metric > em {
+    font-size: 13px !important;
+  }
+  html:not(.ps-obs-mode) .v9-ball-icon {
+    top: 7px !important;
+    right: 6px !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+  html:not(.ps-obs-mode) .v9-bowler-card .v9-player-name {
+    right: 30px !important;
+  }
+  html:not(.ps-obs-mode) .v9-stat-grid {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 2px 4px !important;
+    grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+    border-radius: 0 !important;
+  }
+  html:not(.ps-obs-mode) .v9-stat-grid b {
+    font-size: 18px !important;
+  }
+  html:not(.ps-obs-mode) .v9-stat-grid small {
+    font-size: 13px !important;
+  }
+
+  /* Upcoming players remain available without competing with live stats. */
+  html:not(.ps-obs-mode) #scoreboardCanvas .v9-upcoming-band {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    flex: none !important;
+    display: grid !important;
+    grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+    gap: 5px !important;
+    padding: 7px 5px !important;
+    border-radius: 8px !important;
+    z-index: 24 !important;
+  }
+  html:not(.ps-obs-mode) .v9-upcoming-heading {
+    grid-column: 1 / -1 !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
+  }
+  html:not(.ps-obs-mode) .v9-next-player {
+    min-width: 0 !important;
+    min-height: 27px !important;
+    padding: 4px 3px !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    overflow: hidden !important;
+  }
+  html:not(.ps-obs-mode) .v9-next-avatar { display: none !important; }
+  html:not(.ps-obs-mode) .v9-next-name {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+    white-space: normal !important;
+    overflow: hidden !important;
+    text-align: center !important;
+  }
+
+  /* Small brand footer, keeping the desktop marquee untouched. */
+  html:not(.ps-obs-mode) #scoreboardCanvas .bottom-meta-ribbon {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: calc(100% + 20px) !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    flex: none !important;
+    margin: 2px -10px -8px !important;
+    overflow: hidden !important;
+  }
+  html:not(.ps-obs-mode) .subscribe-marquee-message {
+    font-size: 12px !important;
+    letter-spacing: 0 !important;
+  }
 }
 </style>
 
