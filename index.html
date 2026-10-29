@@ -2499,5 +2499,258 @@ html.ps-obs-mode #scoreboardCanvas {
 }
 </style>
 
+
+<style id="preetSportsHDPlayerLowerThirdStyle">
+/* Reference-inspired player strip: no halo, larger clean typography, crisp broadcast contrast. */
+.player-head-circle,
+.v9-avatar-wrap::before {
+  display: none !important;
+  content: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.v9-avatar-wrap .player-avatar-initials {
+  left: 50% !important;
+  bottom: 0 !important;
+  width: 96px !important;
+  height: 108px !important;
+  transform: translateX(-50%) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: #fff !important;
+  font-family: "Teko", "Rajdhani", sans-serif !important;
+  font-size: 30px !important;
+  font-weight: 900 !important;
+}
+.v9-player-deck {
+  gap: 6px !important;
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+}
+.v9-feature-card {
+  border-radius: 3px !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.55) !important;
+  color: #fff !important;
+}
+.v9-batter-card {
+  border: 1px solid #1aa7ff !important;
+  background: linear-gradient(110deg, #020609 0%, #07131c 58%, #020609 100%) !important;
+}
+.v9-bowler-card {
+  border: 1px solid #ff3157 !important;
+  background: linear-gradient(110deg, #020609 0%, #101015 58%, #020609 100%) !important;
+}
+.v9-card-kicker {
+  height: 28px !important;
+  min-height: 28px !important;
+  padding-left: 116px !important;
+  padding-right: 8px !important;
+  justify-content: center !important;
+  position: relative !important;
+  overflow: hidden !important;
+  background: linear-gradient(180deg,#050709,#111820) !important;
+  border-bottom: 1px solid rgba(255,255,255,.78) !important;
+  color: #fff !important;
+  font-family: "Teko", "Rajdhani", sans-serif !important;
+  font-size: 0 !important;
+  letter-spacing: .7px !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.9) !important;
+}
+.v9-card-kicker::before {
+  content: "BATSMAN";
+  position: absolute !important;
+  left: 116px !important;
+  right: 8px !important;
+  top: 0 !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #fff !important;
+  font-family: "Teko", "Rajdhani", sans-serif !important;
+  font-size: 19px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  letter-spacing: .8px !important;
+}
+.v9-bowler-card .v9-card-kicker::before {
+  content: "BOWLER" !important;
+}
+.v9-player-name {
+  left: 118px !important;
+  right: 8px !important;
+  top: 7px !important;
+  min-height: 31px !important;
+  padding: 1px 5px 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: linear-gradient(180deg,#360006,#120004) !important;
+  border: 1px solid rgba(255,255,255,.92) !important;
+  border-radius: 3px !important;
+  color: #fff200 !important;
+  -webkit-text-fill-color: #fff200 !important;
+  font-family: "Teko", "Rajdhani", sans-serif !important;
+  font-size: 29px !important;
+  font-weight: 900 !important;
+  line-height: .95 !important;
+  letter-spacing: .25px !important;
+  text-align: center !important;
+  text-shadow: 0 1px 3px #000 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.v9-primary-metric {
+  left: 116px !important;
+  right: 8px !important;
+  top: 43px !important;
+  align-items: baseline !important;
+  justify-content: center !important;
+  gap: 7px !important;
+}
+.v9-primary-metric:not(.v9-bowler-metric) > strong {
+  color: #ff2020 !important;
+  -webkit-text-fill-color: #ff2020 !important;
+  font-family: "Teko", "Rajdhani", sans-serif !important;
+  font-size: 57px !important;
+  font-weight: 900 !important;
+  line-height: .78 !important;
+  letter-spacing: -.2px !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,.9) !important;
+}
+.v9-balls-inline,
+.v9-balls-inline > b {
+  color: #ffe62f !important;
+  -webkit-text-fill-color: #ffe62f !important;
+  font-family: "Teko", "Rajdhani", sans-serif !important;
+  font-size: 30px !important;
+  font-weight: 900 !important;
+  line-height: .9 !important;
+  text-shadow: 0 1px 2px #000 !important;
+}
+.v9-bowler-metric {
+  left: 116px !important;
+  right: 7px !important;
+  top: 45px !important;
+  gap: 4px !important;
+}
+.v9-bowler-metric > span {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  font-family: "Teko", "Rajdhani", sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+}
+.v9-bowler-metric > strong {
+  color: #ff2020 !important;
+  -webkit-text-fill-color: #ff2020 !important;
+  font-family: "Teko", "Rajdhani", sans-serif !important;
+  font-size: 39px !important;
+  font-weight: 900 !important;
+  line-height: .83 !important;
+}
+.v9-bowler-metric > em {
+  color: #ffe62f !important;
+  -webkit-text-fill-color: #ffe62f !important;
+  font-size: 16px !important;
+}
+.v9-avatar-wrap {
+  left: 7px !important;
+  bottom: 29px !important;
+  width: 101px !important;
+  height: 110px !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  background: transparent !important;
+}
+.v9-avatar-wrap .player-avatar-photo[src] {
+  left: 50% !important;
+  bottom: 0 !important;
+  transform: translateX(-50%) !important;
+  width: 96px !important;
+  height: 108px !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  z-index: 5 !important;
+  image-rendering: auto !important;
+}
+.v9-avatar-wrap .player-jersey-overlay {
+  left: 50% !important;
+  bottom: 0 !important;
+  transform: translateX(-50%) !important;
+  width: 96px !important;
+  height: 78px !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  z-index: 4 !important;
+}
+.v9-stat-grid {
+  height: 30px !important;
+  padding: 2px 5px !important;
+  grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+  background: #030405 !important;
+  border-top: 1px solid rgba(255,255,255,.9) !important;
+  border-radius: 0 !important;
+}
+.v9-stat-grid > span {
+  gap: 2px !important;
+  justify-content: center !important;
+  align-items: baseline !important;
+}
+.v9-stat-grid b {
+  color: #ffe52b !important;
+  -webkit-text-fill-color: #ffe52b !important;
+  font-family: "Teko", "Rajdhani", sans-serif !important;
+  font-size: 22px !important;
+  line-height: .95 !important;
+  font-weight: 900 !important;
+  text-shadow: 0 1px 2px #000 !important;
+}
+.v9-stat-grid small {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  font-family: "Teko", "Rajdhani", sans-serif !important;
+  font-size: 18px !important;
+  line-height: .95 !important;
+  font-weight: 900 !important;
+}
+.v9-bowler-stats b { font-size: 22px !important; }
+.v9-bowler-stats small { font-size: 16px !important; }
+
+@media (max-width: 1100px) {
+  .v9-player-deck { gap: 5px !important; }
+  .v9-card-kicker { padding-left: 104px !important; }
+  .v9-card-kicker::before { left: 104px !important; font-size: 17px !important; }
+  .v9-player-name { left: 106px !important; right: 5px !important; font-size: 25px !important; }
+  .v9-primary-metric { left: 104px !important; right: 5px !important; }
+  .v9-primary-metric:not(.v9-bowler-metric) > strong { font-size: 51px !important; }
+  .v9-balls-inline, .v9-balls-inline > b { font-size: 26px !important; }
+  .v9-bowler-metric { left: 103px !important; }
+  .v9-bowler-metric > strong { font-size: 34px !important; }
+  .v9-avatar-wrap { left: 4px !important; width: 96px !important; }
+  .v9-avatar-wrap .player-avatar-photo[src] { width: 92px !important; }
+  .v9-avatar-wrap .player-jersey-overlay { width: 92px !important; }
+  .v9-stat-grid b { font-size: 19px !important; }
+  .v9-stat-grid small { font-size: 15px !important; }
+}
+</style>
+
 </body>
 </html>
