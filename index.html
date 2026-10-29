@@ -1492,8 +1492,15 @@
         if (Array.isArray(data.currentOver?.balls) && data.currentOver.balls.length > 0) return data.currentOver.balls;
         if (Array.isArray(data.currentOver) && data.currentOver.length > 0) return data.currentOver;
         if (Array.isArray(data.current_over_balls) && data.current_over_balls.length > 0) return data.current_over_balls;
+        if (Array.isArray(data.current_over_data?.balls) && data.current_over_data.balls.length > 0) return data.current_over_data.balls;
+        if (Array.isArray(data.current_over_data?.deliveries) && data.current_over_data.deliveries.length > 0) return data.current_over_data.deliveries;
         if (Array.isArray(data.recent_balls) && data.recent_balls.length > 0) return data.recent_balls;
         if (Array.isArray(data.balls) && data.balls.length > 0) return data.balls;
+        if (Array.isArray(data.structured_overs) && data.structured_overs.length > 0) {
+          const lastStructuredOver = data.structured_overs[data.structured_overs.length - 1];
+          if (Array.isArray(lastStructuredOver?.balls) && lastStructuredOver.balls.length > 0) return lastStructuredOver.balls;
+          if (Array.isArray(lastStructuredOver?.deliveries) && lastStructuredOver.deliveries.length > 0) return lastStructuredOver.deliveries;
+        }
 
         const historyLists = [
           data.recent_overs,
@@ -1550,6 +1557,7 @@
         // disagreeing with the visible sequence.
         let total = 0;
         let parsedAny = false;
+        let allParsed = true;
         for (const raw of balls) {
           let numericRuns = null;
           let original = "";
@@ -1573,7 +1581,10 @@
           }
 
           const compact = original.toLowerCase().replace(/\s+/g, "").replace(/[()]/g, "");
-          if (!compact) continue;
+          if (!compact) {
+            allParsed = false;
+            continue;
+          }
           if (/^(\.|0|dot|•|w|wk|out|wicket)$/.test(compact) || compact.includes("wicket")) {
             parsedAny = true;
             continue;
@@ -1592,12 +1603,16 @@
           } else if (/^(b|lb)(\d+)?$/.test(compact)) {
             total += Number((compact.match(/\d+/) || ["0"])[0]);
             parsedAny = true;
+          } else {
+            allParsed = false;
           }
         }
 
-        // Source total is used only when no visible balls could be parsed; otherwise keep
-        // the arithmetic consistent with the values actually rendered in the six circles.
-        const displayTotal = parsedAny ? String(total) : (sourceTotal !== null ? String(sourceTotal) : "—");
+        // Show a calculated total only when every visible ball is understood. Otherwise,
+        // use CREX's total only if there are no parsed deliveries; never show a partial sum.
+        const displayTotal = parsedAny && allParsed
+          ? String(total)
+          : (!parsedAny && sourceTotal !== null ? String(sourceTotal) : "—");
         return { balls, total: displayTotal, sourceTotal: sourceTotal === null ? null : String(sourceTotal) };
       }
 
@@ -2017,7 +2032,7 @@
         if (apiToss) {
           const tossStr = typeof apiToss === "object" ? (apiToss.text || apiToss.details || JSON.stringify(apiToss)) : String(apiToss);
           const cleanToss = tossStr.replace(/^toss(?:\s*update)?\s*[:\-]\s*/i, "").trim().toUpperCase();
-          const isTossPlaceholder = /^(?:FETCHING TOSS|TOSS UPDATE UNAVAILABLE|TOSS INFO UNAVAILABLE|UNKNOWN|N\/A|--)\.?\s*$/i.test(cleanToss);
+          const isTossPlaceholder = /FETCHING|UNAVAILABLE|NOT AVAILABLE|UNKNOWN|N\/A|^--$/i.test(cleanToss);
           if (cleanToss && !isTossPlaceholder && tossEl) {
             tossEl.textContent = cleanToss;
           } else if (tossEl && /FETCHING/i.test(tossEl.textContent)) {
@@ -2966,6 +2981,77 @@ html.ps-obs-mode #scoreboardCanvas {
   .stat-metric .lbl { font-size: 11px !important; }
   .stat-metric .val { font-size: 13px !important; }
   #valLastWkt { max-width: 178px !important; }
+}
+</style>
+
+
+<style id="preetSportsScoreTruthAndRibbonFix">
+/* Slightly smaller supporting statistics, with more spacing and consistent truncation. */
+.match-context-bar {
+  grid-template-columns: minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr) !important;
+  column-gap: 10px !important;
+  padding-left: 15px !important;
+  padding-right: 15px !important;
+}
+.match-context-bar > div {
+  min-width: 0 !important;
+  gap: 6px !important;
+}
+.match-context-bar > div + div {
+  padding-left: 10px !important;
+}
+.match-context-bar .context-label {
+  font-size: 15px !important;
+  letter-spacing: .25px !important;
+}
+.match-context-bar strong {
+  min-width: 0 !important;
+  font-size: 17px !important;
+  line-height: 1.05 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.match-stats-bar {
+  gap: 12px !important;
+  padding-left: 15px !important;
+  padding-right: 15px !important;
+}
+.match-stats-bar .stat-metric {
+  min-width: 0 !important;
+  gap: 5px !important;
+  font-size: 17px !important;
+}
+.match-stats-bar .stat-metric .lbl {
+  font-size: 14px !important;
+}
+.match-stats-bar .stat-metric .val {
+  min-width: 0 !important;
+  font-size: 16px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+#valLastWkt {
+  max-width: 245px !important;
+  white-space: nowrap !important;
+}
+#mainScoreHero.is-live-result-message {
+  padding: 0 12px !important;
+}
+@media (max-width: 1100px) {
+  .match-context-bar {
+    column-gap: 4px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  .match-context-bar > div { gap: 4px !important; }
+  .match-context-bar > div + div { padding-left: 5px !important; }
+  .match-context-bar .context-label { font-size: 12px !important; }
+  .match-context-bar strong { font-size: 14px !important; }
+  .match-stats-bar { gap: 5px !important; padding-left: 8px !important; padding-right: 8px !important; }
+  .match-stats-bar .stat-metric { gap: 3px !important; font-size: 14px !important; }
+  .match-stats-bar .stat-metric .lbl { font-size: 11px !important; }
+  .match-stats-bar .stat-metric .val { font-size: 13px !important; }
+  #valLastWkt { max-width: 175px !important; }
 }
 </style>
 
