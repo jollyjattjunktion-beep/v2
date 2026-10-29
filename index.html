@@ -3095,22 +3095,24 @@ html.ps-obs-mode #scoreboardCanvas {
 
 
 <style id="preetSportsCrexPlayerPortraitAndIndicators">
-/* Larger bust/neck crop: scale the real CREX cutout and bring its exact jersey over the lower neck. */
+/* Preserve the real player's face. Keep portrait sizing stable and blend only at the lower neck.
+   Jersey stays small and behind the portrait, matching desktop and mobile. */
 .v9-avatar-wrap {
   z-index: 4 !important;
   left: 3px !important;
   bottom: 29px !important;
-  width: 116px !important;
-  height: 118px !important;
-  overflow: visible !important;
+  width: 101px !important;
+  height: 110px !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
   background: transparent !important;
 }
 .v9-avatar-wrap .player-avatar-photo[src] {
   left: 50% !important;
   bottom: 0 !important;
   transform: translateX(-50%) !important;
-  width: 112px !important;
-  height: 118px !important;
+  width: 96px !important;
+  height: 108px !important;
   max-width: 100% !important;
   max-height: 100% !important;
   object-fit: contain !important;
@@ -3118,18 +3120,19 @@ html.ps-obs-mode #scoreboardCanvas {
   border: 0 !important;
   border-radius: 0 !important;
   background: transparent !important;
-  z-index: 5 !important;
-  -webkit-mask-image: linear-gradient(to bottom,#000 0%,#000 64%,rgba(0,0,0,.96) 69%,rgba(0,0,0,.72) 76%,rgba(0,0,0,.3) 84%,transparent 91%) !important;
-  mask-image: linear-gradient(to bottom,#000 0%,#000 64%,rgba(0,0,0,.96) 69%,rgba(0,0,0,.72) 76%,rgba(0,0,0,.3) 84%,transparent 91%) !important;
+  z-index: 7 !important;
+  /* Opaque face/head; fade begins low and finishes at the lower neck. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 76%, rgba(0,0,0,.94) 82%, rgba(0,0,0,.68) 88%, rgba(0,0,0,.25) 94%, transparent 100%) !important;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 76%, rgba(0,0,0,.94) 82%, rgba(0,0,0,.68) 88%, rgba(0,0,0,.25) 94%, transparent 100%) !important;
 }
 .v9-avatar-wrap .player-jersey-overlay {
   left: 50% !important;
-  bottom: -1px !important;
+  bottom: 0 !important;
   transform: translateX(-50%) !important;
-  width: 108px !important;
-  height: 88px !important;
+  width: 96px !important;
+  height: 78px !important;
   max-width: 100% !important;
-  object-fit: fill !important;
+  object-fit: contain !important;
   object-position: center bottom !important;
   z-index: 6 !important;
   border: 0 !important;
@@ -3178,16 +3181,19 @@ html.ps-obs-mode #scoreboardCanvas {
 @media (max-width: 1100px) {
   .v9-avatar-wrap {
     left: 2px !important;
-    width: 104px !important;
-    height: 112px !important;
+    width: 96px !important;
+    height: 104px !important;
   }
   .v9-avatar-wrap .player-avatar-photo[src] {
-    width: 104px !important;
-    height: 112px !important;
+    width: 92px !important;
+    height: 102px !important;
+    /* Same face-preserving neck fade on smaller displays. */
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 76%, rgba(0,0,0,.94) 82%, rgba(0,0,0,.68) 88%, rgba(0,0,0,.25) 94%, transparent 100%) !important;
+    mask-image: linear-gradient(to bottom, #000 0%, #000 76%, rgba(0,0,0,.94) 82%, rgba(0,0,0,.68) 88%, rgba(0,0,0,.25) 94%, transparent 100%) !important;
   }
   .v9-avatar-wrap .player-jersey-overlay {
-    width: 98px !important;
-    height: 81px !important;
+    width: 92px !important;
+    height: 72px !important;
   }
   .v9-player-action-icon {
     width: 18px !important;
