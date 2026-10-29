@@ -1634,7 +1634,9 @@
         const latestBall = String(data && (data.last_ball ?? data.lastBall ?? "") || "").trim();
         const primaryText = description || (isEventStatus ? resultStatus : "") || "LIVE MATCH";
         const rawBallLabel = String(data && (data.team_result_ball || data.result_ball) || "").trim();
-        const ballLabel = description && !genericLabels.test(rawBallLabel) && !/^\d+$/.test(rawBallLabel) ? rawBallLabel : "";
+        // Keep CREX's real secondary label (e.g. "Ball") with a valid event description.
+        // If the main description was generic/numeric, description is empty and this stays hidden.
+        const ballLabel = description && rawBallLabel ? rawBallLabel : "";
 
         messageNode.textContent = primaryText || "—";
         ballNode.textContent = ballLabel && description ? ballLabel : "";
