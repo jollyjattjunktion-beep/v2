@@ -455,7 +455,12 @@ def scrape_crex_match(url: str):
 
     recent_str = " | ".join(recent_overs[-2:]) if recent_overs else ""
     current_over_data = structured_overs[-1] if structured_overs else None
-    last_ball_txt = center_digit or (current_over_data["balls"][-1]["text"] if current_over_data and current_over_data.get("balls") else "")
+    # Keep last_ball sourced from the actual over delivery, not the unrelated .font1 result marker.
+    last_ball_txt = (
+        current_over_data["balls"][-1]["text"]
+        if current_over_data and current_over_data.get("balls")
+        else ""
+    )
 
     # ── 7. Last Wicket ──
     last_wkt_text = ""
