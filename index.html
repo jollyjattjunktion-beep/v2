@@ -1627,15 +1627,14 @@
         const rawDescription = String(
           data && (data.team_result_description || data.team_result_text || data.result_description) || ""
         ).trim();
-        const genericLabels = /^(?:over|ball|innings|result|score|run|runs|)$/i;
+        const genericLabels = /^(?:(?:\d+\s*)?(?:over|overs|ball|balls|innings|result|score|run|runs)|)$/i;
         const description = (genericLabels.test(rawDescription) || /^\d+$/.test(rawDescription)) ? "" : rawDescription;
         const resultStatus = String(data && (data.status || data.match_status) || "").trim();
         const isEventStatus = /caught|bowled|run.?out|stumped|lbw|hit wicket|drinks|lunch|tea|innings break|rain|delay|abandon|no result|four|six|wide|no.?ball/i.test(resultStatus);
         const latestBall = String(data && (data.last_ball ?? data.lastBall ?? "") || "").trim();
         const primaryText = description || (isEventStatus ? resultStatus : "") || "LIVE MATCH";
         const rawBallLabel = String(data && (data.team_result_ball || data.result_ball) || "").trim();
-        const ballLabel = description && !genericLabels.test(rawBallLabel) ? rawBallLabel : "";
-        const isNumericFallback = /^\d+$/.test(latestBall);
+        const ballLabel = description && !genericLabels.test(rawBallLabel) && !/^\d+$/.test(rawBallLabel) ? rawBallLabel : "";
 
         messageNode.textContent = primaryText || "—";
         ballNode.textContent = ballLabel && description ? ballLabel : "";
