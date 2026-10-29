@@ -1204,15 +1204,29 @@
       function abbreviation(name) {
         const n = String(name || "").trim().toUpperCase();
         if (!n) return "-";
+
+        // CREX sometimes appends an innings marker like P2/P3 to a real team code.
+        // Normalize IREP2 -> IRE, SLP2 -> SL, OMAP3 -> OMA, etc.
+        const inningsAlias = n.match(/^([A-Z]{2,4})P\d+$/);
+        if (inningsAlias) {
+          const baseCode = inningsAlias[1];
+          if (INTERNATIONAL_TEAMS[baseCode] || KNOWN_DOMESTIC_TEAMS[baseCode]) return baseCode;
+        }
+
         if (n.includes("IND-W") || n.includes("INDIA WOMEN")) return "IND-W";
         if (n.includes("ZIM-W") || n.includes("ZIMBABWE WOMEN")) return "ZIM-W";
         if (n.includes("AUS-W") || n.includes("AUSTRALIA WOMEN")) return "AUS-W";
         if (n.includes("NZ-W") || n.includes("NEW ZEALAND WOMEN")) return "NZ-W";
+        if (n.includes("SL-W") || n.includes("SRI LANKA WOMEN")) return "SL-W";
         if (n.includes("WEST INDIES") || n === "WI") return "WI";
         if (n.includes("INDIA") || n === "IND") return "IND";
         if (n.includes("PAKISTAN") || n === "PAK") return "PAK";
         if (n.includes("AUSTRALIA") || n === "AUS") return "AUS";
         if (n.includes("ZIMBABWE") || n === "ZIM") return "ZIM";
+        if (n.includes("SRI LANKA") || n === "SL") return "SL";
+        if (n.includes("IRELAND") || n === "IRE") return "IRE";
+        if (n.includes("ENGLAND") || n === "ENG") return "ENG";
+        if (n.includes("AFGHANISTAN") || n === "AFG") return "AFG";
         return n.slice(0, 6);
       }
 
@@ -1524,28 +1538,69 @@
         if (!selected && Array.isArray(data && data.structured_overs) && data.structured_overs.length) {
           selected = data.structured_overs[data.structured_overs.length - 1];
         }
-        const balls = extractCurrentOverBalls(data);
+
+        const allBalls = extractCurrentOverBalls(data);
+        const balls = Array.isArray(allBalls) ? allBalls.slice(-6) : [];
         const explicitTotal = selected && (selected.total ?? selected.runs ?? selected.run_total ?? selected.over_total);
-        if (explicitTotal !== undefined && explicitTotal !== null && String(explicitTotal).trim() !== "") {
-          const match = String(explicitTotal).match(/-?\d+(?:\.\d+)?/g);
-          if (match && match.length) return { balls, total: match[match.length - 1] };
+        const explicitMatch = explicitTotal !== undefined && explicitTotal !== null
+          ? String(explicitTotal).match(/-?\d+(?:\.\d+)?/g)
+          : null;
+        const sourceTotal = explicitMatch && explicitMatch.length ? Number(explicitMatch[explicitMatch.length - 1]) : null;
+
+        // Calculate the displayed TOTAL from exactly the six values shown in the circles.
+        // This prevents CREX's separate summary label (which can include a hidden/stale delivery)
+        // disagreeing with the visible sequence.
+        let total = 0;
+        let parsedAny = false;
+        for (const raw of balls) {
+          let numericRuns = null;
+          let original = "";
+          if (raw && typeof raw === "object") {
+            for (const key of ["total_runs", "totalRuns", "run_total", "runTotal"]) {
+              const value = raw[key];
+              if (value !== undefined && value !== null && value !== "" && Number.isFinite(Number(value))) {
+                numericRuns = Number(value);
+                break;
+              }
+            }
+            original = String(raw.text ?? raw.value ?? raw.label ?? raw.result ?? "").trim();
+          } else {
+            original = String(raw ?? "").trim();
+          }
+
+          if (numericRuns !== null) {
+            total += numericRuns;
+            parsedAny = true;
+            continue;
+          }
+
+          const compact = original.toLowerCase().replace(/\s+/g, "").replace(/[()]/g, "");
+          if (!compact) continue;
+          if (/^(\.|0|dot|•|w|wk|out|wicket)$/.test(compact) || compact.includes("wicket")) {
+            parsedAny = true;
+            continue;
+          }
+
+          const numericPrefix = (compact.match(/^\d+(?:\.\d+)?/) || [])[0];
+          if (/^(wd|wide)/.test(compact)) {
+            total += numericPrefix ? Number(numericPrefix) : 1;
+            parsedAny = true;
+          } else if (/^(nb|no-ball|noball)/.test(compact)) {
+            total += numericPrefix ? Number(numericPrefix) + 1 : 1;
+            parsedAny = true;
+          } else if (numericPrefix) {
+            total += Number(numericPrefix);
+            parsedAny = true;
+          } else if (/^(b|lb)(\d+)?$/.test(compact)) {
+            total += Number((compact.match(/\d+/) || ["0"])[0]);
+            parsedAny = true;
+          }
         }
 
-        // Fallback: estimate from the actual ball labels if CREX did not expose its over total.
-        // Wides/no-balls include their one-run penalty; wicket/dot balls add zero.
-        let total = 0;
-        for (const raw of balls) {
-          const original = String(typeof raw === "object"
-            ? (raw.text ?? raw.value ?? raw.label ?? raw.result ?? "")
-            : raw).trim().toLowerCase().replace(/\s+/g, "");
-          if (!original || /^(\.|0|dot|•|w|wk|out|wicket)$/.test(original)) continue;
-          const n = Number((original.match(/^\d+/) || [""])[0] || 0);
-          if (/^(wd|wide)/.test(original)) total += (n || 0) + 1;
-          else if (/^(nb|no-ball|noball)/.test(original)) total += (n || 0) + 1;
-          else if (/^\d/.test(original)) total += n;
-          else if (/^(b|lb)/.test(original)) total += n;
-        }
-        return { balls, total: String(total) };
+        // Source total is used only when no visible balls could be parsed; otherwise keep
+        // the arithmetic consistent with the values actually rendered in the six circles.
+        const displayTotal = parsedAny ? String(total) : (sourceTotal !== null ? String(sourceTotal) : "—");
+        return { balls, total: displayTotal, sourceTotal: sourceTotal === null ? null : String(sourceTotal) };
       }
 
       function renderLiveCrexResultHero(data) {
@@ -1870,6 +1925,21 @@
         if (bwl) setPlayerPortrait("bwlPhoto", "bwlInitials", bwl, bwl.short_name || bwl.name);
       }
 
+      function canonicalTeamDisplayName(rawName, code) {
+        const raw = String(rawName || "").trim();
+        // If CREX labels an innings as SLP2/IREP2/OMAP3, show the canonical team name.
+        if (/^[A-Z]{2,4}P\d+$/i.test(raw)) {
+          return INTERNATIONAL_TEAMS[code]?.name || KNOWN_DOMESTIC_TEAMS[code] || code || raw;
+        }
+        return raw || INTERNATIONAL_TEAMS[code]?.name || KNOWN_DOMESTIC_TEAMS[code] || code || "—";
+      }
+
+      function formatOversDisplay(value) {
+        const raw = String(value ?? "").trim();
+        const match = raw.match(/\d+(?:\.\d+)?/);
+        return match ? `${match[0]} OV` : "— OV";
+      }
+
       function renderScoreData(data) {
         if (!data || data.success === false) return;
         latestScorePayloadForAssets = data;
@@ -1880,8 +1950,8 @@
         const t1Code = abbreviation(t1.short || t1.name || urlInfo.team1Code || "TM1");
         const t2Code = abbreviation(t2.short || t2.name || urlInfo.team2Code || "TM2");
 
-        const t1FullName = t1.name || INTERNATIONAL_TEAMS[t1Code]?.name || KNOWN_DOMESTIC_TEAMS[t1Code] || t1Code;
-        const t2FullName = t2.name || INTERNATIONAL_TEAMS[t2Code]?.name || KNOWN_DOMESTIC_TEAMS[t2Code] || t2Code;
+        const t1FullName = canonicalTeamDisplayName(t1.name || t1.full_name || t1.short, t1Code);
+        const t2FullName = canonicalTeamDisplayName(t2.name || t2.full_name || t2.short, t2Code);
 
         const hero1 = document.getElementById("team1HeroName");
         const hero2 = document.getElementById("team2HeroName");
@@ -1896,8 +1966,8 @@
 
         document.getElementById("team1HeroScore").textContent = t1.score || "—";
         document.getElementById("team2HeroScore").textContent = t2.score || "—";
-        document.getElementById("team1HeroOvers").textContent = t1.overs ? `${t1.overs} OV` : "—";
-        document.getElementById("team2HeroOvers").textContent = t2.overs ? `${t2.overs} OV` : "—";
+        document.getElementById("team1HeroOvers").textContent = formatOversDisplay(t1.overs);
+        document.getElementById("team2HeroOvers").textContent = formatOversDisplay(t2.overs);
 
         setTeamCrest("team1HeroCrestWrap", "team1HeroCrest", t1Code, t1);
         setTeamCrest("team2HeroCrestWrap", "team2HeroCrest", t2Code, t2);
