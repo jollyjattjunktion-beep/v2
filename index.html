@@ -2892,28 +2892,27 @@ html.ps-obs-mode #scoreboardCanvas {
   background: transparent !important;
 }
 .v9-avatar-wrap .player-avatar-photo[src] {
-  z-index: 5 !important;
+  z-index: 7 !important;
   object-fit: contain !important;
   object-position: center bottom !important;
+  /* Keep the face opaque; fade only the bottom of the neck/chest cutout. */
   -webkit-mask-image: linear-gradient(
     to bottom,
     #000 0%,
-    #000 61%,
-    rgba(0,0,0,.97) 66%,
-    rgba(0,0,0,.78) 72%,
-    rgba(0,0,0,.42) 79%,
-    rgba(0,0,0,.12) 85%,
-    transparent 89%
+    #000 72%,
+    rgba(0,0,0,.90) 78%,
+    rgba(0,0,0,.62) 84%,
+    rgba(0,0,0,.25) 90%,
+    transparent 96%
   ) !important;
   mask-image: linear-gradient(
     to bottom,
     #000 0%,
-    #000 61%,
-    rgba(0,0,0,.97) 66%,
-    rgba(0,0,0,.78) 72%,
-    rgba(0,0,0,.42) 79%,
-    rgba(0,0,0,.12) 85%,
-    transparent 89%
+    #000 72%,
+    rgba(0,0,0,.90) 78%,
+    rgba(0,0,0,.62) 84%,
+    rgba(0,0,0,.25) 90%,
+    transparent 96%
   ) !important;
 }
 .v9-avatar-wrap .player-jersey-overlay {
@@ -2921,11 +2920,11 @@ html.ps-obs-mode #scoreboardCanvas {
   bottom: -1px !important;
   transform: translateX(-50%) !important;
   width: 96px !important;
-  height: 86px !important;
+  height: 78px !important;
   max-width: 100% !important;
   object-fit: contain !important;
   object-position: center bottom !important;
-  z-index: 6 !important;
+  z-index: 4 !important;
   pointer-events: none !important;
   border: 0 !important;
   border-radius: 0 !important;
@@ -2935,9 +2934,8 @@ html.ps-obs-mode #scoreboardCanvas {
 @media (max-width: 1100px) {
   .v9-avatar-wrap .player-avatar-photo[src] {
     -webkit-mask-image: linear-gradient(
-      to bottom, #000 0%, #000 61%, rgba(0,0,0,.97) 66%,
-      rgba(0,0,0,.78) 72%, rgba(0,0,0,.42) 79%,
-      rgba(0,0,0,.12) 85%, transparent 89%
+      to bottom, #000 0%, #000 72%, rgba(0,0,0,.90) 78%,
+      rgba(0,0,0,.62) 84%, rgba(0,0,0,.25) 90%, transparent 96%
     ) !important;
     mask-image: linear-gradient(
       to bottom, #000 0%, #000 61%, rgba(0,0,0,.97) 66%,
@@ -2947,7 +2945,7 @@ html.ps-obs-mode #scoreboardCanvas {
   }
   .v9-avatar-wrap .player-jersey-overlay {
     width: 92px !important;
-    height: 83px !important;
+    height: 72px !important;
   }
 }
 </style>
