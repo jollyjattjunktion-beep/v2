@@ -367,6 +367,7 @@ def scrape_crex_match(url: str):
     # ── 5. Real Batsmen & Bowlers (NO fallback players) ──
     batsmen = []
     bowler = None
+    has_explicit_striker_marker = False
 
     partnerships = soup.find_all(class_="batsmen-partnership")
     for bp in partnerships:
@@ -403,7 +404,17 @@ def scrape_crex_match(url: str):
             runs_m = re.search(r"^(\d+)\s*\(([\d]+)\)", score_txt)
             runs = runs_m.group(1) if runs_m else "0"
             balls = runs_m.group(2) if runs_m else "0"
-            is_striker = ("*" in score_txt or "*" in p_name or "striker" in bp.get("class", []) or len(batsmen) == 0)
+            # CREX marks the on-strike batter with a .circle-strike-icon inside
+            # .batsmen-score. Prefer that visual marker over assuming the first batter strikes.
+            strike_icon_el = bp.select_one(".batsmen-score .circle-strike-icon, .circle-strike-icon")
+            explicit_striker = (
+                strike_icon_el is not None
+                or "*" in score_txt
+                or "*" in p_name
+                or "striker" in bp.get("class", [])
+            )
+            is_striker = bool(explicit_striker)
+            has_explicit_striker_marker = has_explicit_striker_marker or is_striker
             batsmen.append({
                 "name": p_name, "short_name": short_name, "runs": runs, "balls": balls,
                 "fours": fours_m.group(1) if fours_m else "0",
@@ -411,6 +422,11 @@ def scrape_crex_match(url: str):
                 "sr": sr_m.group(1) if sr_m else "0.00",
                 "img": img_url, "on_strike": is_striker
             })
+
+    # Some CREX match templates don't expose a strike icon or asterisk. Only in that
+    # case, retain the previous safe fallback of marking the first batter on strike.
+    if batsmen and not has_explicit_striker_marker:
+        batsmen[0]["on_strike"] = True
 
     batsman1 = batsmen[0] if len(batsmen) > 0 else None
     batsman2 = batsmen[1] if len(batsmen) > 1 else None
