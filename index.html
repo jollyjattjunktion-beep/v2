@@ -1628,7 +1628,7 @@
           data && (data.team_result_description || data.team_result_text || data.result_description) || ""
         ).trim();
         const genericLabels = /^(?:over|ball|innings|result|score|run|runs|)$/i;
-        const description = genericLabels.test(rawDescription) ? "" : rawDescription;
+        const description = (genericLabels.test(rawDescription) || /^\d+$/.test(rawDescription)) ? "" : rawDescription;
         const resultStatus = String(data && (data.status || data.match_status) || "").trim();
         const isEventStatus = /caught|bowled|run.?out|stumped|lbw|hit wicket|drinks|lunch|tea|innings break|rain|delay|abandon|no result|four|six|wide|no.?ball/i.test(resultStatus);
         const latestBall = String(data && (data.last_ball ?? data.lastBall ?? "") || "").trim();
