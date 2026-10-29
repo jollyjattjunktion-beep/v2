@@ -1513,10 +1513,8 @@
           }
         }
 
-        if (Array.isArray(window.__crexRecentBalls) && window.__crexRecentBalls.length > 0) {
-          return window.__crexRecentBalls;
-        }
-
+        // Do not reuse one-time page-load balls when the live API omits current-over data.
+        // Empty is more honest than displaying a frozen previous over.
         return [];
       }
 
@@ -1609,25 +1607,23 @@
         const ballNode = document.getElementById("mainScoreResultBall");
         if (!hero || !messageNode || !ballNode) return;
 
-        // Prefer CREX .font3 status text (Caught Out, Drinks Break, etc.).
-        // When no description exists, show .font1 (e.g. 4) instead of leaving the panel blank.
-        const description = String(
+        // Show real CREX event/status text only. Never promote a generic number such as "1"
+        // or a structural label such as "Over" into the giant centre headline.
+        const rawDescription = String(
           data && (data.team_result_description || data.team_result_text || data.result_description) || ""
         ).trim();
-        const rawResultValue = data ? (data.team_result ?? data.center_digit ?? "") : "";
-        // Nullish fallback preserves the valid numeric value 0.
-        const resultValue = String(rawResultValue).trim();
+        const genericLabels = /^(?:over|ball|innings|result|score|run|runs|)$/i;
+        const description = genericLabels.test(rawDescription) ? "" : rawDescription;
         const resultStatus = String(data && (data.status || data.match_status) || "").trim();
-        const isEventStatus = /caught|bowled|run.?out|stumped|lbw|hit wicket|drinks|lunch|tea|innings break|rain|delay|abandon|no result/i.test(resultStatus);
+        const isEventStatus = /caught|bowled|run.?out|stumped|lbw|hit wicket|drinks|lunch|tea|innings break|rain|delay|abandon|no result|four|six|wide|no.?ball/i.test(resultStatus);
         const latestBall = String(data && (data.last_ball ?? data.lastBall ?? "") || "").trim();
-        // Fallback order is source text -> source result value -> real last-ball value; never fabricate a score.
-        const primaryText = description || resultValue || (isEventStatus ? resultStatus : "") || latestBall;
-        const ballLabel = String(
-          data && (data.team_result_ball || data.result_ball) || ""
-        ).trim();
+        const primaryText = description || (isEventStatus ? resultStatus : "") || "LIVE MATCH";
+        const rawBallLabel = String(data && (data.team_result_ball || data.result_ball) || "").trim();
+        const ballLabel = description && !genericLabels.test(rawBallLabel) ? rawBallLabel : "";
+        const isNumericFallback = /^\d+$/.test(latestBall);
 
         messageNode.textContent = primaryText || "—";
-        ballNode.textContent = ballLabel && primaryText ? ballLabel : "";
+        ballNode.textContent = ballLabel && description ? ballLabel : "";
         ballNode.classList.toggle("is-visible", Boolean(ballLabel && primaryText));
         hero.setAttribute(
           "aria-label",
@@ -1636,7 +1632,7 @@
         hero.classList.add("is-live-result-message");
         hero.classList.remove("is-live-over-feed");
         hero.classList.toggle("is-long-result", primaryText.length > 18);
-        hero.classList.toggle("is-short-result", Boolean(primaryText) && primaryText.length <= 6 && !description);
+        hero.classList.toggle("is-short-result", primaryText.length <= 6 && primaryText !== "LIVE MATCH" && Boolean(description));
       }
 
       function renderCurrentOverBalls(balls) {
@@ -2017,14 +2013,21 @@
           window.__crexToss,
           ""
         );
+        const tossEl = document.getElementById("tossUpdate");
         if (apiToss) {
           const tossStr = typeof apiToss === "object" ? (apiToss.text || apiToss.details || JSON.stringify(apiToss)) : String(apiToss);
           const cleanToss = tossStr.replace(/^toss(?:\s*update)?\s*[:\-]\s*/i, "").trim().toUpperCase();
-          if (cleanToss && cleanToss !== "TOSS UPDATE UNAVAILABLE") {
-            document.getElementById("tossUpdate").textContent = cleanToss;
+          const isTossPlaceholder = /^(?:FETCHING TOSS|TOSS UPDATE UNAVAILABLE|TOSS INFO UNAVAILABLE|UNKNOWN|N\/A|--)\.?\s*$/i.test(cleanToss);
+          if (cleanToss && !isTossPlaceholder && tossEl) {
+            tossEl.textContent = cleanToss;
+          } else if (tossEl && /FETCHING/i.test(tossEl.textContent)) {
+            tossEl.textContent = "TOSS INFO UNAVAILABLE";
           }
-        } else if (window.__crexToss) {
-          document.getElementById("tossUpdate").textContent = window.__crexToss;
+        } else if (window.__crexToss && tossEl) {
+          const cleanToss = String(window.__crexToss).trim().toUpperCase();
+          if (cleanToss && !/FETCHING|UNAVAILABLE|UNKNOWN|N\/A/.test(cleanToss)) tossEl.textContent = cleanToss;
+        } else if (tossEl && /FETCHING/i.test(tossEl.textContent)) {
+          tossEl.textContent = "TOSS INFO UNAVAILABLE";
         }
 
         const b1 = data.batsman1 || data.batter1;
@@ -2199,7 +2202,7 @@
         document.getElementById("b1Name").textContent = "WAITING FOR FEED";
         document.getElementById("b2Name").textContent = "WAITING FOR FEED";
         document.getElementById("bwlName").textContent = "WAITING FOR FEED";
-        document.getElementById("tossUpdate").textContent = "FETCHING TOSS...";
+        document.getElementById("tossUpdate").textContent = "TOSS INFO UNAVAILABLE";
 
         fetchCrexAssetsForMatch(activeTargetUrl);
         fetchScores();
@@ -2890,6 +2893,79 @@ html.ps-obs-mode #scoreboardCanvas {
     width: 92px !important;
     height: 83px !important;
   }
+}
+</style>
+
+
+<style id="preetSportsFinalReliabilitySpacingFix">
+/* Clearer breathing room for context and supporting-stat ribbons, preserving the current design. */
+.match-context-bar {
+  grid-template-columns: minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr) !important;
+  gap: 8px !important;
+  padding: 0 14px !important;
+}
+.match-context-bar > div {
+  min-width: 0 !important;
+  gap: 6px !important;
+}
+.match-context-bar > div + div {
+  padding-left: 10px !important;
+}
+.context-label {
+  flex: 0 0 auto !important;
+  font-size: 15px !important;
+  letter-spacing: .3px !important;
+}
+.match-context-bar strong {
+  min-width: 0 !important;
+  font-size: 17px !important;
+  line-height: 1.1 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.match-stats-bar {
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 0 14px !important;
+}
+.stat-metric {
+  min-width: 0 !important;
+  gap: 5px !important;
+  font-size: 17px !important;
+}
+.stat-metric .lbl {
+  flex: 0 0 auto !important;
+  font-size: 14px !important;
+  letter-spacing: .2px !important;
+}
+.stat-metric .val {
+  min-width: 0 !important;
+  font-size: 16px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+#valLastWkt {
+  max-width: 255px !important;
+  white-space: nowrap !important;
+}
+#mainScoreHero.is-live-result-message {
+  min-width: 0 !important;
+  padding: 0 12px !important;
+}
+#mainScoreResultText {
+  text-transform: uppercase !important;
+}
+@media (max-width: 1100px) {
+  .match-context-bar { gap: 4px !important; padding: 0 8px !important; }
+  .match-context-bar > div { gap: 4px !important; }
+  .match-context-bar > div + div { padding-left: 5px !important; }
+  .context-label { font-size: 12px !important; }
+  .match-context-bar strong { font-size: 14px !important; }
+  .match-stats-bar { gap: 5px !important; padding: 0 8px !important; }
+  .stat-metric { gap: 3px !important; font-size: 14px !important; }
+  .stat-metric .lbl { font-size: 11px !important; }
+  .stat-metric .val { font-size: 13px !important; }
+  #valLastWkt { max-width: 178px !important; }
 }
 </style>
 
