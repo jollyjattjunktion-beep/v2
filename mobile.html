@@ -12,10 +12,8 @@
 <style>
 :root {
   --bg-deep: #030a16;
-  --panel-bg: rgba(7, 21, 39, 0.88);
-  --panel-border: rgba(56, 114, 180, 0.35);
   --gold: #ffc21a;
-  --gold-glow: rgba(255, 194, 26, 0.35);
+  --gold-glow: rgba(255, 194, 26, 0.45);
   --cyan: #00d9ff;
   --white: #ffffff;
   --muted: #94abc2;
@@ -51,6 +49,7 @@ html, body {
   border-radius: 10px;
   background: #061426;
   font-family: var(--font-data);
+  z-index: 10;
 }
 .toolbar label {
   font-size: 13px;
@@ -81,9 +80,7 @@ html, body {
   white-space: nowrap;
   cursor: pointer;
   letter-spacing: 0.05em;
-  transition: transform 0.1s ease;
 }
-.toolbar button:active { transform: scale(0.97); }
 #status { font-size: 12px; color: #5ef396; font-weight: 700; white-space: nowrap; }
 
 /* 16:9 Screen Container */
@@ -99,15 +96,41 @@ html, body {
   box-shadow: 0 16px 50px rgba(0,0,0,0.85);
 }
 
+/* ANIMATION 1: Infinite Stadium Drift & Scale */
 .stadium {
   position: absolute;
-  inset: 0;
+  inset: -5%;
+  width: 110%;
+  height: 110%;
   background:
     radial-gradient(ellipse at 50% 10%, rgba(0, 180, 255, 0.18), transparent 60%),
-    linear-gradient(180deg, rgba(3, 10, 20, 0.3) 0%, rgba(2, 8, 16, 0.85) 65%, #010409 100%),
+    linear-gradient(180deg, rgba(3, 10, 20, 0.25) 0%, rgba(2, 8, 16, 0.85) 65%, #010409 100%),
     url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1920&q=80') center 40%/cover;
   opacity: 0.65;
   mix-blend-mode: luminosity;
+  animation: stadiumGlide 35s ease-in-out infinite alternate;
+}
+@keyframes stadiumGlide {
+  0% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.06) translate(-1.5%, -1%); }
+  100% { transform: scale(1.02) translate(1.5%, 0.8%); }
+}
+
+/* ANIMATION 2: Drifting TV Floodlight Beam */
+.tv-light-beam {
+  position: absolute;
+  top: -40%;
+  left: -20%;
+  width: 140%;
+  height: 180%;
+  background: radial-gradient(ellipse at 30% 20%, rgba(0, 217, 255, 0.08) 0%, rgba(255, 194, 26, 0.04) 30%, transparent 65%);
+  pointer-events: none;
+  animation: beamRotate 22s linear infinite;
+}
+@keyframes beamRotate {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(6deg) scale(1.05); }
+  100% { transform: rotate(0deg); }
 }
 
 /* Master Layout */
@@ -120,14 +143,28 @@ html, body {
   z-index: 2;
 }
 
-/* 1. Header Bar */
+/* 1. Header Bar with Shimmer */
 .brand-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 2px solid rgba(255, 194, 26, 0.6);
   padding-bottom: 0.5%;
+  position: relative;
+  overflow: hidden;
 }
+.brand-bar::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: glassSheen 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes glassSheen {
+  0%, 65% { left: -100%; }
+  100% { left: 200%; }
+}
+
 .brand-pill {
   display: inline-flex;
   align-items: center;
@@ -141,6 +178,8 @@ html, body {
 }
 .brand-pill b { color: var(--gold); }
 .brand-sub { font-size: 1.3cqw; font-family: var(--font-data); color: var(--muted); font-weight: 700; }
+
+/* ANIMATION 3: Double Radar LIVE Badge */
 .live-pill {
   font-size: 1.4cqw;
   font-weight: 900;
@@ -150,20 +189,35 @@ html, body {
   border-radius: 4px;
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
+  gap: 0.5em;
   letter-spacing: .08em;
-  box-shadow: 0 0 12px rgba(255, 30, 66, 0.6);
+  box-shadow: 0 0 14px rgba(255, 30, 66, 0.7);
+  position: relative;
 }
-.live-dot {
+.live-beacon {
+  position: relative;
   width: 0.7em;
   height: 0.7em;
+}
+.live-dot {
+  position: absolute;
+  inset: 0;
   background: #fff;
   border-radius: 50%;
-  animation: pulse 1.2s infinite ease-in-out;
 }
-@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.8); } }
+.live-radar {
+  position: absolute;
+  inset: -4px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  animation: radarWave 1.8s infinite ease-out;
+}
+@keyframes radarWave {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
 
-/* 2. Team Score Plates */
+/* 2. Team Cards */
 .teams-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -239,7 +293,7 @@ html, body {
 }
 .team-card.away .team-overs { color: #ff94a8; }
 
-/* 3. Middle Section: Match State & Over Tracker */
+/* 3. Middle Section */
 .middle-row {
   display: grid;
   grid-template-columns: 1fr 1.05fr;
@@ -313,6 +367,8 @@ html, body {
   grid-template-columns: repeat(6, 1fr);
   gap: 2%;
 }
+
+/* ANIMATION 4: Live Ball Pulse & Chips */
 .ball {
   display: flex;
   align-items: center;
@@ -326,6 +382,15 @@ html, body {
   border: 1px solid #204b73;
   color: #ffffff;
   box-shadow: inset 0 1px 1px rgba(255,255,255,0.2);
+  transition: all 0.3s ease;
+}
+.ball.active-latest {
+  border-color: #fff;
+  animation: ballGaze 1.5s infinite alternate;
+}
+@keyframes ballGaze {
+  0% { transform: scale(1); box-shadow: 0 0 6px rgba(0, 217, 255, 0.4); }
+  100% { transform: scale(1.06); box-shadow: 0 0 14px rgba(0, 217, 255, 0.85); }
 }
 .ball.dot { color: #6b829c; }
 .ball.four {
@@ -399,18 +464,33 @@ html, body {
   gap: 4%;
   position: relative;
   overflow: hidden;
+  transition: all 0.4s ease;
 }
+
+/* ANIMATION 5: Breathing Striker Halo */
 .player-box.striker {
   border-color: var(--gold);
-  box-shadow: 0 0 14px rgba(255, 194, 26, 0.22);
+  animation: strikerPulse 2.5s infinite ease-in-out;
+}
+@keyframes strikerPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 194, 26, 0.25), inset 0 0 10px rgba(255, 194, 26, 0.1);
+    border-color: rgba(255, 194, 26, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 194, 26, 0.55), inset 0 0 14px rgba(255, 194, 26, 0.25);
+    border-color: rgba(255, 218, 102, 1);
+  }
 }
 .player-box.striker::before {
   content: "";
   position: absolute;
   top: 0; left: 0; bottom: 0;
-  width: 4px;
+  width: 5px;
   background: var(--gold);
+  box-shadow: 0 0 10px var(--gold);
 }
+
 .player-avatar {
   width: 5cqw;
   height: 5cqw;
@@ -441,7 +521,13 @@ html, body {
   padding: 0.1em 0.5em;
   border-radius: 2px;
   letter-spacing: .06em;
+  animation: badgeGlow 1.8s infinite alternate;
 }
+@keyframes badgeGlow {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
 .player-name {
   font-size: 1.9cqw;
   font-weight: 900;
@@ -473,7 +559,7 @@ html, body {
   white-space: nowrap;
 }
 
-/* 6. Footer Ticker */
+/* ANIMATION 6: Flowing LED Ticker Strip */
 .ticker-strip {
   display: flex;
   align-items: center;
@@ -486,12 +572,26 @@ html, body {
   font-weight: 800;
   color: #fff;
   letter-spacing: .08em;
+  position: relative;
+  overflow: hidden;
 }
+.ticker-strip::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 0; height: 2px; width: 100%;
+  background: linear-gradient(90deg, #030a16, var(--cyan), var(--gold), #030a16);
+  background-size: 200% 100%;
+  animation: tickerGradient 4s linear infinite;
+}
+@keyframes tickerGradient {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 .ticker-left { display: flex; gap: 1.5cqw; color: var(--muted); }
 .ticker-left span b { color: var(--gold); }
 .ticker-right { color: var(--gold); }
 
-/* Mobile responsiveness */
 @media (max-width: 600px) {
   body { padding: 0; }
   .toolbar { border-radius: 0; margin: 0 0 6px 0; padding: 6px; }
@@ -501,117 +601,6 @@ html, body {
   #status { display: none; }
   .stage { width: 100vw; border: none; }
 }
-
-/* PREET SPORTS broadcast motion: restrained, continuous and data-led */
-.stadium {
-  transform: scale(1.025);
-  transform-origin: center center;
-  animation: ps-stadium-drift 34s ease-in-out infinite alternate;
-}
-@keyframes ps-stadium-drift {
-  0% { background-position: 49% 39%; transform: scale(1.025); }
-  100% { background-position: 52% 42%; transform: scale(1.055); }
-}
-.live-pill {
-  animation: ps-live-glow 2.4s ease-in-out infinite;
-}
-@keyframes ps-live-glow {
-  0%,100% { box-shadow: 0 0 8px rgba(255,30,66,.35); }
-  50% { box-shadow: 0 0 17px rgba(255,30,66,.72); }
-}
-.live-dot {
-  position: relative;
-  animation: pulse 1.2s infinite ease-in-out;
-}
-.live-dot::after {
-  content: "";
-  position: absolute;
-  inset: -65%;
-  border: 1px solid rgba(255,255,255,.75);
-  border-radius: 50%;
-  animation: ps-live-ring 1.8s ease-out infinite;
-}
-@keyframes ps-live-ring {
-  0% { transform: scale(.55); opacity:.75; }
-  100% { transform: scale(1.75); opacity:0; }
-}
-.brand-pill { position:relative; overflow:hidden; }
-.brand-pill::after {
-  content:"";
-  position:absolute;
-  top:-30%; bottom:-30%; left:-35%; width:18%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);
-  transform:skewX(-22deg);
-  animation:ps-brand-sweep 9s ease-in-out infinite;
-  pointer-events:none;
-}
-@keyframes ps-brand-sweep {
-  0%,62% { left:-35%; opacity:0; }
-  70% { opacity:1; }
-  92%,100% { left:125%; opacity:0; }
-}
-.team-card::after {
-  background-size:200% 100%;
-  animation:ps-team-edge 7s ease-in-out infinite alternate;
-}
-@keyframes ps-team-edge {
-  from { background-position:0% 50%; opacity:.35; }
-  to { background-position:100% 50%; opacity:.9; }
-}
-.player-box.striker {
-  animation:ps-striker-glow 2.8s ease-in-out infinite;
-}
-@keyframes ps-striker-glow {
-  0%,100% { box-shadow:0 0 8px rgba(255,194,26,.12); }
-  50% { box-shadow:0 0 18px rgba(255,194,26,.34); }
-}
-.player-box.striker::before {
-  animation:ps-striker-bar 1.8s ease-in-out infinite;
-}
-@keyframes ps-striker-bar {
-  0%,100% { opacity:.65; }
-  50% { opacity:1; }
-}
-.value-updated {
-  animation:ps-value-update .72s cubic-bezier(.2,.8,.2,1);
-}
-@keyframes ps-value-update {
-  0% { filter:brightness(2.1); transform:translateY(-3px) scale(1.035); text-shadow:0 0 15px rgba(255,194,26,.65); }
-  55% { filter:brightness(1.35); }
-  100% { filter:brightness(1); transform:translateY(0) scale(1); text-shadow:none; }
-}
-.ball-arrival {
-  animation:ps-ball-arrival .78s cubic-bezier(.16,.9,.25,1.2);
-}
-@keyframes ps-ball-arrival {
-  0% { opacity:.25; transform:translateY(-12px) scale(.72); filter:brightness(1.8); }
-  70% { opacity:1; transform:translateY(2px) scale(1.08); }
-  100% { transform:translateY(0) scale(1); filter:brightness(1); }
-}
-.ticker-strip {
-  position:relative;
-  overflow:hidden;
-}
-.ticker-strip::before {
-  content:"";
-  position:absolute;
-  left:0; right:0; top:0; height:1px;
-  background:linear-gradient(90deg,transparent,var(--gold),transparent);
-  background-size:220% 100%;
-  animation:ps-ticker-line 6s linear infinite;
-}
-@keyframes ps-ticker-line {
-  from { background-position:100% 0; }
-  to { background-position:-120% 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .stadium,.live-pill,.live-dot,.live-dot::after,.brand-pill::after,
-  .team-card::after,.player-box.striker,.player-box.striker::before,
-  .value-updated,.ball-arrival,.ticker-strip::before {
-    animation:none !important;
-  }
-}
-
 </style>
 </head>
 <body>
@@ -625,20 +614,23 @@ html, body {
 
 <main class="stage" aria-label="Preet Sports TV Cricket Scoreboard">
   <div class="stadium"></div>
+  <div class="tv-light-beam"></div>
 
   <div class="content">
-    <!-- 1. Top Brand Bar -->
     <header class="brand-bar">
       <div class="brand-pill">
         <span>PREET <b>SPORTS</b></span>
         <span class="brand-sub">| LIVE BROADCAST CENTRE</span>
       </div>
       <div class="live-pill">
-        <span class="live-dot"></span> LIVE
+        <div class="live-beacon">
+          <span class="live-dot"></span>
+          <span class="live-radar"></span>
+        </div>
+        LIVE
       </div>
     </header>
 
-    <!-- 2. Team Scores -->
     <section class="teams-grid">
       <div class="team-card">
         <img class="crest" id="logo1" alt="" hidden>
@@ -663,7 +655,6 @@ html, body {
       </div>
     </section>
 
-    <!-- 3. Current Over & Match Equation -->
     <section class="middle-row">
       <div class="match-status-card">
         <span class="badge-label">MATCH SITUATION</span>
@@ -687,7 +678,6 @@ html, body {
       </div>
     </section>
 
-    <!-- 4. Contextual Stats Strip -->
     <section class="context-strip">
       <div class="context-box">
         <div class="context-title">TARGET</div>
@@ -707,7 +697,6 @@ html, body {
       </div>
     </section>
 
-    <!-- 5. Active Players (Batters & Bowler) -->
     <section class="players-grid">
       <article class="player-box" id="cardBat1">
         <img class="player-avatar" id="photo1" alt="" hidden>
@@ -748,7 +737,6 @@ html, body {
       </article>
     </section>
 
-    <!-- 6. Bottom Information Ticker -->
     <footer class="ticker-strip">
       <div class="ticker-left">
         <span>VENUE: <b id="venue">STADIUM</b></span>
@@ -767,24 +755,13 @@ html, body {
   const input = $("crexUrl"), status = $("status");
   let activeUrl = params.get("url") || "";
   let timer = null, busy = false;
-  let lastBallSignature = null;
 
   input.value = activeUrl;
 
   const clean = value => String(value ?? "").replace(/\s+/g, " ").trim();
-  const animatedValues = new Set(["score1","score2","target","rates","partnership","lastWicket","bat1score","bat2score","bowlscore"]);
   const text = (id, value, fallback = "—") => {
     const el = $(id);
-    if (!el) return;
-    const next = clean(value) || fallback;
-    if (el.textContent !== next) {
-      el.textContent = next;
-      if (animatedValues.has(id)) {
-        el.classList.remove("value-updated");
-        void el.offsetWidth;
-        el.classList.add("value-updated");
-      }
-    }
+    if (el) el.textContent = clean(value) || fallback;
   };
 
   const safeImage = (id, url) => {
@@ -806,19 +783,20 @@ html, body {
     return s ? s.replace(/[()]/g, "") + " OV" : "— OV";
   };
 
-  function renderBall(b) {
+  function renderBall(b, isLatest = false) {
     const value = clean(typeof b === "object" ? (b.text ?? b.value ?? b.label ?? "") : b);
     const low = value.toLowerCase();
     let cls = "dot", label = value || "–";
 
-    if (/^(wd|wide|nb|no.?ball)/.test(low)) { cls = "extra"; label = value.toUpperCase(); }
-    else if (/^(w|wk|out|wicket)(\b|$)/.test(low)) { cls = "wicket"; label = "W"; }
+    if (/^w|wicket|out/.test(low)) { cls = "wicket"; label = "W"; }
     else if (low === "4") { cls = "four"; }
     else if (low === "6") { cls = "six"; }
+    else if (/wd|wide|nb|no.?ball/.test(low)) { cls = "extra"; label = value.toUpperCase(); }
     else if (/^(0|\.|dot)$/.test(low)) { cls = "dot"; label = "0"; }
 
-    const safeLabel = label.replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
-    return `<span class="ball ${cls}">${safeLabel}</span>`;
+    if (isLatest && label !== "–") cls += " active-latest";
+
+    return `<span class="ball ${cls}">${label}</span>`;
   }
 
   function render(d) {
@@ -845,25 +823,16 @@ html, body {
     text("lastWicket", d.last_wicket);
     text("venue", d.venue || "VENUE FEED");
 
-    // Over Balls
     const ov = d.current_over || {};
     const balls = Array.isArray(ov.balls) ? ov.balls.slice(-6) : [];
-    const ballSignature = balls.map(x => clean(typeof x === "object" ? (x.text ?? x.value ?? x.label ?? "") : x)).join("|") + "::" + clean(ov.total);
-    if (ballSignature !== lastBallSignature) {
-      const hadPreviousOver = lastBallSignature !== null;
-      const ballContainer = $("balls");
-      ballContainer.innerHTML = Array.from({ length: 6 }, (_, i) =>
-        balls[i] ? renderBall(balls[i]) : '<span class="ball dot">–</span>'
-      ).join("");
-      if (hadPreviousOver && balls.length) {
-        const latestBall = ballContainer.children[Math.min(balls.length - 1, 5)];
-        if (latestBall) latestBall.classList.add("ball-arrival");
-      }
-      lastBallSignature = ballSignature;
-    }
+    const validBallCount = balls.length;
+
+    $("balls").innerHTML = Array.from({ length: 6 }, (_, i) => {
+      const isLatest = (i === validBallCount - 1 && validBallCount > 0);
+      return balls[i] ? renderBall(balls[i], isLatest) : '<span class="ball dot">–</span>';
+    }).join("");
     text("overTotal", `TOTAL: ${ov.total ?? 0}`);
 
-    // Batsmen & Bowler
     const p1 = d.batsman1 || {}, p2 = d.batsman2 || {}, bw = d.bowler || {};
 
     text("bat1", p1.short_name || p1.name, "WAITING...");
@@ -881,7 +850,6 @@ html, body {
     text("bowlstats", `OV ${bw.overs ?? "—"}   ECON ${bw.econ ?? "—"}`);
     safeImage("photoB", bw.img || bw.photo_url || bw.image);
 
-    // Striker Highlights
     const isP1Striker = Boolean(p1.on_strike);
     const isP2Striker = Boolean(p2.on_strike);
 
