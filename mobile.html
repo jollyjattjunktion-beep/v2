@@ -41,7 +41,7 @@ html, body {
 .toolbar {
   width: min(100%, 1280px);
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   padding: 6px 12px;
   margin: 4px auto;
@@ -57,9 +57,28 @@ html, body {
 }
 .toolbar button {
   border: 0; border-radius: 4px; background: linear-gradient(180deg, #ffd65c, #e69a0a);
-  color: #071220; font-weight: 800; padding: 6px 14px; font-size: 12px; cursor: pointer;
+  color: #071220; font-weight: 800; padding: 6px 12px; font-size: 12px; cursor: pointer;
+  white-space: nowrap;
+}
+#obsBtn {
+  background: linear-gradient(180deg, #35d9f3, #0982aa);
+  color: #030f1e;
 }
 #status { font-size: 11px; color: #5ef396; font-weight: 800; }
+
+/* OBS Mode: Complete Toolbar Hiding & Clean Background */
+body.obs-mode {
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+body.obs-mode .toolbar {
+  display: none !important;
+}
+body.obs-mode .stage {
+  border: none !important;
+  box-shadow: none !important;
+}
 
 /* 16:9 Broadcast Canvas */
 .stage {
@@ -111,7 +130,21 @@ html, body {
   justify-content: space-between;
   border-bottom: 2px solid rgba(255, 196, 0, 0.65);
   padding-bottom: 0.3%;
+  position: relative;
+  overflow: hidden;
 }
+.brand-bar::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  animation: glassSheen 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes glassSheen {
+  0%, 65% { left: -100%; }
+  100% { left: 200%; }
+}
+
 .brand-pill {
   font-family: var(--font-score);
   font-size: 2.4cqw;
@@ -134,7 +167,26 @@ html, body {
   gap: 0.4em;
   box-shadow: 0 0 12px rgba(255, 18, 61, 0.7);
 }
-.live-dot { width: 0.55em; height: 0.55em; background: #fff; border-radius: 50%; }
+.live-beacon {
+  position: relative;
+  width: 0.65em;
+  height: 0.65em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.live-dot { position: absolute; inset: 0; background: #fff; border-radius: 50%; }
+.live-radar {
+  position: absolute;
+  inset: -4px;
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+  animation: radarWave 1.8s infinite ease-out;
+}
+@keyframes radarWave {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
 
 /* 2. Top Score Row */
 .top-score-row {
@@ -233,16 +285,13 @@ html, body {
 }
 .center-action-box.ball-in-air .action-live-text {
   color: var(--cyan);
-  text-shadow: 0 0 16px var(--cyan);
 }
 .center-action-box.wicket-alert {
   border-color: #ff123d;
   background: linear-gradient(180deg, #3d050f, #140206);
-  box-shadow: 0 0 24px rgba(255, 18, 61, 0.7);
 }
 .center-action-box.wicket-alert .action-live-text {
   color: #ff2a4f;
-  text-shadow: 0 0 18px rgba(255, 18, 61, 0.8);
 }
 .center-action-box.break-alert {
   border-color: #ffd65c;
@@ -335,8 +384,12 @@ html, body {
 .ball.wicket { background: linear-gradient(180deg, #ff1a3c, #ad0821); border-color: #ffa1af; color: #fff; }
 .ball.extra { background: linear-gradient(180deg, #139785, #075c51); border-color: #4ee0cd; color: #fff; font-size: 1.8cqw; }
 .ball.active-latest {
-  border-color: #fff;
-  box-shadow: 0 0 12px var(--cyan);
+  border-color: #fff !important;
+  animation: ballGlow 1.4s infinite alternate !important;
+}
+@keyframes ballGlow {
+  0% { transform: scale(1); box-shadow: 0 0 6px var(--cyan); }
+  100% { transform: scale(1.08); box-shadow: 0 0 16px var(--cyan); }
 }
 
 /* 4. Context Stats Strip */
@@ -376,8 +429,18 @@ html, body {
   flex-direction: column;
 }
 .player-box.striker {
-  border-color: var(--gold);
-  box-shadow: 0 0 14px rgba(255, 196, 0, 0.35);
+  border-color: var(--gold) !important;
+  animation: strikerNeonPulse 2.4s infinite ease-in-out !important;
+}
+@keyframes strikerNeonPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 196, 0, 0.35), inset 0 0 8px rgba(255, 196, 0, 0.15);
+    border-color: rgba(255, 196, 0, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(255, 196, 0, 0.7), inset 0 0 14px rgba(255, 196, 0, 0.3);
+    border-color: #ffe685;
+  }
 }
 
 .player-card-top {
@@ -487,7 +550,7 @@ html, body {
   margin-top: 0.15em;
 }
 
-/* 6. Footer Ticker */
+/* 6. Footer Ticker with Flowing LED */
 .ticker-strip {
   display: flex;
   align-items: center;
@@ -500,57 +563,6 @@ html, body {
   font-weight: 800;
   color: #fff;
   letter-spacing: .08em;
-}
-.ticker-left { display: flex; gap: 1.5cqw; color: var(--muted); }
-.ticker-left span b { color: var(--gold); }
-.ticker-right { color: var(--gold); }
-
-@media (max-width: 600px) {
-  body { padding: 0; }
-  .toolbar { border-radius: 0; margin: 0 0 4px 0; padding: 4px; }
-  .toolbar label { font-size: 9px; }
-  .toolbar input { font-size: 10px; padding: 4px 6px; }
-  .toolbar button { font-size: 10px; padding: 4px 8px; }
-  #status { display: none; }
-  .stage { width: 100vw; border: none; }
-}
-  /* --- TV BROADCAST NEON ANIMATIONS --- */
-
-/* 1. Breathing Striker Halo */
-.player-box.striker {
-  border-color: var(--gold) !important;
-  animation: strikerNeonPulse 2.4s infinite ease-in-out !important;
-}
-@keyframes strikerNeonPulse {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(255, 196, 0, 0.35), inset 0 0 8px rgba(255, 196, 0, 0.15);
-    border-color: rgba(255, 196, 0, 0.7);
-  }
-  50% {
-    box-shadow: 0 0 22px rgba(255, 196, 0, 0.7), inset 0 0 14px rgba(255, 196, 0, 0.3);
-    border-color: #ffe685;
-  }
-}
-
-/* 2. Top Header Glass Sheen */
-.brand-bar {
-  position: relative;
-  overflow: hidden;
-}
-.brand-bar::after {
-  content: "";
-  position: absolute;
-  top: 0; left: -100%; width: 50%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
-  animation: glassSheen 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-@keyframes glassSheen {
-  0%, 65% { left: -100%; }
-  100% { left: 200%; }
-}
-
-/* 3. Flowing LED Neon Ticker Border */
-.ticker-strip {
   position: relative;
   overflow: hidden;
 }
@@ -566,110 +578,31 @@ html, body {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+.ticker-left { display: flex; gap: 1.5cqw; color: var(--muted); }
+.ticker-left span b { color: var(--gold); }
+.ticker-right { color: var(--gold); }
 
-/* 4. Live Pill Radar Beacon */
-.live-beacon {
-  position: relative;
-  width: 0.65em;
-  height: 0.65em;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.live-radar {
-  position: absolute;
-  inset: -4px;
-  border: 1.5px solid #fff;
-  border-radius: 50%;
-  animation: radarWave 1.8s infinite ease-out;
-}
-@keyframes radarWave {
-  0% { transform: scale(0.6); opacity: 1; }
-  100% { transform: scale(2.2); opacity: 0; }
-}
-
-/* 5. Active Ball Neon Glow */
-.ball.active-latest {
-  border-color: #fff !important;
-  animation: ballGlow 1.4s infinite alternate !important;
-}
-@keyframes ballGlow {
-  0% { transform: scale(1); box-shadow: 0 0 6px var(--cyan); }
-  100% { transform: scale(1.08); box-shadow: 0 0 16px var(--cyan); }
-}
-  /* OBS Mode Styling */
-#obsBtn {
-  border: 0;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #35d9f3, #0982aa);
-  color: #030f1e;
-  font-weight: 800;
-  padding: 6px 12px;
-  font-size: 12px;
-  cursor: pointer;
-  white-space: nowrap;
-  letter-spacing: 0.04em;
-  transition: transform 0.1s ease;
-}
-#obsBtn:active { transform: scale(0.96); }
-
-/* Auto-hides control bar when loaded inside OBS Browser Source */
-body.obs-mode .toolbar {
-  display: none !important;
-}
-body.obs-mode {
-  padding: 0 !important;
-  background: transparent !important;
+@media (max-width: 600px) {
+  body { padding: 0; }
+  .toolbar { border-radius: 0; margin: 0 0 4px 0; padding: 4px; }
+  .toolbar label { font-size: 9px; }
+  .toolbar input { font-size: 10px; padding: 4px 6px; }
+  .toolbar button { font-size: 10px; padding: 4px 8px; }
+  #status { display: none; }
+  .stage { width: 100vw; border: none; }
 }
 </style>
-  <script>// Check if opened as an OBS Browser Source (?obs=1)
-  if (params.get("obs") === "1") {
-    document.body.classList.add("obs-mode");
-  }
-
-  // Copy Clean OBS URL to Clipboard
-  $("obsBtn")?.addEventListener("click", async () => {
-    const matchUrl = input.value.trim();
-    if (!matchUrl.startsWith("http")) {
-      status.textContent = "ENTER A VALID URL FIRST";
-      status.style.color = "#ff4f6b";
-      return;
-    }
-
-    const obsUrl = new URL(location.href);
-    obsUrl.searchParams.set("url", matchUrl);
-    obsUrl.searchParams.set("obs", "1");
-
-    try {
-      await navigator.clipboard.writeText(obsUrl.toString());
-      const btn = $("obsBtn");
-      const originalText = btn.textContent;
-      btn.textContent = "✓ COPIED!";
-      btn.style.background = "#5ef396";
-      btn.style.color = "#031424";
-
-      status.textContent = "● OBS LINK COPIED (PASTE IN OBS BROWSER SOURCE)";
-      status.style.color = "#5ef396";
-
-      setTimeout(() => {
-        btn.textContent = originalText;
-        btn.style.background = "";
-        btn.style.color = "";
-      }, 2000);
-    } catch (err) {
-      prompt("Copy your OBS Browser Source URL:", obsUrl.toString());
-    }
-  });
-  </script></head>
+</head>
 <body>
 
 <div class="toolbar">
   <label for="crexUrl">CREX MATCH</label>
   <input id="crexUrl" type="url" placeholder="Paste CREX match URL..." autocomplete="off">
   <button id="loadBtn">SYNC FEED</button>
-  <button id="obsBtn" type="button" title="Copy direct link for OBS Studio">COPY OBS LINK</button>
+  <button id="obsBtn" type="button" title="Copy clean link for OBS Browser Source">COPY OBS LINK</button>
   <span id="status">READY</span>
 </div>
+
 <main class="stage" aria-label="Preet Sports HD TV Cricket Scoreboard">
   <div class="stadium"></div>
 
@@ -681,12 +614,13 @@ body.obs-mode {
         <span class="brand-sub">| HD LIVE MATCH HUB</span>
       </div>
       <div class="live-pill">
-  <div class="live-beacon">
-    <span class="live-dot"></span>
-    <span class="live-radar"></span>
-  </div>
-  LIVE
-</div>    </header>
+        <div class="live-beacon">
+          <span class="live-dot"></span>
+          <span class="live-radar"></span>
+        </div>
+        LIVE
+      </div>
+    </header>
 
     <!-- Top Score Row -->
     <section class="top-score-row">
@@ -857,6 +791,16 @@ body.obs-mode {
   let activeUrl = params.get("url") || "";
   let timer = null, busy = false;
 
+  // Auto-hide toolbar if launched inside OBS Studio (?obs=1)
+  if (params.get("obs") === "1") {
+    document.body.classList.add("obs-mode");
+  }
+
+  // Toggle OBS toolbar mode with F9 key
+  window.addEventListener("keydown", e => {
+    if (e.key === "F9") document.body.classList.toggle("obs-mode");
+  });
+
   input.value = activeUrl;
 
   const clean = value => String(value ?? "").replace(/\s+/g, " ").trim();
@@ -1023,6 +967,41 @@ body.obs-mode {
 
   $("loadBtn").addEventListener("click", load);
   input.addEventListener("keydown", e => { if (e.key === "Enter") load(); });
+
+  // One-click OBS Link generator & clipboard copy
+  $("obsBtn")?.addEventListener("click", async () => {
+    const matchUrl = input.value.trim();
+    if (!matchUrl.startsWith("http")) {
+      status.textContent = "PASTE MATCH URL FIRST";
+      status.style.color = "#ff4f6b";
+      return;
+    }
+
+    const obsUrl = new URL(location.href);
+    obsUrl.searchParams.set("url", matchUrl);
+    obsUrl.searchParams.set("obs", "1");
+
+    try {
+      await navigator.clipboard.writeText(obsUrl.toString());
+      const btn = $("obsBtn");
+      const orig = btn.textContent;
+      btn.textContent = "✓ COPIED!";
+      btn.style.background = "#5ef396";
+      btn.style.color = "#031424";
+
+      status.textContent = "● OBS LINK COPIED (PASTE AS 1920x1080 BROWSER SOURCE)";
+      status.style.color = "#5ef396";
+
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.style.background = "";
+        btn.style.color = "";
+      }, 2000);
+    } catch (err) {
+      prompt("Copy your OBS Browser Source Link:", obsUrl.toString());
+    }
+  });
+
   if (activeUrl) load();
 })();
 </script>
