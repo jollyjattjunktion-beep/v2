@@ -15,9 +15,9 @@ body{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px;o
 .toolbar input{min-width:0;flex:1;background:#020b18;border:1px solid #2b91b0;color:#fff;border-radius:8px;padding:9px 11px;font-size:13px}
 .toolbar button{border:0;border-radius:8px;background:linear-gradient(180deg,#ffd65c,#e69a0a);color:#101827;font-weight:900;padding:9px 12px;white-space:nowrap;cursor:pointer}
 #status{font-size:11px;color:#8ff0ae;white-space:nowrap;font-weight:800}
-.stage{width:min(100vw,177.7778vh);max-width:1920px;aspect-ratio:16/9;container-type:inline-size;position:relative;overflow:hidden;background:#061326;border:1px solid #173b60;box-shadow:0 12px 42px #000}
+.stage{width:min(100vw,calc((100vh - 64px)*16/9));width:min(100vw,calc((100svh - 64px)*16/9));max-width:1920px;aspect-ratio:16/9;container-type:inline-size;position:relative;overflow:hidden;background:#061326;border:1px solid #173b60;box-shadow:0 12px 42px #000}
 .stadium{position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,14,29,.28),rgba(4,14,29,.36) 35%,rgba(3,11,23,.94) 100%),url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1920&q=85') center 42%/cover;opacity:.78}
-.content{position:absolute;inset:1.35% 1.45%;display:grid;grid-template-rows:minmax(0,.65fr) minmax(0,1.75fr) minmax(0,1.55fr) minmax(0,.63fr) minmax(0,.8fr) minmax(0,2.2fr) minmax(0,.57fr) minmax(0,.35fr);gap:.75%;z-index:1;min-height:0}
+.content{position:absolute;inset:1.35% 1.45%;display:grid;grid-template-rows:minmax(0,.60fr) minmax(0,1.75fr) minmax(0,1.55fr) minmax(0,.75fr) minmax(0,.55fr) minmax(0,2.25fr) minmax(0,.48fr) minmax(0,.28fr);gap:.7%;z-index:1;min-height:0}
 .brand-row{display:flex;align-items:center;justify-content:center;gap:1.2%;min-height:0}
 .brand{font-size:2.5cqw;font-weight:1000;letter-spacing:.07em;padding:.18em .8em;border:1px solid #4776a7;border-radius:.3em;background:linear-gradient(180deg,#102e55,#061326);box-shadow:0 .25em .8em #0008}
 .brand b{color:var(--gold)}
@@ -128,6 +128,21 @@ body{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px;o
  #status{display:none}
  .stage{width:100vw;max-width:none;border-left:0;border-right:0}
 }
+
+
+/* Minimum readable type when the 16:9 stream is viewed at phone width */
+.brand{font-size:clamp(10px,2.5cqw,48px)}
+.live-pill{font-size:clamp(9px,1.7cqw,32px)}
+.team-name{font-size:clamp(10px,2cqw,36px)}
+.team-score{font-size:clamp(18px,4cqw,72px)}
+.team-overs{font-size:clamp(8px,1.25cqw,22px)}
+.eyebrow{font-size:clamp(8px,1.05cqw,20px)}
+.over-title{font-size:clamp(8px,1.35cqw,24px)}
+.over-total{font-size:clamp(8px,1cqw,18px)}
+.ball{font-size:clamp(14px,2.05cqw,40px)}
+.next-k{font-size:clamp(7px,.9cqw,14px)}
+.next-v{font-size:clamp(8px,1.05cqw,17px)}
+.footer{font-size:clamp(7px,.85cqw,16px);line-height:1}
 
 </style>
 </head>
