@@ -7,7 +7,6 @@
 <title>PREET SPORTS | HD TV Broadcast Scoreboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- High-contrast TV Broadcast Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Teko:wght@600;700;800&display=swap" rel="stylesheet">
 
 <style>
@@ -170,7 +169,7 @@ html, body {
 }
 @keyframes liveBlink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.7); } }
 
-/* TOP SCORE ROW: Team 1 | Center Action | Team 2 */
+/* Top Score Row */
 .top-score-row {
   display: grid;
   grid-template-columns: 1.25fr 1fr 1.25fr;
@@ -424,9 +423,7 @@ html, body {
   text-overflow: ellipsis;
 }
 
-/* ========================================================
-   PLAYER CARDS: FULL CUTOUT WITH JERSEY DISPLAY
-   ======================================================== */
+/* Player Lower Thirds */
 .players-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -449,7 +446,6 @@ html, body {
   box-shadow: 0 0 16px rgba(255, 196, 0, 0.35);
 }
 
-/* Top Role Header Plate */
 .player-role-header {
   display: flex;
   align-items: center;
@@ -474,7 +470,6 @@ html, body {
   letter-spacing: .05em;
 }
 
-/* Main Body: Left Player Cutout + Right Telemetry */
 .player-main {
   flex: 1;
   display: grid;
@@ -484,7 +479,6 @@ html, body {
   position: relative;
 }
 
-/* Big Player Cutout with Team Jersey */
 .player-cutout-wrap {
   position: relative;
   width: 100%;
@@ -506,7 +500,6 @@ html, body {
 }
 .player-cutout[hidden] { display: none; }
 
-/* Right Column Data */
 .player-data-col {
   display: flex;
   flex-direction: column;
@@ -548,13 +541,11 @@ html, body {
   margin-left: 0.15em;
 }
 
-/* Striker Bat Icon & Bowler Ball Icon */
 .action-icon {
   font-size: 1.4cqw;
   line-height: 1;
 }
 
-/* Substats Bottom Line */
 .player-substats {
   font-family: var(--font-tv);
   font-size: 1.15cqw;
@@ -632,32 +623,29 @@ html, body {
 
     <!-- Top Score Row -->
     <section class="top-score-row">
-      <!-- Team 1 -->
       <div class="team-card">
         <img class="crest" id="logo1" alt="" hidden>
         <div class="team-info">
-          <div class="team-name" id="team1">PAKISTAN</div>
+          <div class="team-name" id="team1">TEAM 1</div>
           <div class="team-score-wrap">
-            <div class="team-score" id="score1">50-2</div>
-            <div class="team-overs" id="overs1">10.0 OV</div>
+            <div class="team-score" id="score1">—</div>
+            <div class="team-overs" id="overs1">— OV</div>
           </div>
         </div>
       </div>
 
-      <!-- CENTER ACTION HUB: Over / Wicket / Ball In Air -->
       <div class="center-action-box" id="actionBox">
         <span class="action-top-label" id="actionLabel">LIVE MATCH ACTION</span>
         <div class="action-live-text" id="actionText">OVER</div>
       </div>
 
-      <!-- Team 2 -->
       <div class="team-card away">
         <img class="crest" id="logo2" alt="" hidden>
         <div class="team-info">
-          <div class="team-name" id="team2">SRI LANKA</div>
+          <div class="team-name" id="team2">TEAM 2</div>
           <div class="team-score-wrap">
-            <div class="team-score" id="score2">325-8</div>
-            <div class="team-overs" id="overs2">50.0 OV</div>
+            <div class="team-score" id="score2">—</div>
+            <div class="team-overs" id="overs2">— OV</div>
           </div>
         </div>
       </div>
@@ -667,22 +655,22 @@ html, body {
     <section class="middle-row">
       <div class="situation-card">
         <span class="card-label">MATCH SITUATION</span>
-        <div class="situation-main" id="matchState">PAK NEED 276 RUNS IN 240 BALLS</div>
-        <div class="situation-sub" id="matchSub">FINAL ODI • TRI SERIES IN PAKISTAN 2026</div>
+        <div class="situation-main" id="matchState">MATCH IN PROGRESS</div>
+        <div class="situation-sub" id="matchSub">PREET SPORTS EXCLUSIVE</div>
       </div>
 
       <div class="over-tracker-card">
         <div class="over-card-head">
           <span class="card-label">CURRENT OVER</span>
-          <span class="over-total-tag" id="overTotal">TOTAL: 9</span>
+          <span class="over-total-tag" id="overTotal">TOTAL: 0</span>
         </div>
         <div class="balls-grid" id="balls">
-          <span class="ball dot">0</span>
-          <span class="ball dot">0</span>
-          <span class="ball four">4</span>
-          <span class="ball dot">1</span>
-          <span class="ball four">4</span>
-          <span class="ball dot">0</span>
+          <span class="ball dot">–</span>
+          <span class="ball dot">–</span>
+          <span class="ball dot">–</span>
+          <span class="ball dot">–</span>
+          <span class="ball dot">–</span>
+          <span class="ball dot">–</span>
         </div>
       </div>
     </section>
@@ -691,27 +679,24 @@ html, body {
     <section class="context-strip">
       <div class="context-box">
         <div class="context-title">TARGET</div>
-        <div class="context-val" id="target">326</div>
+        <div class="context-val" id="target">—</div>
       </div>
       <div class="context-box">
         <div class="context-title">CRR / RRR</div>
-        <div class="context-val" id="rates">5.00 / 6.90</div>
+        <div class="context-val" id="rates">— / —</div>
       </div>
       <div class="context-box">
         <div class="context-title">PARTNERSHIP</div>
-        <div class="context-val" id="partnership">36 (39)</div>
+        <div class="context-val" id="partnership">—</div>
       </div>
       <div class="context-box">
         <div class="context-title">LAST WICKET</div>
-        <div class="context-val" id="lastWicket">Babar Azam 0(5)</div>
+        <div class="context-val" id="lastWicket">—</div>
       </div>
     </section>
 
-    <!-- ========================================================
-         PLAYER CARDS: FULL CUTOUT + TEAM JERSEY DISPLAY
-         ======================================================== -->
+    <!-- Players Lower Thirds -->
     <section class="players-grid">
-      <!-- Batsman 1 -->
       <article class="player-box" id="cardBat1">
         <div class="player-role-header">
           <span class="player-role-title">BATSMAN</span>
@@ -719,41 +704,39 @@ html, body {
         </div>
         <div class="player-main">
           <div class="player-cutout-wrap">
-            <img class="player-cutout" id="photo1" alt="" src="https://images.crex.live/players/small/468.webp">
+            <img class="player-cutout" id="photo1" alt="" hidden>
           </div>
           <div class="player-data-col">
-            <div class="player-name-plate" id="bat1">F ZAMAN</div>
+            <div class="player-name-plate" id="bat1">WAITING...</div>
             <div class="player-score-row">
-              <span class="player-score-big" id="bat1score">22 <small>(30)</small></span>
+              <span class="player-score-big" id="bat1score">—</span>
               <span class="action-icon" id="batIcon1" style="display:none">🏏</span>
             </div>
-            <div class="player-substats" id="bat1stats">4s 0 &nbsp; 6s 1 &nbsp; SR 73.33</div>
+            <div class="player-substats" id="bat1stats">4s — &nbsp; 6s — &nbsp; SR —</div>
           </div>
         </div>
       </article>
 
-      <!-- Batsman 2 -->
-      <article class="player-box striker" id="cardBat2">
+      <article class="player-box" id="cardBat2">
         <div class="player-role-header">
           <span class="player-role-title">BATSMAN</span>
-          <span class="role-badge" id="strikeBadge2">STRIKER</span>
+          <span class="role-badge" id="strikeBadge2" style="display:none">STRIKER</span>
         </div>
         <div class="player-main">
           <div class="player-cutout-wrap">
-            <img class="player-cutout" id="photo2" alt="" src="https://images.crex.live/players/small/469.webp">
+            <img class="player-cutout" id="photo2" alt="" hidden>
           </div>
           <div class="player-data-col">
-            <div class="player-name-plate" id="bat2">S BAIG</div>
+            <div class="player-name-plate" id="bat2">WAITING...</div>
             <div class="player-score-row">
-              <span class="player-score-big" id="bat2score">22 <small>(18)</small></span>
-              <span class="action-icon" id="batIcon2">🏏</span>
+              <span class="player-score-big" id="bat2score">—</span>
+              <span class="action-icon" id="batIcon2" style="display:none">🏏</span>
             </div>
-            <div class="player-substats" id="bat2stats">4s 4 &nbsp; 6s 0 &nbsp; SR 122.22</div>
+            <div class="player-substats" id="bat2stats">4s — &nbsp; 6s — &nbsp; SR —</div>
           </div>
         </div>
       </article>
 
-      <!-- Bowler -->
       <article class="player-box" id="cardBowler">
         <div class="player-role-header">
           <span class="player-role-title">CURRENT BOWLER</span>
@@ -761,15 +744,15 @@ html, body {
         </div>
         <div class="player-main">
           <div class="player-cutout-wrap">
-            <img class="player-cutout" id="photoB" alt="" src="https://images.crex.live/players/small/470.webp">
+            <img class="player-cutout" id="photoB" alt="" hidden>
           </div>
           <div class="player-data-col">
-            <div class="player-name-plate" id="bowler">A FERNANDO</div>
+            <div class="player-name-plate" id="bowler">WAITING...</div>
             <div class="player-score-row">
-              <span class="player-score-big" id="bowlscore">0-24</span>
+              <span class="player-score-big" id="bowlscore">—</span>
               <span class="action-icon">🔴</span>
             </div>
-            <div class="player-substats" id="bowlstats">OV 5.0 &nbsp; ECON 4.80</div>
+            <div class="player-substats" id="bowlstats">OV — &nbsp; ECON —</div>
           </div>
         </div>
       </article>
@@ -778,9 +761,9 @@ html, body {
     <!-- Footer Ticker -->
     <footer class="ticker-strip">
       <div class="ticker-left">
-        <span>VENUE: <b id="venue">GADDAFI STADIUM, LAHORE</b></span>
-        <span>NEXT BAT: <b id="next1">M RIZWAN</b></span>
-        <span>NEXT BOWL: <b id="nextB">M THEEKSHANA</b></span>
+        <span>VENUE: <b id="venue">STADIUM</b></span>
+        <span>NEXT BAT: <b id="next1">—</b></span>
+        <span>NEXT BOWL: <b id="nextB">—</b></span>
       </div>
       <div class="ticker-right">PREET SPORTS BROADCAST</div>
     </footer>
@@ -801,6 +784,10 @@ html, body {
   const text = (id, value, fallback = "—") => {
     const el = $(id);
     if (el) el.textContent = clean(value) || fallback;
+  };
+  const html = (id, value, fallback = "—") => {
+    const el = $(id);
+    if (el) el.innerHTML = clean(value) || fallback;
   };
 
   const safeImage = (id, url) => {
@@ -872,11 +859,9 @@ html, body {
     safeImage("logo1", a.logo);
     safeImage("logo2", b.logo);
 
-    // Center Action Box
     const actionVal = d.live_action || d.result_box || d.team_result || d.center_commentary || d.last_ball_text;
     updateActionBox(actionVal);
 
-    // Situation & Target
     text("matchState", d.equation || d.status || "LIVE MATCH", "LIVE MATCH");
     text("matchSub", d.status_note || d.series_name || "PREET SPORTS LIVE");
     text("target", b.target || d.target);
@@ -885,7 +870,6 @@ html, body {
     text("lastWicket", d.last_wicket);
     text("venue", d.venue || "VENUE FEED");
 
-    // Over Balls
     const ov = d.current_over || {};
     const balls = Array.isArray(ov.balls) ? ov.balls.slice(-6) : [];
     const validCount = balls.length;
@@ -896,16 +880,15 @@ html, body {
     }).join("");
     text("overTotal", `TOTAL: ${ov.total ?? 0}`);
 
-    // Batters & Bowler Full Cutout Handling
     const p1 = d.batsman1 || {}, p2 = d.batsman2 || {}, bw = d.bowler || {};
 
     text("bat1", p1.short_name || p1.name, "WAITING...");
-    text("bat1score", `${p1.runs ?? "—"} <small>(${p1.balls ?? "—"})</small>`);
+    html("bat1score", `${p1.runs ?? "—"} <small>(${p1.balls ?? "—"})</small>`);
     text("bat1stats", `4s ${p1.fours ?? "—"}   6s ${p1.sixes ?? "—"}   SR ${p1.sr ?? "—"}`);
     safeImage("photo1", p1.img || p1.photo_url || p1.image);
 
     text("bat2", p2.short_name || p2.name, "WAITING...");
-    text("bat2score", `${p2.runs ?? "—"} <small>(${p2.balls ?? "—"})</small>`);
+    html("bat2score", `${p2.runs ?? "—"} <small>(${p2.balls ?? "—"})</small>`);
     text("bat2stats", `4s ${p2.fours ?? "—"}   6s ${p2.sixes ?? "—"}   SR ${p2.sr ?? "—"}`);
     safeImage("photo2", p2.img || p2.photo_url || p2.image);
 
@@ -914,7 +897,6 @@ html, body {
     text("bowlstats", `OV ${bw.overs ?? "—"}   ECON ${bw.econ ?? "—"}`);
     safeImage("photoB", bw.img || bw.photo_url || bw.image);
 
-    // Striker Highlights & Bat Icons
     const isP1Striker = Boolean(p1.on_strike);
     const isP2Striker = Boolean(p2.on_strike);
 
