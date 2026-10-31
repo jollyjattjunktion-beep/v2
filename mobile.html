@@ -208,6 +208,7 @@ html, body {
   align-items: center;
   text-align: center;
   box-shadow: 0 0 16px rgba(255, 196, 0, 0.3), inset 0 0 10px rgba(255, 196, 0, 0.1);
+  transition: all 0.3s ease;
 }
 .action-top-label {
   font-size: 0.8cqw;
@@ -224,6 +225,7 @@ html, body {
   color: var(--gold);
   text-transform: uppercase;
   white-space: nowrap;
+  text-shadow: 0 0 12px rgba(255, 196, 0, 0.6);
 }
 .center-action-box.ball-in-air {
   border-color: var(--cyan);
@@ -231,13 +233,26 @@ html, body {
 }
 .center-action-box.ball-in-air .action-live-text {
   color: var(--cyan);
+  text-shadow: 0 0 16px var(--cyan);
 }
 .center-action-box.wicket-alert {
   border-color: #ff123d;
   background: linear-gradient(180deg, #3d050f, #140206);
+  box-shadow: 0 0 24px rgba(255, 18, 61, 0.7);
 }
 .center-action-box.wicket-alert .action-live-text {
   color: #ff2a4f;
+  text-shadow: 0 0 18px rgba(255, 18, 61, 0.8);
+}
+.center-action-box.break-alert {
+  border-color: #ffd65c;
+  background: linear-gradient(180deg, #2a1c04, #120b01);
+  box-shadow: 0 0 16px rgba(255, 196, 0, 0.45);
+}
+.center-action-box.break-alert .action-live-text {
+  color: #ffd65c;
+  font-size: clamp(16px, 2.6cqw, 36px);
+  text-shadow: 0 0 12px rgba(255, 214, 92, 0.6);
 }
 
 /* 3. Match Situation & Over Tracker */
@@ -312,12 +327,17 @@ html, body {
   background: #06192d;
   border: 1.2px solid #204c75;
   color: #ffffff;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.25);
 }
 .ball.dot { color: #627b97; }
 .ball.four { background: linear-gradient(180deg, #1898d6, #075b8b); border-color: #63d9ff; color: #fff; }
 .ball.six { background: linear-gradient(180deg, #ffc72c, #cf8d00); border-color: #ffe685; color: #051322; }
 .ball.wicket { background: linear-gradient(180deg, #ff1a3c, #ad0821); border-color: #ffa1af; color: #fff; }
 .ball.extra { background: linear-gradient(180deg, #139785, #075c51); border-color: #4ee0cd; color: #fff; font-size: 1.8cqw; }
+.ball.active-latest {
+  border-color: #fff;
+  box-shadow: 0 0 12px var(--cyan);
+}
 
 /* 4. Context Stats Strip */
 .context-strip {
@@ -733,11 +753,14 @@ html, body {
     const labelEl = $("actionLabel");
 
     text("actionText", textVal);
-    box.classList.remove("wicket-alert", "ball-in-air");
+    box.classList.remove("wicket-alert", "ball-in-air", "break-alert");
 
     if (low.includes("wicket") || low.includes("out") || low.includes("caught") || low.includes("bowled") || low.includes("lbw")) {
       box.classList.add("wicket-alert");
       labelEl.textContent = "● WICKET FALLEN";
+    } else if (low.includes("break") || low.includes("delay") || low.includes("rain") || low.includes("lunch") || low.includes("tea") || low.includes("innings")) {
+      box.classList.add("break-alert");
+      labelEl.textContent = "● MATCH INTERVAL";
     } else if (low.includes("air") || low.includes("catch")) {
       box.classList.add("ball-in-air");
       labelEl.textContent = "● IN THE AIR";
@@ -771,23 +794,21 @@ html, body {
     text("partnership", d.partnership);
     text("lastWicket", d.last_wicket);
 
-    // Precise Over Balls (supports extra deliveries like Wides/No-balls without wrapping)
-  const balls = (d.current_over && Array.isArray(d.current_over.balls)) ? d.current_over.balls : [];
-  const validCount = balls.length;
-  const totalSlots = Math.max(6, validCount);
+    // Dynamic Over Balls: handles 6 balls or overs with extras (WD/NB)
+    const balls = (d.current_over && Array.isArray(d.current_over.balls)) ? d.current_over.balls : [];
+    const validCount = balls.length;
+    const totalSlots = Math.max(6, validCount);
 
-  $("balls").style.gridTemplateColumns = `repeat(${totalSlots}, 1fr)`;
-  $("balls").innerHTML = Array.from({ length: totalSlots }, (_, i) => {
-    if (i < validCount && balls[i] !== "") {
-      const isLatest = (i === validCount - 1);
-      return renderBall(balls[i], isLatest);
-    }
-    return '<span class="ball dot">–</span>';
-  }).join("");
+    $("balls").style.gridTemplateColumns = `repeat(${totalSlots}, 1fr)`;
+    $("balls").innerHTML = Array.from({ length: totalSlots }, (_, i) => {
+      if (i < validCount && balls[i] !== "") {
+        const isLatest = (i === validCount - 1);
+        return renderBall(balls[i], isLatest);
+      }
+      return '<span class="ball dot">–</span>';
+    }).join("");
 
-  if (d.current_over && d.current_over.total !== undefined) {
-    text("overTotal", `TOTAL: ${d.current_over.total}`);
-  }
+    text("overTotal", `TOTAL: ${d.current_over?.total ?? 0}`);
 
     // Players
     const p1 = d.batsman1 || {}, p2 = d.batsman2 || {}, bw = d.bowler || {};
