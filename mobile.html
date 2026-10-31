@@ -17,7 +17,7 @@ body{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px;o
 #status{font-size:11px;color:#8ff0ae;white-space:nowrap;font-weight:800}
 .stage{width:min(100vw,177.7778vh);max-width:1920px;aspect-ratio:16/9;container-type:inline-size;position:relative;overflow:hidden;background:#061326;border:1px solid #173b60;box-shadow:0 12px 42px #000}
 .stadium{position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,14,29,.28),rgba(4,14,29,.36) 35%,rgba(3,11,23,.94) 100%),url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1920&q=85') center 42%/cover;opacity:.78}
-.content{position:absolute;inset:1.8% 1.5%;display:grid;grid-template-rows:6% 17% 14% 6% 12% 25% 6% 4%;gap:1%;z-index:1}
+.content{position:absolute;inset:1.35% 1.45%;display:grid;grid-template-rows:minmax(0,.65fr) minmax(0,1.75fr) minmax(0,1.55fr) minmax(0,.63fr) minmax(0,.8fr) minmax(0,2.2fr) minmax(0,.57fr) minmax(0,.35fr);gap:.75%;z-index:1;min-height:0}
 .brand-row{display:flex;align-items:center;justify-content:center;gap:1.2%;min-height:0}
 .brand{font-size:2.5cqw;font-weight:1000;letter-spacing:.07em;padding:.18em .8em;border:1px solid #4776a7;border-radius:.3em;background:linear-gradient(180deg,#102e55,#061326);box-shadow:0 .25em .8em #0008}
 .brand b{color:var(--gold)}
@@ -73,6 +73,62 @@ body{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px;o
 .footer b{color:var(--gold)}
 .empty{opacity:.55}
 @media(max-width:600px){body{padding:0;gap:0}.toolbar{width:100%;border-radius:0;padding:6px}.toolbar label{font-size:9px}.toolbar input{font-size:11px;padding:7px}.toolbar button{font-size:10px;padding:7px}.toolbar #status{display:none}.stage{width:100vw;border-left:0;border-right:0}}
+
+/* BROADCAST POLISH: all rows are constrained inside the 16:9 canvas */
+.stage{isolation:isolate}
+.content>*{min-width:0;min-height:0}
+.brand-row,.teams,.middle,.context,.pitch,.players,.next,.footer{min-height:0}
+.teams{align-items:stretch}
+.team{height:100%;padding:1.2% 2.1%;grid-template-columns:18% minmax(0,1fr);gap:2.2%;border-width:2px}
+.team.away{grid-template-columns:minmax(0,1fr) 18%}
+.crest{max-height:100%;width:100%;padding:7%;border-width:2px}
+.team-name{font-size:2.0cqw;line-height:1.05}
+.team-score{font-size:4.0cqw;line-height:.98;margin-top:.08em}
+.team-overs{font-size:1.25cqw;margin-top:.12em}
+.middle{grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);align-items:stretch}
+.match-state,.over-card{height:100%;min-height:0;padding:1.1% 1.8%;overflow:hidden;border-radius:.55cqw}
+.match-state{gap:.08em}
+.eyebrow{font-size:1.05cqw}
+.state-main{font-size:clamp(15px,2.6cqw,42px);line-height:1.02;margin-top:.12em;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.state-sub{font-size:clamp(9px,1.05cqw,17px);line-height:1.15;max-width:96%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:.18em}
+.over-head{margin-bottom:.7%;gap:1%}
+.over-title{font-size:1.35cqw}
+.over-total{font-size:1.0cqw;white-space:nowrap}
+.balls{height:64%;min-height:0;gap:1.2%}
+.ball{font-size:2.05cqw;border-radius:.45cqw}
+.context{grid-template-columns:.8fr .95fr 1.25fr 1.55fr;gap:.3%;padding:.25% .65%;overflow:hidden}
+.context-item{padding:0 1.4%;min-width:0}
+.context-label{font-size:clamp(8px,.88cqw,14px);line-height:1.05}
+.context-value{font-size:clamp(10px,1.28cqw,20px);line-height:1.05;margin-top:.12em;overflow:hidden;text-overflow:ellipsis}
+.context-item:last-child .context-value{font-size:clamp(9px,1.02cqw,16px)}
+.pitch{padding:.7% 1.6%;align-items:center;background-image:linear-gradient(90deg,rgba(4,16,30,.82),rgba(4,16,30,.46)),url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1600&q=85');background-position:center 47%;background-size:cover}
+.pitch-tag{font-size:clamp(9px,1.0cqw,16px);max-width:47%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pitch-note{font-size:clamp(9px,1.0cqw,16px);max-width:50%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+.players{grid-template-columns:repeat(3,minmax(0,1fr));gap:.85%;align-items:stretch}
+.player{height:100%;grid-template-columns:24% minmax(0,1fr);gap:2%;padding:1.5% 1.7%;border-radius:.5cqw}
+.player:before{width:.45%}
+.player-photo{width:100%;height:90%;max-height:90%;align-self:end;object-fit:contain;object-position:center bottom}
+.player-info{min-width:0;overflow:hidden}
+.role{font-size:clamp(8px,1.0cqw,16px);letter-spacing:.065em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-name{font-size:clamp(11px,1.65cqw,27px);line-height:1.05;margin:.22em 0 .3em;overflow:hidden;text-overflow:ellipsis}
+.player-score{font-size:clamp(19px,3.0cqw,48px);line-height:1.02}
+.player-score small{font-size:.48em}
+.player-stats{display:flex;gap:4%;font-size:clamp(8px,.95cqw,15px);line-height:1.12;margin-top:.32em;white-space:nowrap;overflow:hidden}
+.next{gap:.65%;align-items:stretch}
+.next-item{height:100%;gap:1.5%;padding:0 1.5%;overflow:hidden}
+.next-k{font-size:clamp(8px,.9cqw,14px)}
+.next-v{font-size:clamp(9px,1.05cqw,17px);min-width:0}
+.footer{font-size:clamp(8px,1.0cqw,16px);letter-spacing:.09em;overflow:hidden}
+@media(max-width:600px){
+ body{padding:0;gap:0}
+ .toolbar{width:100%;min-height:38px;gap:5px;padding:5px 7px}
+ .toolbar label{font-size:8px}
+ .toolbar input{font-size:10px;padding:6px 7px}
+ .toolbar button{font-size:9px;padding:6px 8px}
+ #status{display:none}
+ .stage{width:100vw;max-width:none;border-left:0;border-right:0}
+}
+
 </style>
 </head>
 <body>
@@ -134,10 +190,10 @@ body{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px;o
    const value=clean(typeof b==="object" ? (b.text ?? b.value ?? b.label ?? "") : b);
    const low=value.toLowerCase();
    let cls="dot", label=value||"–";
-   if(/^w|wicket|out/.test(low)){cls="wicket";label="W";}
+   if(/^(wd|wide|nb|no.?ball)/.test(low)){cls="extra";label=value.toUpperCase();}
+   else if(/^(w|wk|out|wicket)(\\b|$)/.test(low)){cls="wicket";label="W";}
    else if(low==="4"){cls="four";}
    else if(low==="6"){cls="six";}
-   else if(/wd|wide|nb|no.?ball/.test(low)){cls="extra";label=value.toUpperCase();}
    else if(/^(0|\.|dot)$/.test(low)){cls="dot";label="0";}
    return '<span class="ball '+cls+'">'+label.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+'</span>';
  }
@@ -147,17 +203,23 @@ body{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px;o
    text("team1",a.full_name||a.name||a.short,"TEAM 1");text("team2",b.full_name||b.name||b.short,"TEAM 2");
    text("score1",a.score);text("score2",b.score);text("overs1",fmtOvers(a.overs));text("overs2",fmtOvers(b.overs));
    safeImage("logo1",a.logo);safeImage("logo2",b.logo);
-   text("matchState",d.status||"LIVE MATCH","LIVE MATCH");
-   text("matchSub",d.match_title||d.series_name||"PREET SPORTS • LIVE SCORE");
+   const situation=clean(d.status||"");
+   const isLongSituation=situation.length>19;
+   const headline=isLongSituation
+     ? (/\\b(need|requires?)\\b/i.test(situation)?"RUN CHASE":(/\\b(won|result)\\b/i.test(situation)?"MATCH RESULT":"LIVE MATCH"))
+     : (situation.toUpperCase()||"LIVE MATCH");
+   text("matchState",headline,"LIVE MATCH");
+   text("matchSub",situation||d.match_title||d.series_name||"PREET SPORTS • LIVE SCORE");
    text("target",b.target||d.target);
    text("rates",(d.crr||"—")+" / "+(d.rrr||"—"));
    text("partnership",d.partnership);text("lastWicket",d.last_wicket);
    text("venue",d.venue||"VENUE • CREX LIVE");
-   text("equation",d.equation||d.status||"LIVE MATCH CENTRE");
+   text("equation",d.match_title||d.series_name||"LIVE • BALL-BY-BALL SCORE");
    const ov=d.current_over||{};
    const balls=Array.isArray(ov.balls)?ov.balls.slice(-6):[];
    $("balls").innerHTML=Array.from({length:6},(_,i)=>balls[i]?renderBall(balls[i]):'<span class="ball dot">–</span>').join("");
-   text("overTotal",ov.total ? "TOTAL: "+ov.total : "TOTAL: —");
+   const cleanOverTotal=clean(ov.total).replace(/^=\\s*/,"");
+   text("overTotal",cleanOverTotal ? "OVER TOTAL: "+cleanOverTotal : "OVER TOTAL: —");
    const p1=d.batsman1||{},p2=d.batsman2||{},bw=d.bowler||{};
    const player=(p,id,nameId,scoreId,statsId,photoId,isBowler=false)=>{
      text(nameId,p.short_name||p.name,"WAITING FOR FEED");
