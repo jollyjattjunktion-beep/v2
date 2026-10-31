@@ -841,7 +841,7 @@ html, body {
   input.value = activeUrl;
 
   const clean = value => String(value ?? "").replace(/\s+/g, " ").trim();
-  const animatedIds = new Set(["score1","score2","target","rates","partnership","lastWicket"]);
+  const animatedIds = new Set(["score1","score2","target","rates","partnership","lastWicket","bowlscore"]);
   const pulse = el => {
     el.classList.remove("data-pulse");
     void el.offsetWidth;
@@ -967,7 +967,7 @@ html, body {
     const ov = d.current_over || {};
     const balls = Array.isArray(ov.balls) ? ov.balls.slice(-6) : [];
     const validCount = balls.length;
-    const overSignature = balls.map(x => clean(typeof x === "object" ? (x.text ?? x.value ?? x.label ?? "") : x)).join("|");
+    const overSignature = clean(ov.label) + "::" + balls.map(x => clean(typeof x === "object" ? (x.text ?? x.value ?? x.label ?? "") : x)).join("|");
     if (overSignature !== lastOverSignature) {
       const shouldAnimateDelivery = lastOverSignature !== null && validCount > 0;
       $("balls").innerHTML = Array.from({ length: 6 }, (_, i) => {
