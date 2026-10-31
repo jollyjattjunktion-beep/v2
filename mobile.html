@@ -596,6 +596,66 @@ html, body {
   #status { display: none; }
   .stage { width: 100vw; border: none; }
 }
+
+/* Broadcast motion: low-key, data-led and suitable for long live streams */
+.brand-pill { position:relative; overflow:hidden; }
+.brand-pill::after {
+  content:""; position:absolute; top:-35%; bottom:-35%; left:-38%; width:20%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
+  transform:skewX(-22deg); pointer-events:none;
+  animation:brandSweep 10s ease-in-out infinite;
+}
+@keyframes brandSweep {
+  0%,65% { left:-38%; opacity:0; }
+  72% { opacity:1; }
+  94%,100% { left:125%; opacity:0; }
+}
+.team-card { isolation:isolate; }
+.team-card::before {
+  content:""; position:absolute; z-index:0; top:0; bottom:0; left:-32%; width:22%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.055),transparent);
+  transform:skewX(-20deg); pointer-events:none;
+  animation:teamSheen 13s ease-in-out infinite;
+}
+.team-card > * { position:relative; z-index:1; }
+@keyframes teamSheen {
+  0%,70% { left:-32%; opacity:0; }
+  78% { opacity:1; }
+  100% { left:125%; opacity:0; }
+}
+.action-live-text { transition:opacity .18s ease,transform .18s ease; }
+.action-live-text.data-pulse { animation:actionPulse .5s ease-out; }
+@keyframes actionPulse {
+  0% { opacity:.35; transform:translateY(5px) scale(.97); }
+  65% { opacity:1; transform:translateY(-1px) scale(1.02); }
+  100% { opacity:1; transform:translateY(0) scale(1); }
+}
+.ball.latest { animation:ballArrival .72s cubic-bezier(.18,.85,.25,1.15); }
+@keyframes ballArrival {
+  0% { opacity:.3; transform:translateY(-9px) scale(.78); filter:brightness(1.8); }
+  68% { opacity:1; transform:translateY(1px) scale(1.06); }
+  100% { transform:translateY(0) scale(1); filter:brightness(1); }
+}
+.team-score.data-pulse,.player-score-big.data-pulse,.context-val.data-pulse {
+  animation:scoreUpdate .62s ease-out;
+}
+@keyframes scoreUpdate {
+  0% { filter:brightness(2); text-shadow:0 0 14px rgba(255,196,0,.7); }
+  100% { filter:brightness(1); text-shadow:none; }
+}
+.player-box.striker { animation:strikerGlow 2.8s ease-in-out infinite; }
+@keyframes strikerGlow {
+  0%,100% { box-shadow:0 0 7px rgba(255,196,0,.12); }
+  50% { box-shadow:0 0 17px rgba(255,196,0,.3); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stadium,.live-dot,.brand-pill::after,.team-card::before,
+  .action-live-text.data-pulse,.ball.latest,
+  .team-score.data-pulse,.player-score-big.data-pulse,
+  .context-val.data-pulse,.player-box.striker {
+    animation:none !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -776,18 +836,49 @@ html, body {
   const params = new URLSearchParams(location.search);
   const input = $("crexUrl"), status = $("status");
   let activeUrl = params.get("url") || "";
-  let timer = null, busy = false;
+  let timer = null, busy = false, lastOverSignature = null;
 
   input.value = activeUrl;
 
   const clean = value => String(value ?? "").replace(/\s+/g, " ").trim();
+  const animatedIds = new Set(["score1","score2","target","rates","partnership","lastWicket"]);
+  const pulse = el => {
+    el.classList.remove("data-pulse");
+    void el.offsetWidth;
+    el.classList.add("data-pulse");
+  };
   const text = (id, value, fallback = "—") => {
     const el = $(id);
-    if (el) el.textContent = clean(value) || fallback;
+    if (!el) return;
+    const next = clean(value) || fallback;
+    if (el.textContent !== next) {
+      el.textContent = next;
+      if (animatedIds.has(id) || id === "actionText") pulse(el);
+    }
   };
-  const html = (id, value, fallback = "—") => {
+  const battingScore = (id, runs, balls) => {
     const el = $(id);
-    if (el) el.innerHTML = clean(value) || fallback;
+    if (!el) return;
+    const runText = clean(runs ?? "—");
+    const ballText = `(${clean(balls ?? "—")})`;
+    const signature = runText + "|" + ballText;
+    if (el.dataset.scoreSignature === signature) return;
+    el.dataset.scoreSignature = signature;
+    const small = document.createElement("small");
+    small.textContent = ballText;
+    el.replaceChildren(document.createTextNode(runText + " "), small);
+    pulse(el);
+  };
+  const fitSingleLine = id => {
+    const el = $(id);
+    if (!el) return;
+    el.style.fontSize = "";
+    let size = parseFloat(getComputedStyle(el).fontSize) || 24;
+    const min = 14;
+    while (el.scrollWidth > el.clientWidth + 1 && size > min) {
+      size -= 1;
+      el.style.fontSize = size + "px";
+    }
   };
 
   const safeImage = (id, url) => {
@@ -814,13 +905,14 @@ html, body {
     const low = value.toLowerCase();
     let cls = "dot", label = value || "–";
 
-    if (/^w|wicket|out/.test(low)) { cls = "wicket"; label = "W"; }
+    if (/(?:wd|wide|nb|no.?ball)/.test(low)) { cls = "extra"; label = value.toUpperCase(); }
+    else if (/^(?:w|wk|out|wicket)(?:\b|$)/.test(low)) { cls = "wicket"; label = "W"; }
     else if (low === "4") { cls = "four"; }
     else if (low === "6") { cls = "six"; }
-    else if (/wd|wide|nb|no.?ball/.test(low)) { cls = "extra"; label = value.toUpperCase(); }
     else if (/^(0|\.|dot)$/.test(low)) { cls = "dot"; label = "0"; }
 
-    return `<span class="ball ${cls}">${label}</span>`;
+    const safeLabel = label.replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+    return `<span class="ball ${cls}${isLatest ? " latest" : ""}">${safeLabel}</span>`;
   }
 
   function updateActionBox(actionRaw) {
@@ -859,10 +951,12 @@ html, body {
     safeImage("logo1", a.logo);
     safeImage("logo2", b.logo);
 
-    const actionVal = d.live_action || d.result_box || d.team_result || d.center_commentary || d.last_ball_text;
+    const actionVal = d.team_result_description || d.live_action || d.center_commentary ||
+      (d.team_result_ball ? `LAST BALL ${d.team_result_ball}` : d.last_ball ? `LAST BALL ${d.last_ball}` : "LIVE MATCH");
     updateActionBox(actionVal);
 
     text("matchState", d.equation || d.status || "LIVE MATCH", "LIVE MATCH");
+    requestAnimationFrame(() => fitSingleLine("matchState"));
     text("matchSub", d.status_note || d.series_name || "PREET SPORTS LIVE");
     text("target", b.target || d.target);
     text("rates", `${clean(d.crr) || "—"} / ${clean(d.rrr) || "—"}`);
@@ -873,22 +967,26 @@ html, body {
     const ov = d.current_over || {};
     const balls = Array.isArray(ov.balls) ? ov.balls.slice(-6) : [];
     const validCount = balls.length;
-
-    $("balls").innerHTML = Array.from({ length: 6 }, (_, i) => {
-      const isLatest = (i === validCount - 1 && validCount > 0);
-      return balls[i] ? renderBall(balls[i], isLatest) : '<span class="ball dot">–</span>';
-    }).join("");
-    text("overTotal", `TOTAL: ${ov.total ?? 0}`);
+    const overSignature = balls.map(x => clean(typeof x === "object" ? (x.text ?? x.value ?? x.label ?? "") : x)).join("|");
+    if (overSignature !== lastOverSignature) {
+      const shouldAnimateDelivery = lastOverSignature !== null && validCount > 0;
+      $("balls").innerHTML = Array.from({ length: 6 }, (_, i) => {
+        const isLatest = shouldAnimateDelivery && i === validCount - 1;
+        return balls[i] ? renderBall(balls[i], isLatest) : '<span class="ball dot">–</span>';
+      }).join("");
+      lastOverSignature = overSignature;
+    }
+    text("overTotal", `TOTAL: ${ov.total ?? "—"}`);
 
     const p1 = d.batsman1 || {}, p2 = d.batsman2 || {}, bw = d.bowler || {};
 
     text("bat1", p1.short_name || p1.name, "WAITING...");
-    html("bat1score", `${p1.runs ?? "—"} <small>(${p1.balls ?? "—"})</small>`);
+    battingScore("bat1score", p1.runs, p1.balls);
     text("bat1stats", `4s ${p1.fours ?? "—"}   6s ${p1.sixes ?? "—"}   SR ${p1.sr ?? "—"}`);
     safeImage("photo1", p1.img || p1.photo_url || p1.image);
 
     text("bat2", p2.short_name || p2.name, "WAITING...");
-    html("bat2score", `${p2.runs ?? "—"} <small>(${p2.balls ?? "—"})</small>`);
+    battingScore("bat2score", p2.runs, p2.balls);
     text("bat2stats", `4s ${p2.fours ?? "—"}   6s ${p2.sixes ?? "—"}   SR ${p2.sr ?? "—"}`);
     safeImage("photo2", p2.img || p2.photo_url || p2.image);
 
@@ -939,6 +1037,7 @@ html, body {
       return;
     }
     activeUrl = value;
+    lastOverSignature = null;
     const u = new URL(location.href);
     u.searchParams.set("url", activeUrl);
     history.replaceState({}, "", u);
