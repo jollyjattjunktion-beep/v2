@@ -771,21 +771,23 @@ html, body {
     text("partnership", d.partnership);
     text("lastWicket", d.last_wicket);
 
-    // Precise Over Balls
-    const balls = (d.current_over && Array.isArray(d.current_over.balls)) ? d.current_over.balls : [];
-    const validCount = balls.length;
+    // Precise Over Balls (supports extra deliveries like Wides/No-balls without wrapping)
+  const balls = (d.current_over && Array.isArray(d.current_over.balls)) ? d.current_over.balls : [];
+  const validCount = balls.length;
+  const totalSlots = Math.max(6, validCount);
 
-    $("balls").innerHTML = Array.from({ length: 6 }, (_, i) => {
-      if (i < validCount && balls[i] !== "") {
-        const isLatest = (i === validCount - 1);
-        return renderBall(balls[i], isLatest);
-      }
-      return '<span class="ball dot">–</span>';
-    }).join("");
-
-    if (d.current_over && d.current_over.total !== undefined) {
-      text("overTotal", `TOTAL: ${d.current_over.total}`);
+  $("balls").style.gridTemplateColumns = `repeat(${totalSlots}, 1fr)`;
+  $("balls").innerHTML = Array.from({ length: totalSlots }, (_, i) => {
+    if (i < validCount && balls[i] !== "") {
+      const isLatest = (i === validCount - 1);
+      return renderBall(balls[i], isLatest);
     }
+    return '<span class="ball dot">–</span>';
+  }).join("");
+
+  if (d.current_over && d.current_over.total !== undefined) {
+    text("overTotal", `TOTAL: ${d.current_over.total}`);
+  }
 
     // Players
     const p1 = d.batsman1 || {}, p2 = d.batsman2 || {}, bw = d.bowler || {};
