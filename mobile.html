@@ -597,17 +597,79 @@ html, body {
   0% { transform: scale(1); box-shadow: 0 0 6px var(--cyan); }
   100% { transform: scale(1.08); box-shadow: 0 0 16px var(--cyan); }
 }
+  /* OBS Mode Styling */
+#obsBtn {
+  border: 0;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #35d9f3, #0982aa);
+  color: #030f1e;
+  font-weight: 800;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+  transition: transform 0.1s ease;
+}
+#obsBtn:active { transform: scale(0.96); }
+
+/* Auto-hides control bar when loaded inside OBS Browser Source */
+body.obs-mode .toolbar {
+  display: none !important;
+}
+body.obs-mode {
+  padding: 0 !important;
+  background: transparent !important;
+}
 </style>
-</head>
+  <script>// Check if opened as an OBS Browser Source (?obs=1)
+  if (params.get("obs") === "1") {
+    document.body.classList.add("obs-mode");
+  }
+
+  // Copy Clean OBS URL to Clipboard
+  $("obsBtn")?.addEventListener("click", async () => {
+    const matchUrl = input.value.trim();
+    if (!matchUrl.startsWith("http")) {
+      status.textContent = "ENTER A VALID URL FIRST";
+      status.style.color = "#ff4f6b";
+      return;
+    }
+
+    const obsUrl = new URL(location.href);
+    obsUrl.searchParams.set("url", matchUrl);
+    obsUrl.searchParams.set("obs", "1");
+
+    try {
+      await navigator.clipboard.writeText(obsUrl.toString());
+      const btn = $("obsBtn");
+      const originalText = btn.textContent;
+      btn.textContent = "✓ COPIED!";
+      btn.style.background = "#5ef396";
+      btn.style.color = "#031424";
+
+      status.textContent = "● OBS LINK COPIED (PASTE IN OBS BROWSER SOURCE)";
+      status.style.color = "#5ef396";
+
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = "";
+        btn.style.color = "";
+      }, 2000);
+    } catch (err) {
+      prompt("Copy your OBS Browser Source URL:", obsUrl.toString());
+    }
+  });
+  </script></head>
 <body>
 
 <div class="toolbar">
   <label for="crexUrl">CREX MATCH</label>
   <input id="crexUrl" type="url" placeholder="Paste CREX match URL..." autocomplete="off">
   <button id="loadBtn">SYNC FEED</button>
+  <button id="obsBtn" type="button" title="Copy direct link for OBS Studio">COPY OBS LINK</button>
   <span id="status">READY</span>
 </div>
-
 <main class="stage" aria-label="Preet Sports HD TV Cricket Scoreboard">
   <div class="stadium"></div>
 
