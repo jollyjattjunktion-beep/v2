@@ -731,6 +731,7 @@ html, body {
     return `<span class="ball ${cls}">${label}</span>`;
   }
 
+ // 1. Ensure "Caught and bowled", "LBW", and "Run out" trigger the red Wicket box:
   function updateActionBox(actionRaw) {
     const textVal = clean(actionRaw) || "OVER";
     const low = textVal.toLowerCase();
@@ -740,7 +741,7 @@ html, body {
     text("actionText", textVal);
     box.classList.remove("wicket-alert", "ball-in-air");
 
-    if (low.includes("wicket") || low.includes("out")) {
+    if (low.includes("wicket") || low.includes("out") || low.includes("caught") || low.includes("bowled") || low.includes("lbw")) {
       box.classList.add("wicket-alert");
       labelEl.textContent = "● WICKET FALLEN";
     } else if (low.includes("air") || low.includes("catch")) {
@@ -753,45 +754,21 @@ html, body {
     }
   }
 
-  function render(d) {
-    if (!d || d.success === false) return;
+  // 2. In render(d), map the balls so unbowled deliveries stay as dashes:
+  const balls = (d.current_over && Array.isArray(d.current_over.balls)) ? d.current_over.balls : [];
+  const validCount = balls.length;
 
-    const a = d.team1 || {}, b = d.team2 || {};
-
-    text("team1", a.name, "PAK");
-    text("team2", b.name, "SL");
-    text("score1", a.score);
-    text("score2", b.score);
-    text("overs1", a.overs ? a.overs + " OV" : "— OV");
-    text("overs2", b.overs ? b.overs + " OV" : "— OV");
-
-    safeImage("logo1", a.logo);
-    safeImage("logo2", b.logo);
-
-    updateActionBox(d.live_action || "OVER");
-    text("matchState", d.equation || "LIVE MATCH");
-    text("matchSub", d.match_title || "PREET SPORTS LIVE BROADCAST");
-
-    text("rates", `${clean(d.crr) || "—"} / ${clean(d.rrr) || "—"}`);
-    text("partnership", d.partnership);
-    text("lastWicket", d.last_wicket);
-
-    // Precise Over Balls (unbowled slots remain dashes)
-    const balls = (d.current_over && Array.isArray(d.current_over.balls)) ? d.current_over.balls : [];
-    const validCount = balls.length;
-
-    $("balls").innerHTML = Array.from({ length: 6 }, (_, i) => {
-      if (i < validCount && balls[i] !== "") {
-        const isLatest = (i === validCount - 1);
-        return renderBall(balls[i], isLatest);
-      }
-      return '<span class="ball dot">–</span>';
-    }).join("");
-
-    if (d.current_over && d.current_over.total !== undefined) {
-      text("overTotal", `TOTAL: ${d.current_over.total}`);
+  $("balls").innerHTML = Array.from({ length: 6 }, (_, i) => {
+    if (i < validCount && balls[i] !== "") {
+      const isLatest = (i === validCount - 1);
+      return renderBall(balls[i], isLatest);
     }
+    return '<span class="ball dot">–</span>';
+  }).join("");
 
+  if (d.current_over && d.current_over.total !== undefined) {
+    text("overTotal", `TOTAL: ${d.current_over.total}`);
+  }
     // Players
     const p1 = d.batsman1 || {}, p2 = d.batsman2 || {}, bw = d.bowler || {};
 
