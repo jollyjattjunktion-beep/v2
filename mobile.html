@@ -7,13 +7,13 @@
 <title>PREET SPORTS | HD TV Broadcast Scoreboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Teko:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Teko:wght@600;700;800&display=swap" rel="stylesheet">
 
 <style>
 :root {
   --bg-deep: #020712;
   --gold: #ffc400;
-  --gold-glow: rgba(255, 196, 0, 0.4);
+  --gold-glow: rgba(255, 196, 0, 0.45);
   --cyan: #00e1ff;
   --white: #ffffff;
   --muted: #a6bdd4;
@@ -168,10 +168,10 @@ html, body {
 }
 @keyframes liveBlink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.7); } }
 
-/* Top Score Row */
+/* TOP SCORE ROW: Team 1 | Center Action Hub | Team 2 */
 .top-score-row {
   display: grid;
-  grid-template-columns: 1.2fr 1.1fr 1.2fr;
+  grid-template-columns: 1.25fr 1.05fr 1.25fr;
   gap: 1.2%;
   align-items: stretch;
 }
@@ -239,44 +239,67 @@ html, body {
 }
 .team-card.away .team-overs { color: #ff8ca3; }
 
-/* Center Commentary Area */
-.center-commentary-box {
-  background: linear-gradient(180deg, #071930, #020c1a);
+/* CENTER ACTION HUB (Exact text from CREX: Over, Wicket, Ball in Air, etc.) */
+.center-action-box {
+  background: linear-gradient(180deg, #051425, #020b17);
   border: 2px solid var(--gold);
   border-radius: 0.5cqw;
-  padding: 1.2% 2%;
+  padding: 1% 2%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  box-shadow: 0 0 18px rgba(255, 196, 0, 0.25), inset 0 0 10px rgba(255, 196, 0, 0.1);
+  box-shadow: 0 0 16px rgba(255, 196, 0, 0.25), inset 0 0 10px rgba(255, 196, 0, 0.1);
   position: relative;
   overflow: hidden;
+  transition: all 0.3s ease;
 }
-.comm-tag-badge {
+.action-top-label {
   font-size: 0.9cqw;
   font-weight: 800;
-  letter-spacing: .14em;
+  letter-spacing: .12em;
   color: var(--gold);
   text-transform: uppercase;
-  margin-bottom: 0.2em;
 }
-.comm-live-text {
-  font-family: var(--font-tv);
-  font-size: clamp(14px, 1.8cqw, 28px);
+.action-live-text {
+  font-family: var(--font-score);
+  font-size: clamp(24px, 4.4cqw, 64px);
   font-weight: 800;
-  line-height: 1.15;
-  color: #ffffff;
+  line-height: 0.95;
+  letter-spacing: .04em;
+  color: var(--gold);
   text-transform: uppercase;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  text-shadow: 0 0 12px rgba(255, 196, 0, 0.5);
+  white-space: nowrap;
   overflow: hidden;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
-.comm-live-text b, .comm-live-text span {
-  color: var(--cyan);
+
+/* Event-Specific Reactive Colors */
+.center-action-box.wicket-alert {
+  border-color: #ff123d;
+  background: linear-gradient(180deg, #3d050f, #140206);
+  animation: alertPulse 1.2s infinite alternate;
+}
+.center-action-box.wicket-alert .action-live-text {
+  color: #ff2a4f;
+  text-shadow: 0 0 18px rgba(255, 18, 61, 0.8);
+}
+
+.center-action-box.boundary-alert {
+  border-color: #00e1ff;
+  background: linear-gradient(180deg, #04243b, #02121f);
+}
+.center-action-box.boundary-alert .action-live-text {
+  color: #00e1ff;
+  text-shadow: 0 0 18px rgba(0, 225, 255, 0.8);
+}
+
+@keyframes alertPulse {
+  0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 18, 61, 0.4); }
+  100% { transform: scale(1.02); box-shadow: 0 0 24px rgba(255, 18, 61, 0.85); }
 }
 
 /* Middle Situation & Current Over */
@@ -601,10 +624,10 @@ html, body {
         </div>
       </div>
 
-      <!-- CENTER COMMENTARY / ACTION BOX -->
-      <div class="center-commentary-box">
-        <span class="comm-tag-badge" id="commBadge">MATCH ACTION</span>
-        <div class="comm-live-text" id="commText">WAITING FOR BALL FEED...</div>
+      <!-- CENTER ACTION HUB: Over / Wicket / Ball In Air etc. -->
+      <div class="center-action-box" id="actionBox">
+        <span class="action-top-label" id="actionLabel">LIVE MATCH ACTION</span>
+        <div class="action-live-text" id="actionText">OVER</div>
       </div>
 
       <!-- Team 2 -->
@@ -768,6 +791,33 @@ html, body {
     return `<span class="ball ${cls}">${label}</span>`;
   }
 
+  function updateActionBox(actionRaw) {
+    const textVal = clean(actionRaw) || "OVER";
+    const low = textVal.toLowerCase();
+    const box = $("actionBox");
+    const labelEl = $("actionLabel");
+
+    text("actionText", textVal);
+
+    // Reset styles
+    box.classList.remove("wicket-alert", "boundary-alert");
+
+    if (low.includes("wicket") || low.includes("out")) {
+      box.classList.add("wicket-alert");
+      labelEl.textContent = "● WICKET FALLEN";
+    } else if (low.includes("four") || low.includes("six") || low === "4" || low === "6") {
+      box.classList.add("boundary-alert");
+      labelEl.textContent = "● BOUNDARY";
+    } else if (low.includes("air") || low.includes("catch")) {
+      box.classList.add("boundary-alert");
+      labelEl.textContent = "● IN THE AIR";
+    } else if (low.includes("injured") || low.includes("injury")) {
+      labelEl.textContent = "● MEDICAL ATTENTION";
+    } else {
+      labelEl.textContent = "LIVE MATCH ACTION";
+    }
+  }
+
   function render(d) {
     if (!d || d.success === false) throw new Error(d?.error || "Match data feed empty");
 
@@ -783,24 +833,11 @@ html, body {
     safeImage("logo1", a.logo);
     safeImage("logo2", b.logo);
 
-    // FETCHING AND PARSING CREX CENTER AREA TEXT (.team-result / .result-box)
-    const centerRawText = clean(
-      d.center_commentary ||
-      d.team_result ||
-      d.result_box ||
-      d.latest_commentary ||
-      d.commentary ||
-      d.last_ball_commentary ||
-      d.last_ball_text ||
-      d.equation ||
-      d.status ||
-      "IN PROGRESS"
-    );
+    // Center Action Box: receives exact text from CREX center element
+    const actionVal = d.live_action || d.result_box || d.team_result || d.center_commentary || d.last_ball_text;
+    updateActionBox(actionVal);
 
-    text("commText", centerRawText);
-    text("commBadge", d.current_over?.over_number ? `OVER ${d.current_over.over_number}` : "LIVE BALL ACTION");
-
-    // Match Situation Strip
+    // Situation Strip
     text("matchState", d.equation || d.status || "LIVE MATCH", "LIVE MATCH");
     text("matchSub", d.status_note || d.series_name || "PREET SPORTS LIVE");
 
@@ -810,7 +847,7 @@ html, body {
     text("lastWicket", d.last_wicket);
     text("venue", d.venue || "VENUE FEED");
 
-    // Current Over Chips
+    // Over Balls
     const ov = d.current_over || {};
     const balls = Array.isArray(ov.balls) ? ov.balls.slice(-6) : [];
     const validCount = balls.length;
