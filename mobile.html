@@ -191,7 +191,7 @@ body{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px;o
    const low=value.toLowerCase();
    let cls="dot", label=value||"–";
    if(/^(wd|wide|nb|no.?ball)/.test(low)){cls="extra";label=value.toUpperCase();}
-   else if(/^(w|wk|out|wicket)(\\b|$)/.test(low)){cls="wicket";label="W";}
+   else if(/^(w|wk|out|wicket)(\b|$)/.test(low)){cls="wicket";label="W";}
    else if(low==="4"){cls="four";}
    else if(low==="6"){cls="six";}
    else if(/^(0|\.|dot)$/.test(low)){cls="dot";label="0";}
@@ -206,7 +206,7 @@ body{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px;o
    const situation=clean(d.status||"");
    const isLongSituation=situation.length>19;
    const headline=isLongSituation
-     ? (/\\b(need|requires?)\\b/i.test(situation)?"RUN CHASE":(/\\b(won|result)\\b/i.test(situation)?"MATCH RESULT":"LIVE MATCH"))
+     ? (/\b(need|requires?)\b/i.test(situation)?"RUN CHASE":(/\b(won|result)\b/i.test(situation)?"MATCH RESULT":"LIVE MATCH"))
      : (situation.toUpperCase()||"LIVE MATCH");
    text("matchState",headline,"LIVE MATCH");
    text("matchSub",situation||d.match_title||d.series_name||"PREET SPORTS • LIVE SCORE");
@@ -218,7 +218,7 @@ body{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px;o
    const ov=d.current_over||{};
    const balls=Array.isArray(ov.balls)?ov.balls.slice(-6):[];
    $("balls").innerHTML=Array.from({length:6},(_,i)=>balls[i]?renderBall(balls[i]):'<span class="ball dot">–</span>').join("");
-   const cleanOverTotal=clean(ov.total).replace(/^=\\s*/,"");
+   const cleanOverTotal=clean(ov.total).replace(/^=\s*/,"");
    text("overTotal",cleanOverTotal ? "OVER TOTAL: "+cleanOverTotal : "OVER TOTAL: —");
    const p1=d.batsman1||{},p2=d.batsman2||{},bw=d.bowler||{};
    const player=(p,id,nameId,scoreId,statsId,photoId,isBowler=false)=>{
