@@ -77,22 +77,22 @@ def scrape_match():
     t1_logo = FLAG_MAP.get(t1_name, f"https://flagcdn.com/w160/{t1_name[:2].lower()}.png")
     t2_logo = FLAG_MAP.get(t2_name, f"https://flagcdn.com/w160/{t2_name[:2].lower()}.png")
 
-    # 2. Extract Scores and Overs cleanly
+    # 2. Scores & Overs
     t1_score, t1_overs = "—", "—"
     t2_score, t2_overs = "—", "—"
 
-    score_matches = re.findall(r"(\b\d{1,3}-\d{1,2}\b|\b\d{2,3}\/\d{1,2}\b)\s*(\d{1,2}\.\d{1})?", raw_text)
+    score_matches = re.findall(r"\b(\d{1,3}[-/]\d{1,2})\b\s*(?:\(?(\d{1,2}\.\d)\)?)?", raw_text)
     if len(score_matches) >= 1:
-        t1_score = score_matches[0][0]
+        t1_score = score_matches[0][0].replace("/", "-")
         if score_matches[0][1]:
             t1_overs = score_matches[0][1]
     if len(score_matches) >= 2:
-        t2_score = score_matches[1][0]
+        t2_score = score_matches[1][0].replace("/", "-")
         if score_matches[1][1]:
             t2_overs = score_matches[1][1]
 
     if t1_overs == "—":
-        ov_match = re.search(r"(\d{1,2}\.\d{1})\s*(?:OV|overs)", raw_text, re.IGNORECASE)
+        ov_match = re.search(r"(\d{1,2}\.\d)\s*(?:ov|overs)", raw_text, re.IGNORECASE)
         if ov_match:
             t1_overs = ov_match.group(1)
 
@@ -126,7 +126,7 @@ def scrape_match():
     if lw_match:
         last_wicket = lw_match.group(1).strip()
 
-    # 5. Batsmen & Bowler: Fixed Stats Regex
+    # 5. Batsmen & Bowler Stats
     def parse_card(card, is_bowler=False):
         if not card:
             return {}
@@ -178,46 +178,25 @@ def scrape_match():
     batsman2 = parse_card(cards[1], False) if len(cards) > 1 else {}
     bowler = parse_card(cards[2], True) if len(cards) > 2 else {}
 
-    # 6. ACCURATE LIVE OVER BALLS (Defined AFTER t1_overs and raw_text are ready)
+    # 6. ACCURATE LIVE OVER BALLS (Targeted directly from timeline)
     current_balls = []
     over_total = 0
 
-    timeline_text = raw_text
-    for stop_word in ["Probability", "Slow-over rate", "Commentary", "Who will win?", "Match Info"]:
-        if stop_word in timeline_text:
-            timeline_text = timeline_text.split(stop_word)[0]
+    # Matches over strip patterns like: "Over 27  4 0 4 1 W = 9"
+    over_blocks = re.findall(r"\bOver\s+(\d+)\s+([^=]+?)=\s*(\d+)", raw_text, re.IGNORECASE)
+    valid_overs = []
+    for ov_num, b_str, tot in over_blocks:
+        b_clean = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", b_str, re.IGNORECASE)
+        # Avoid commentary paragraphs by checking element character length
+        if 1 <= len(b_clean) <= 10 and len(b_str.strip()) < 40:
+            valid_overs.append((ov_num, b_clean, tot))
 
-    target_over = None
-    try:
-        ov_f = float(t1_overs)
-        target_over = (int(ov_f) + 1) if (ov_f % 1 > 0) else int(ov_f)
-    except Exception:
-        pass
-
-    # 1. Match the exact target over (e.g., "Over 27 4 0 4 1 W = 9")
-    if target_over:
-        m = re.search(rf"Over\s+{target_over}[:\s]+([^=]+?)(?:=\s*(\d+)|\s+Over|$)", timeline_text, re.IGNORECASE)
-        if m:
-            raw_b = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", m.group(1), re.IGNORECASE)
-            current_balls = [b.upper() for b in raw_b if b.upper() != "OVER"]
-            if m.group(2):
-                try:
-                    over_total = int(m.group(2).strip())
-                except Exception:
-                    pass
-
-    # 2. Fallback to the latest over in the clean timeline
-    if not current_balls:
-        over_chunks = re.findall(r"Over\s+\d+[:\s]+([^=]+?)(?:=\s*(\d+)|\s+Over|$)", timeline_text, re.IGNORECASE)
-        if over_chunks:
-            last_balls_str, total_str = over_chunks[-1]
-            raw_b = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", last_balls_str, re.IGNORECASE)
-            current_balls = [b.upper() for b in raw_b if b.upper() != "OVER"]
-            if total_str:
-                try:
-                    over_total = int(total_str.strip())
-                except Exception:
-                    pass
+    if valid_overs:
+        _, current_balls, tot_val = valid_overs[-1]
+        try:
+            over_total = int(tot_val.strip())
+        except Exception:
+            over_total = 0
 
     return jsonify({
         "success": True,
