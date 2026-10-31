@@ -77,25 +77,30 @@ def scrape_match():
     t1_logo = FLAG_MAP.get(t1_name, f"https://flagcdn.com/w160/{t1_name[:2].lower()}.png")
     t2_logo = FLAG_MAP.get(t2_name, f"https://flagcdn.com/w160/{t2_name[:2].lower()}.png")
 
-    # 2. Scores & Overs
-    t1_score, t1_overs = "—", "—"
-    t2_score, t2_overs = "—", "—"
+    # 1. Match the exact target over (e.g., "Over 27 4 0 4 1 W = 9")
+    if target_over:
+        m = re.search(rf"Over\s+{target_over}[:\s]+([^=]+?)(?:=\s*(\d+)|\s+Over|$)", timeline_text, re.IGNORECASE)
+        if m:
+            raw_b = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", m.group(1), re.IGNORECASE)
+            current_balls = [b.upper() for b in raw_b if b.upper() != "OVER"]
+            if m.group(2):
+                try:
+                    over_total = int(m.group(2).strip())
+                except:
+                    pass
 
-    score_matches = re.findall(r"(\b\d{1,3}-\d{1,2}\b|\b\d{2,3}\/\d{1,2}\b)\s*(\d{1,2}\.\d{1})?", raw_text)
-    if len(score_matches) >= 1:
-        t1_score = score_matches[0][0]
-        if score_matches[0][1]:
-            t1_overs = score_matches[0][1]
-    if len(score_matches) >= 2:
-        t2_score = score_matches[1][0]
-        if score_matches[1][1]:
-            t2_overs = score_matches[1][1]
-
-    if t1_overs == "—":
-        ov_match = re.search(r"(\d{1,2}\.\d{1})\s*(?:OV|overs)", raw_text, re.IGNORECASE)
-        if ov_match:
-            t1_overs = ov_match.group(1)
-
+    # 2. Fallback to the latest over in the clean timeline
+    if not current_balls:
+        over_chunks = re.findall(r"Over\s+\d+[:\s]+([^=]+?)(?:=\s*(\d+)|\s+Over|$)", timeline_text, re.IGNORECASE)
+        if over_chunks:
+            last_balls_str, total_str = over_chunks[-1]
+            raw_b = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", last_balls_str, re.IGNORECASE)
+            current_balls = [b.upper() for b in raw_b if b.upper() != "OVER"]
+            if total_str:
+                try:
+                    over_total = int(total_str.strip())
+                except:
+                    pass
     # 3. Center Live Action Text
     result_box = soup.select_one(".team-result .result-box") or soup.select_one(".team-result") or soup.select_one(".font2")
     live_action = " ".join(result_box.stripped_strings) if result_box else ""
@@ -179,22 +184,24 @@ def scrape_match():
     batsman2 = parse_card(cards[1], False) if len(cards) > 1 else {}
     bowler = parse_card(cards[2], True) if len(cards) > 2 else {}
 
-    # 6. ACCURATE LIVE OVER BALLS (Ignores the "= total" run value)
+   # 6. ACCURATE LIVE OVER BALLS (Scrapes only the active over strip)
     current_balls = []
     over_total = 0
 
-    # Pattern matches text between "Over <num>" and the "=" delimiter
-    over_chunks = re.findall(r"Over\s+\d+[:\s]+([^=]+)(?:=\s*(\d+))?", raw_text, re.IGNORECASE)
-    if over_chunks:
-        last_balls_str, total_str = over_chunks[-1]
-        raw_b = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", last_balls_str, re.IGNORECASE)
-        current_balls = [b.upper() for b in raw_b]
-        if total_str:
-            try:
-                over_total = int(total_str.strip())
-            except ValueError:
-                pass
+    # Cut off text before Commentary or Probability so old overs are ignored
+    timeline_text = raw_text
+    for stop_word in ["Probability", "Slow-over rate", "Commentary", "Who will win?", "Match Info"]:
+        if stop_word in timeline_text:
+            timeline_text = timeline_text.split(stop_word)[0]
 
+    # Calculate active over number (e.g., 26.5 -> 27, 27.0 -> 27)
+    target_over = None
+    try:
+        ov_f = float(t1_overs)
+        target_over = (int(ov_f) + 1) if (ov_f % 1 > 0) else int(ov_f)
+    except:
+        pass
+        
     return jsonify({
         "success": True,
         "live_action": live_action,
