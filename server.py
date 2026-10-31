@@ -24,7 +24,6 @@ def index():
         return send_from_directory(".", "mobile.html")
     return jsonify({"status": "ready"})
 
-# High-resolution official flag CDN map (Guaranteed 200 OK)
 FLAG_MAP = {
     "PAK": "https://flagcdn.com/w160/pk.png",
     "SL": "https://flagcdn.com/w160/lk.png",
@@ -64,7 +63,7 @@ def scrape_match():
     soup = BeautifulSoup(html, "html.parser")
     raw_text = soup.get_text()
 
-    # 1. Team Names & Flags
+    # 1. Teams & Flags
     title_el = soup.select_one(".sub-title, .match-info-title, h1")
     match_title = title_el.get_text(strip=True) if title_el else "PAK vs SL Live"
     
@@ -78,7 +77,7 @@ def scrape_match():
     t1_logo = FLAG_MAP.get(t1_name, f"https://flagcdn.com/w160/{t1_name[:2].lower()}.png")
     t2_logo = FLAG_MAP.get(t2_name, f"https://flagcdn.com/w160/{t2_name[:2].lower()}.png")
 
-    # 2. Extract Scores and Overs cleanly
+    # 2. Scores & Overs
     t1_score, t1_overs = "—", "—"
     t2_score, t2_overs = "—", "—"
 
@@ -127,7 +126,7 @@ def scrape_match():
     if lw_match:
         last_wicket = lw_match.group(1).strip()
 
-    # 5. Batsmen & Bowler Avatars & Scores
+    # 5. Batsmen & Bowler: Fixed Stats Regex
     def parse_card(card, is_bowler=False):
         if not card:
             return {}
@@ -144,22 +143,29 @@ def scrape_match():
             figures = score_p[0].get_text(strip=True) if len(score_p) > 0 else "0-0"
             overs = score_p[1].get_text(strip=True).replace("(", "").replace(")", "") if len(score_p) > 1 else "0.0"
             econ_el = card.select_one(".player-strike-wrapper .strike-rate")
-            econ = re.sub(r"[^0-9.]", "", econ_el.get_text()) if econ_el else "0.00"
+            econ_m = re.search(r"([\d\.]+)", econ_el.get_text()) if econ_el else None
+            econ = econ_m.group(1) if econ_m else "0.00"
             return {"name": name, "figures": figures, "overs": overs, "econ": econ, "face": face, "jersey": jersey}
         else:
             score_p = card.select(".batsmen-score p")
             runs = score_p[0].get_text(strip=True) if len(score_p) > 0 else "0"
             balls = score_p[1].get_text(strip=True).replace("(", "").replace(")", "") if len(score_p) > 1 else "0"
 
-            fours, sixes, sr = "0", "0", "0.00"
+            fours = "0"
+            sixes = "0"
+            sr = "0.00"
             for sr_el in card.select(".player-strike-wrapper .strike-rate"):
                 t = sr_el.get_text()
-                if "4s" in t:
-                    fours = re.sub(r"[^0-9]", "", t)
-                elif "6s" in t:
-                    sixes = re.sub(r"[^0-9]", "", t)
-                elif "SR" in t:
-                    sr = re.sub(r"[^0-9.]", "", t)
+                # Targets only numbers appearing after the label
+                m4 = re.search(r"4s\D*(\d+)", t, re.IGNORECASE)
+                m6 = re.search(r"6s\D*(\d+)", t, re.IGNORECASE)
+                msr = re.search(r"SR\D*([\d\.]+)", t, re.IGNORECASE)
+                if m4:
+                    fours = m4.group(1)
+                if m6:
+                    sixes = m6.group(1)
+                if msr:
+                    sr = msr.group(1)
 
             on_strike = bool(card.select_one(".circle-strike-icon"))
             return {
@@ -173,24 +179,21 @@ def scrape_match():
     batsman2 = parse_card(cards[1], False) if len(cards) > 1 else {}
     bowler = parse_card(cards[2], True) if len(cards) > 2 else {}
 
-    # 6. Current Over Balls: Scrapes the live over timeline
+    # 6. ACCURATE LIVE OVER BALLS (Ignores the "= total" run value)
     current_balls = []
-    
-    # Check for direct over-balls DOM container
-    ball_elements = soup.select(".over-balls span, .recent-overs span, .circle-ball")
-    if ball_elements:
-        for b in ball_elements[-6:]:
-            val = b.get_text(strip=True)
-            if re.match(r"^([0-6]|W|WD|NB|B|LB)$", val, re.IGNORECASE):
-                current_balls.append(val.upper())
+    over_total = 0
 
-    # Fallback: Parse the last over string from raw text
-    if not current_balls:
-        over_matches = re.findall(r"Over\s+\d+[:\s]+([0-9\sWwNnBbDd/=]+)", raw_text, re.IGNORECASE)
-        if over_matches:
-            last_over = over_matches[-1]
-            raw_balls = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", last_over, re.IGNORECASE)
-            current_balls = [b.upper() for b in raw_balls if b != "="]
+    # Pattern matches text between "Over <num>" and the "=" delimiter
+    over_chunks = re.findall(r"Over\s+\d+[:\s]+([^=]+)(?:=\s*(\d+))?", raw_text, re.IGNORECASE)
+    if over_chunks:
+        last_balls_str, total_str = over_chunks[-1]
+        raw_b = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", last_balls_str, re.IGNORECASE)
+        current_balls = [b.upper() for b in raw_b]
+        if total_str:
+            try:
+                over_total = int(total_str.strip())
+            except ValueError:
+                pass
 
     return jsonify({
         "success": True,
@@ -206,7 +209,7 @@ def scrape_match():
         "batsman1": batsman1,
         "batsman2": batsman2,
         "bowler": bowler,
-        "current_over": {"balls": current_balls[-6:] if current_balls else ["0", "0", "0", "0", "0", "0"], "total": 0}
+        "current_over": {"balls": current_balls, "total": over_total}
     })
 
 if __name__ == "__main__":
