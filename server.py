@@ -49,7 +49,9 @@ def scrape_match():
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        "Referer": "https://crex.com/"
+        "Referer": "https://crex.com/",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache"
     }
 
     try:
@@ -77,7 +79,7 @@ def scrape_match():
     t1_logo = FLAG_MAP.get(t1_name, f"https://flagcdn.com/w160/{t1_name[:2].lower()}.png")
     t2_logo = FLAG_MAP.get(t2_name, f"https://flagcdn.com/w160/{t2_name[:2].lower()}.png")
 
-    # 2. Scores & Overs
+    # 2. Extract Scores and Overs cleanly
     t1_score, t1_overs = "—", "—"
     t2_score, t2_overs = "—", "—"
 
@@ -100,8 +102,8 @@ def scrape_match():
     result_box = soup.select_one(".team-result .result-box") or soup.select_one(".team-result") or soup.select_one(".font2")
     live_action = " ".join(result_box.stripped_strings) if result_box else ""
     if not live_action:
-        act_match = re.search(r"\b(Over|Wicket|Four|Six|Ball in air|Review|No ball|Wide)\b", raw_text, re.IGNORECASE)
-        live_action = act_match.group(0).upper() if act_match else "OVER"
+        act_match = re.search(r"\b(Over|Wicket|Four|Six|Ball in air|Review|No ball|Wide|Drinks Break|Innings Break|Rain Delay)\b", raw_text, re.IGNORECASE)
+        live_action = act_match.group(0) if act_match else "OVER"
 
     # 4. Telemetry (CRR, RRR, Partnership, Target)
     crr = "—"
@@ -126,7 +128,7 @@ def scrape_match():
     if lw_match:
         last_wicket = lw_match.group(1).strip()
 
-    # 5. Batsmen & Bowler Stats
+    # 5. Batsmen & Bowler: Exact Stats Matching
     def parse_card(card, is_bowler=False):
         if not card:
             return {}
@@ -178,29 +180,46 @@ def scrape_match():
     batsman2 = parse_card(cards[1], False) if len(cards) > 1 else {}
     bowler = parse_card(cards[2], True) if len(cards) > 2 else {}
 
-    # 6. ACCURATE LIVE OVER BALLS (Locks onto the highest active over number)
+    # 6. ACCURATE LIVE OVER BALLS (Scrapes the exact timeline strip)
     current_balls = []
     over_total = 0
 
-    # Match all over blocks like: "Over 33 0 2 wd 4 4 1 = 12"
-    over_blocks = re.findall(r"\bOver\s+(\d+)\s+([^=]+?)=\s*(\d+)", raw_text, re.IGNORECASE)
-    valid_overs = []
-    
-    for ov_num, b_str, tot in over_blocks:
-        # Match balls including 0-6, W, WD, NB, B, LB
-        raw_b = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", b_str, re.IGNORECASE)
-        if 1 <= len(raw_b) <= 12 and len(b_str.strip()) < 50:
-            valid_overs.append((int(ov_num), [b.upper() for b in raw_b], tot))
+    timeline_matches = []
+    for tag in soup.find_all(True):
+        txt = tag.get_text(" ", strip=True)
+        if re.search(r"\bOver\s+\d+\b", txt, re.IGNORECASE) and "=" in txt:
+            if len(txt) < 80:
+                timeline_matches.append(txt)
 
-    if valid_overs:
-        # ALWAYS select the highest over number (e.g., Over 33 > Over 32 > Over 31)
-        active_over_tuple = max(valid_overs, key=lambda x: x[0])
-        current_balls = active_over_tuple[1]
-        try:
-            over_total = int(active_over_tuple[2].strip())
-        except Exception:
-            over_total = 0
-            
+    if timeline_matches:
+        last_over_text = timeline_matches[-1]
+        m = re.search(r"\bOver\s+(\d+)\s+([^=]+?)(?:=\s*(\d+))?$", last_over_text, re.IGNORECASE)
+        if m:
+            b_text = m.group(2)
+            raw_b = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", b_text, re.IGNORECASE)
+            current_balls = [b.upper() for b in raw_b if b.upper() != "OVER"]
+            if m.group(3):
+                try:
+                    over_total = int(m.group(3).strip())
+                except Exception:
+                    pass
+
+    if not current_balls:
+        clean_text = raw_text
+        for stop_w in ["Slow-over rate Penalty", "Probability", "Who will win?"]:
+            if stop_w in clean_text:
+                clean_text = clean_text.split(stop_w)[0]
+
+        all_overs = re.findall(r"\bOver\s+(\d+)\s+([^=]+?)=\s*(\d+)", clean_text, re.IGNORECASE)
+        if all_overs:
+            latest_over = max(all_overs, key=lambda x: int(x[0]))
+            raw_b = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", latest_over[1], re.IGNORECASE)
+            current_balls = [b.upper() for b in raw_b if b.upper() != "OVER"]
+            try:
+                over_total = int(latest_over[2].strip())
+            except Exception:
+                pass
+
     return jsonify({
         "success": True,
         "live_action": live_action,
