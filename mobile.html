@@ -514,6 +514,89 @@ html, body {
   #status { display: none; }
   .stage { width: 100vw; border: none; }
 }
+  /* --- TV BROADCAST NEON ANIMATIONS --- */
+
+/* 1. Breathing Striker Halo */
+.player-box.striker {
+  border-color: var(--gold) !important;
+  animation: strikerNeonPulse 2.4s infinite ease-in-out !important;
+}
+@keyframes strikerNeonPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 196, 0, 0.35), inset 0 0 8px rgba(255, 196, 0, 0.15);
+    border-color: rgba(255, 196, 0, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(255, 196, 0, 0.7), inset 0 0 14px rgba(255, 196, 0, 0.3);
+    border-color: #ffe685;
+  }
+}
+
+/* 2. Top Header Glass Sheen */
+.brand-bar {
+  position: relative;
+  overflow: hidden;
+}
+.brand-bar::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  animation: glassSheen 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes glassSheen {
+  0%, 65% { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* 3. Flowing LED Neon Ticker Border */
+.ticker-strip {
+  position: relative;
+  overflow: hidden;
+}
+.ticker-strip::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 0; height: 2px; width: 100%;
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--gold), transparent);
+  background-size: 200% 100%;
+  animation: tickerFlow 4s linear infinite;
+}
+@keyframes tickerFlow {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* 4. Live Pill Radar Beacon */
+.live-beacon {
+  position: relative;
+  width: 0.65em;
+  height: 0.65em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.live-radar {
+  position: absolute;
+  inset: -4px;
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+  animation: radarWave 1.8s infinite ease-out;
+}
+@keyframes radarWave {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* 5. Active Ball Neon Glow */
+.ball.active-latest {
+  border-color: #fff !important;
+  animation: ballGlow 1.4s infinite alternate !important;
+}
+@keyframes ballGlow {
+  0% { transform: scale(1); box-shadow: 0 0 6px var(--cyan); }
+  100% { transform: scale(1.08); box-shadow: 0 0 16px var(--cyan); }
+}
 </style>
 </head>
 <body>
@@ -535,8 +618,13 @@ html, body {
         <span>PREET <b>SPORTS</b></span>
         <span class="brand-sub">| HD LIVE MATCH HUB</span>
       </div>
-      <div class="live-pill"><span class="live-dot"></span> LIVE</div>
-    </header>
+      <div class="live-pill">
+  <div class="live-beacon">
+    <span class="live-dot"></span>
+    <span class="live-radar"></span>
+  </div>
+  LIVE
+</div>    </header>
 
     <!-- Top Score Row -->
     <section class="top-score-row">
