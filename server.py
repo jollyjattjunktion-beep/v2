@@ -178,26 +178,29 @@ def scrape_match():
     batsman2 = parse_card(cards[1], False) if len(cards) > 1 else {}
     bowler = parse_card(cards[2], True) if len(cards) > 2 else {}
 
-    # 6. ACCURATE LIVE OVER BALLS (Targeted directly from timeline)
+    # 6. ACCURATE LIVE OVER BALLS (Locks onto the highest active over number)
     current_balls = []
     over_total = 0
 
-    # Matches over strip patterns like: "Over 27  4 0 4 1 W = 9"
+    # Match all over blocks like: "Over 33 0 2 wd 4 4 1 = 12"
     over_blocks = re.findall(r"\bOver\s+(\d+)\s+([^=]+?)=\s*(\d+)", raw_text, re.IGNORECASE)
     valid_overs = []
+    
     for ov_num, b_str, tot in over_blocks:
-        b_clean = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", b_str, re.IGNORECASE)
-        # Avoid commentary paragraphs by checking element character length
-        if 1 <= len(b_clean) <= 10 and len(b_str.strip()) < 40:
-            valid_overs.append((ov_num, b_clean, tot))
+        # Match balls including 0-6, W, WD, NB, B, LB
+        raw_b = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", b_str, re.IGNORECASE)
+        if 1 <= len(raw_b) <= 12 and len(b_str.strip()) < 50:
+            valid_overs.append((int(ov_num), [b.upper() for b in raw_b], tot))
 
     if valid_overs:
-        _, current_balls, tot_val = valid_overs[-1]
+        # ALWAYS select the highest over number (e.g., Over 33 > Over 32 > Over 31)
+        active_over_tuple = max(valid_overs, key=lambda x: x[0])
+        current_balls = active_over_tuple[1]
         try:
-            over_total = int(tot_val.strip())
+            over_total = int(active_over_tuple[2].strip())
         except Exception:
             over_total = 0
-
+            
     return jsonify({
         "success": True,
         "live_action": live_action,
