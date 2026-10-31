@@ -15,7 +15,6 @@
   --gold: #ffc400;
   --gold-glow: rgba(255, 196, 0, 0.45);
   --cyan: #00e1ff;
-  --cyan-glow: rgba(0, 225, 255, 0.4);
   --white: #ffffff;
   --muted: #a6bdd4;
   --red-live: #ff123d;
@@ -44,43 +43,23 @@ html, body {
   display: flex;
   gap: 10px;
   align-items: center;
-  padding: 8px 14px;
-  margin: 6px auto;
+  padding: 6px 12px;
+  margin: 4px auto;
   border: 1px solid rgba(255, 196, 0, 0.35);
-  border-radius: 8px;
+  border-radius: 6px;
   background: #061426;
   z-index: 10;
 }
-.toolbar label {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--gold);
-  letter-spacing: .08em;
-  white-space: nowrap;
-}
+.toolbar label { font-size: 12px; font-weight: 800; color: var(--gold); }
 .toolbar input {
-  min-width: 0;
-  flex: 1;
-  background: #020914;
-  border: 1px solid #1f4f78;
-  color: #fff;
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 13px;
-  font-family: monospace;
+  min-width: 0; flex: 1; background: #020914; border: 1px solid #1f4f78;
+  color: #fff; border-radius: 4px; padding: 6px 10px; font-size: 12px;
 }
 .toolbar button {
-  border: 0;
-  border-radius: 6px;
-  background: linear-gradient(180deg, #ffd65c, #e69a0a);
-  color: #071220;
-  font-weight: 800;
-  padding: 8px 16px;
-  font-size: 13px;
-  white-space: nowrap;
-  cursor: pointer;
+  border: 0; border-radius: 4px; background: linear-gradient(180deg, #ffd65c, #e69a0a);
+  color: #071220; font-weight: 800; padding: 6px 14px; font-size: 12px; cursor: pointer;
 }
-#status { font-size: 12px; color: #5ef396; font-weight: 800; white-space: nowrap; }
+#status { font-size: 11px; color: #5ef396; font-weight: 800; }
 
 /* 16:9 Canvas */
 .stage {
@@ -92,33 +71,27 @@ html, body {
   overflow: hidden;
   background: radial-gradient(circle at 50% 15%, #0f2d59 0%, #030c1a 75%, #010408 100%);
   border: 1px solid #193e68;
-  box-shadow: 0 16px 50px rgba(0,0,0,0.9);
 }
 
+/* Middle Cricket Pitch Graphic */
 .stadium {
   position: absolute;
-  inset: -5%;
-  width: 110%;
-  height: 110%;
+  inset: 0;
   background:
-    radial-gradient(ellipse at 50% 10%, rgba(0, 225, 255, 0.16), transparent 65%),
-    linear-gradient(180deg, rgba(2, 8, 16, 0.3) 0%, rgba(2, 8, 16, 0.9) 70%, #010408 100%),
-    url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1920&q=80') center 38%/cover;
-  opacity: 0.58;
+    radial-gradient(ellipse at 50% 50%, rgba(0, 225, 255, 0.1), transparent 60%),
+    linear-gradient(180deg, rgba(2, 8, 16, 0.4) 0%, rgba(2, 8, 16, 0.95) 85%),
+    url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1920&q=80') center 40%/cover;
+  opacity: 0.55;
   mix-blend-mode: luminosity;
-  animation: stadiumDrift 30s ease-in-out infinite alternate;
-}
-@keyframes stadiumDrift {
-  0% { transform: scale(1) translate(0, 0); }
-  100% { transform: scale(1.05) translate(-1%, -0.8%); }
 }
 
+/* Master Grid Layout: Compact Proportions */
 .content {
   position: absolute;
-  inset: 1.8% 2%;
+  inset: 1.5% 1.8%;
   display: grid;
   grid-template-rows: auto auto auto auto 1fr auto;
-  gap: 1.3%;
+  gap: 1%;
   z-index: 2;
 }
 
@@ -128,132 +101,104 @@ html, body {
   align-items: center;
   justify-content: space-between;
   border-bottom: 2px solid rgba(255, 196, 0, 0.65);
-  padding-bottom: 0.3%;
+  padding-bottom: 0.2%;
 }
 .brand-pill {
   font-family: var(--font-score);
-  font-size: 2.5cqw;
+  font-size: 2.3cqw;
   line-height: 1;
-  letter-spacing: .06em;
   text-transform: uppercase;
   color: #fff;
 }
 .brand-pill b { color: var(--gold); }
-.brand-sub {
-  font-family: var(--font-tv);
-  font-size: 1.1cqw;
-  font-weight: 700;
-  color: var(--muted);
-  letter-spacing: 0.05em;
-  margin-left: 0.6em;
-}
+.brand-sub { font-size: 1.05cqw; font-weight: 700; color: var(--muted); margin-left: 0.5em; }
 .live-pill {
-  font-size: 1.25cqw;
+  font-size: 1.15cqw;
   font-weight: 800;
   background: var(--red-live);
   color: #fff;
-  padding: 0.25em 0.85em;
+  padding: 0.15em 0.7em;
   border-radius: 4px;
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
-  letter-spacing: .08em;
-  box-shadow: 0 0 14px rgba(255, 18, 61, 0.6);
+  gap: 0.35em;
+  box-shadow: 0 0 10px rgba(255, 18, 61, 0.6);
 }
-.live-dot {
-  width: 0.6em;
-  height: 0.6em;
-  background: #fff;
-  border-radius: 50%;
-  animation: liveBlink 1.2s infinite ease-in-out;
-}
-@keyframes liveBlink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.7); } }
+.live-dot { width: 0.55em; height: 0.55em; background: #fff; border-radius: 50%; }
 
-/* Top Score Row */
+/* TOP ROW: Team 1 | Center Action | Team 2 */
 .top-score-row {
   display: grid;
   grid-template-columns: 1.25fr 1fr 1.25fr;
-  gap: 1.2%;
+  gap: 1%;
   align-items: stretch;
 }
 .team-card {
   display: flex;
   align-items: center;
-  gap: 4%;
-  padding: 1% 3%;
-  border-radius: 0.5cqw;
+  gap: 3.5%;
+  padding: 0.8% 2.5%;
+  border-radius: 0.4cqw;
   background: var(--panel-bg);
   border: 1.5px solid #1a5e9a;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
   position: relative;
   overflow: hidden;
 }
-.team-card.away {
-  flex-direction: row-reverse;
-  text-align: right;
-  border-color: #a32240;
-}
-.crest {
-  width: 5.2cqw;
-  height: 5.2cqw;
+.team-card.away { flex-direction: row-reverse; text-align: right; border-color: #a32240; }
+.crest-circle {
+  width: 4.8cqw;
+  height: 4.8cqw;
   border-radius: 50%;
-  object-fit: cover;
   border: 2px solid var(--gold);
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   flex-shrink: 0;
 }
-.crest[hidden] { display: none; }
+.crest-img { width: 100%; height: 100%; object-fit: cover; }
+.crest-fallback { font-family: var(--font-score); font-size: 2cqw; font-weight: 800; color: #fff; }
 .team-info { flex: 1; min-width: 0; }
 .team-name {
-  font-family: var(--font-tv);
-  font-size: 1.7cqw;
+  font-size: 1.55cqw;
   font-weight: 800;
-  letter-spacing: .06em;
   text-transform: uppercase;
   color: #d8e7f5;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
-.team-score-wrap {
-  display: flex;
-  align-items: baseline;
-  gap: 3%;
-  margin-top: -0.2em;
-}
+.team-score-wrap { display: flex; align-items: baseline; gap: 3%; margin-top: -0.2em; }
 .team-card.away .team-score-wrap { justify-content: flex-end; }
 .team-score {
   font-family: var(--font-score);
-  font-size: 4.8cqw;
+  font-size: 4.4cqw;
   line-height: 0.95;
   font-weight: 700;
   color: #fff;
-  letter-spacing: 0.02em;
 }
 .team-overs {
   font-family: var(--font-score);
-  font-size: 2.0cqw;
+  font-size: 1.8cqw;
   font-weight: 600;
   color: var(--cyan);
   white-space: nowrap;
 }
 .team-card.away .team-overs { color: #ff8ca3; }
 
-/* Center Action Hub */
+/* Center Action Box */
 .center-action-box {
   background: linear-gradient(180deg, #051425, #020b17);
   border: 2px solid var(--gold);
-  border-radius: 0.5cqw;
-  padding: 0.8% 2%;
+  border-radius: 0.4cqw;
+  padding: 0.6% 2%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  box-shadow: 0 0 16px rgba(255, 196, 0, 0.25), inset 0 0 10px rgba(255, 196, 0, 0.1);
 }
 .action-top-label {
-  font-size: 0.85cqw;
+  font-size: 0.8cqw;
   font-weight: 800;
   letter-spacing: .12em;
   color: var(--gold);
@@ -261,134 +206,89 @@ html, body {
 }
 .action-live-text {
   font-family: var(--font-score);
-  font-size: clamp(22px, 4.2cqw, 60px);
+  font-size: clamp(20px, 3.8cqw, 54px);
   font-weight: 800;
   line-height: 0.95;
-  letter-spacing: .04em;
   color: var(--gold);
   text-transform: uppercase;
-  text-shadow: 0 0 12px rgba(255, 196, 0, 0.5);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-.center-action-box.wicket-alert {
-  border-color: #ff123d;
-  background: linear-gradient(180deg, #3d050f, #140206);
-}
-.center-action-box.wicket-alert .action-live-text {
-  color: #ff2a4f;
-  text-shadow: 0 0 18px rgba(255, 18, 61, 0.8);
 }
 
-/* Middle Situation */
+/* Middle Match Situation & Over Tracker */
 .middle-row {
   display: grid;
   grid-template-columns: 1.15fr 1fr;
-  gap: 1.2%;
+  gap: 1%;
 }
 .situation-card {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 1.2% 2.8%;
+  padding: 1% 2.4%;
   background: var(--panel-bg);
   border: 1px solid #1a5286;
-  border-left: 5px solid var(--gold);
-  border-radius: 0.4cqw;
+  border-left: 4px solid var(--gold);
+  border-radius: 0.35cqw;
 }
-.card-label {
-  font-size: 0.95cqw;
-  font-weight: 800;
-  letter-spacing: .12em;
-  color: var(--gold);
-}
+.card-label { font-size: 0.85cqw; font-weight: 800; color: var(--gold); }
 .situation-main {
   font-family: var(--font-score);
-  font-size: 3.2cqw;
+  font-size: 2.8cqw;
   font-weight: 700;
   line-height: 1;
   color: #fff;
-  letter-spacing: .03em;
-  text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 0.1em;
 }
-.situation-sub {
-  font-size: 1.1cqw;
-  font-weight: 700;
-  color: var(--muted);
-  margin-top: 0.15em;
-}
+.situation-sub { font-size: 1.05cqw; font-weight: 700; color: var(--muted); }
 
 .over-tracker-card {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 1.2% 2.8%;
+  padding: 1% 2.4%;
   background: var(--panel-bg);
   border: 1px solid #1a5286;
-  border-radius: 0.4cqw;
+  border-radius: 0.35cqw;
 }
 .over-card-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5%;
+  margin-bottom: 1%;
 }
 .over-total-tag {
   font-family: var(--font-score);
-  font-size: 1.5cqw;
+  font-size: 1.35cqw;
   color: #fff;
   background: rgba(255, 196, 0, 0.2);
   border: 1px solid var(--gold);
-  padding: 0 0.5em;
+  padding: 0 0.4em;
   border-radius: 3px;
-  line-height: 1.2;
 }
 .balls-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 2%;
+  gap: 1.8%;
 }
 .ball {
   display: flex;
   align-items: center;
   justify-content: center;
   aspect-ratio: 1.15 / 1;
-  border-radius: 0.4cqw;
+  border-radius: 0.3cqw;
   font-family: var(--font-score);
-  font-size: 2.5cqw;
+  font-size: 2.2cqw;
   font-weight: 700;
   background: #06192d;
   border: 1.2px solid #204c75;
   color: #ffffff;
 }
 .ball.dot { color: #627b97; }
-.ball.four {
-  background: linear-gradient(180deg, #1898d6, #075b8b);
-  border-color: #63d9ff;
-  color: #fff;
-}
-.ball.six {
-  background: linear-gradient(180deg, #ffc72c, #cf8d00);
-  border-color: #ffe685;
-  color: #051322;
-}
-.ball.wicket {
-  background: linear-gradient(180deg, #ff1a3c, #ad0821);
-  border-color: #ffa1af;
-  color: #fff;
-}
-.ball.extra {
-  background: linear-gradient(180deg, #139785, #075c51);
-  border-color: #4ee0cd;
-  color: #fff;
-  font-size: 1.7cqw;
-}
+.ball.four { background: linear-gradient(180deg, #1898d6, #075b8b); border-color: #63d9ff; color: #fff; }
+.ball.six { background: linear-gradient(180deg, #ffc72c, #cf8d00); border-color: #ffe685; color: #051322; }
+.ball.wicket { background: linear-gradient(180deg, #ff1a3c, #ad0821); border-color: #ffa1af; color: #fff; }
 
 /* Context Strip */
 .context-strip {
@@ -396,195 +296,149 @@ html, body {
   grid-template-columns: 1fr 1.2fr 1.3fr 1.5fr;
   background: rgba(3, 13, 27, 0.95);
   border: 1px solid #1a4f82;
-  border-radius: 0.4cqw;
+  border-radius: 0.35cqw;
   align-items: center;
-  padding: 0.5% 0;
+  padding: 0.4% 0;
 }
-.context-box {
-  text-align: center;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0 1cqw;
-}
+.context-box { text-align: center; border-right: 1px solid rgba(255, 255, 255, 0.1); padding: 0 0.8cqw; }
 .context-box:last-child { border-right: none; }
-.context-title {
-  font-size: 0.9cqw;
-  font-weight: 800;
-  color: var(--gold);
-  letter-spacing: .08em;
-}
+.context-title { font-size: 0.85cqw; font-weight: 800; color: var(--gold); }
 .context-val {
   font-family: var(--font-tv);
-  font-size: 1.35cqw;
+  font-size: 1.25cqw;
   font-weight: 800;
   color: #fff;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* ========================================================
-   PLAYER CARDS: 2-LAYER COMPOSITE HEAD + JERSEY
+   REDUCED-HEIGHT COMPACT PLAYER CARDS (MATCHING IMAGE 3)
    ======================================================== */
 .players-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.2%;
+  gap: 1%;
+  align-items: end;
   min-height: 0;
+  max-height: 28cqw; /* Limits card height */
 }
+
 .player-box {
   background: var(--panel-bg);
   border: 1.5px solid #194673;
-  border-radius: 0.5cqw;
-  position: relative;
+  border-radius: 0.4cqw;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 .player-box.striker {
   border-color: var(--gold);
-  box-shadow: 0 0 16px rgba(255, 196, 0, 0.35);
+  box-shadow: 0 0 12px rgba(255, 196, 0, 0.3);
 }
-.player-role-header {
+
+/* RunBuzz Style Name Header Strip */
+.player-name-banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(90deg, #071930, #04101e);
-  border-bottom: 1px solid #1e4a77;
+  background: linear-gradient(90deg, #b8142f, #660615);
+  border-bottom: 1.5px solid #ff425e;
   padding: 0.25em 0.8em;
 }
-.player-role-title {
-  font-size: 0.95cqw;
-  font-weight: 800;
-  color: var(--gold);
-  letter-spacing: .08em;
+.player-box:nth-child(2) .player-name-banner {
+  background: linear-gradient(90deg, #c78906, #785002);
+  border-color: #ffd059;
 }
-.role-badge {
-  font-size: 0.8cqw;
-  font-weight: 900;
-  background: var(--gold);
-  color: #061528;
-  padding: 0.05em 0.5em;
-  border-radius: 2px;
-  letter-spacing: .05em;
+.player-box:nth-child(3) .player-name-banner {
+  background: linear-gradient(90deg, #106296, #073454);
+  border-color: #4dc2ff;
 }
 
+.banner-pname {
+  font-family: var(--font-tv);
+  font-size: 1.4cqw;
+  font-weight: 900;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+.banner-role {
+  font-size: 0.8cqw;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: .06em;
+}
+
+/* Compact Main Body: Left Composite Head+Jersey, Right Telemetry */
 .player-main {
   flex: 1;
   display: grid;
-  grid-template-columns: 42% 58%;
-  align-items: stretch;
-  min-height: 0;
-  position: relative;
-}
-
-/* 2-Layer Avatar Composite */
-.player-cutout-wrap {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
+  grid-template-columns: 36% 64%;
   align-items: center;
-  justify-content: flex-end;
-  overflow: visible;
-  padding-bottom: 0.2em;
+  padding: 0.2em 0.4em;
+  min-height: 0;
 }
 
 .avatar-composite {
-  position: relative;
-  width: 7.2cqw;
-  height: 9.6cqw;
+  width: 5.6cqw;
+  height: 7.2cqw;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
+  position: relative;
+  margin: 0 auto;
 }
-
 .avatar-head {
-  width: 4.8cqw;
-  height: 4.8cqw;
+  width: 4.0cqw;
+  height: 4.0cqw;
   object-fit: contain;
   z-index: 2;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
-  position: relative;
 }
-
 .avatar-jersey {
-  width: 6.4cqw;
+  width: 5.2cqw;
   height: auto;
   object-fit: contain;
-  margin-top: -1.4cqw; /* Overlaps collar under head */
+  margin-top: -1.2cqw;
   z-index: 1;
-  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.8));
-  position: relative;
-}
-
-/* Fallback for single combined cutouts */
-.avatar-single {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 98%;
-  object-fit: contain;
-  object-position: bottom center;
-  z-index: 2;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.8));
 }
 
 .player-data-col {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0.2em 0.6em;
-  min-width: 0;
+  padding-left: 0.3em;
 }
-.player-name-plate {
-  font-family: var(--font-tv);
-  font-size: 1.8cqw;
-  font-weight: 800;
-  color: #ffffff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
-}
+
 .player-score-row {
   display: flex;
   align-items: center;
-  gap: 0.35em;
-  margin-top: -0.15em;
+  gap: 0.3em;
 }
 .player-score-big {
   font-family: var(--font-score);
-  font-size: 3.6cqw;
+  font-size: 3.2cqw;
   font-weight: 700;
   line-height: 0.95;
   color: #ffffff;
-  letter-spacing: 0.02em;
 }
 .player-score-big small {
-  font-size: 2.1cqw;
+  font-size: 1.8cqw;
   color: var(--muted);
   font-weight: 600;
   margin-left: 0.15em;
 }
-
-/* Custom CREX Strike Icon */
 .action-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 1.2cqw;
   line-height: 1;
 }
-.action-icon svg {
-  width: 1.3cqw;
-  height: 1.3cqw;
-  fill: var(--gold);
-}
 
+/* Compact Substats Strip */
 .player-substats {
   font-family: var(--font-tv);
-  font-size: 1.15cqw;
+  font-size: 1.05cqw;
   font-weight: 700;
   color: var(--cyan);
   white-space: nowrap;
@@ -598,37 +452,23 @@ html, body {
   justify-content: space-between;
   background: #030c18;
   border: 1px solid #14355a;
-  border-radius: 0.3cqw;
-  padding: 0.3% 2%;
-  font-size: 1.1cqw;
+  border-radius: 0.25cqw;
+  padding: 0.25% 1.8%;
+  font-size: 1cqw;
   font-weight: 800;
   color: #fff;
   letter-spacing: .08em;
-  position: relative;
-  overflow: hidden;
 }
-.ticker-strip::after {
-  content: "";
-  position: absolute;
-  bottom: 0; left: 0; height: 2px; width: 100%;
-  background: linear-gradient(90deg, transparent, var(--cyan), var(--gold), transparent);
-  background-size: 200% 100%;
-  animation: tickerFlow 4s linear infinite;
-}
-@keyframes tickerFlow {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-.ticker-left { display: flex; gap: 1.5cqw; color: var(--muted); }
+.ticker-left { display: flex; gap: 1.2cqw; color: var(--muted); }
 .ticker-left span b { color: var(--gold); }
 .ticker-right { color: var(--gold); }
 
 @media (max-width: 600px) {
   body { padding: 0; }
-  .toolbar { border-radius: 0; margin: 0 0 6px 0; padding: 6px; }
-  .toolbar label { font-size: 10px; }
-  .toolbar input { font-size: 11px; padding: 6px 8px; }
-  .toolbar button { font-size: 11px; padding: 6px 10px; }
+  .toolbar { border-radius: 0; margin: 0 0 4px 0; padding: 4px; }
+  .toolbar label { font-size: 9px; }
+  .toolbar input { font-size: 10px; padding: 4px 6px; }
+  .toolbar button { font-size: 10px; padding: 4px 8px; }
   #status { display: none; }
   .stage { width: 100vw; border: none; }
 }
@@ -652,61 +492,68 @@ html, body {
         <span>PREET <b>SPORTS</b></span>
         <span class="brand-sub">| HD LIVE MATCH HUB</span>
       </div>
-      <div class="live-pill">
-        <span class="live-dot"></span> LIVE
-      </div>
+      <div class="live-pill"><span class="live-dot"></span> LIVE</div>
     </header>
 
     <!-- Top Score Row -->
     <section class="top-score-row">
+      <!-- Team 1 -->
       <div class="team-card">
-        <img class="crest" id="logo1" alt="" hidden>
+        <div class="crest-circle">
+          <img class="crest-img" id="logo1" alt="" src="https://cricketvectors.akamaized.net/teams/org/PAK.png" onerror="this.style.display='none';$('t1fb').style.display='block';">
+          <span class="crest-fallback" id="t1fb" style="display:none">PAK</span>
+        </div>
         <div class="team-info">
           <div class="team-name" id="team1">PAKISTAN</div>
           <div class="team-score-wrap">
-            <div class="team-score" id="score1">—</div>
-            <div class="team-overs" id="overs1">— OV</div>
+            <div class="team-score" id="score1">94-2</div>
+            <div class="team-overs" id="overs1">18.0 OV</div>
           </div>
         </div>
       </div>
 
+      <!-- CENTER ACTION HUB: OVER / WICKET -->
       <div class="center-action-box" id="actionBox">
         <span class="action-top-label" id="actionLabel">LIVE MATCH ACTION</span>
         <div class="action-live-text" id="actionText">OVER</div>
       </div>
 
+      <!-- Team 2 -->
       <div class="team-card away">
-        <img class="crest" id="logo2" alt="" hidden>
+        <div class="crest-circle">
+          <img class="crest-img" id="logo2" alt="" src="https://cricketvectors.akamaized.net/teams/org/SL.png" onerror="this.style.display='none';$('t2fb').style.display='block';">
+          <span class="crest-fallback" id="t2fb" style="display:none">SL</span>
+        </div>
         <div class="team-info">
           <div class="team-name" id="team2">SRI LANKA</div>
           <div class="team-score-wrap">
-            <div class="team-score" id="score2">—</div>
-            <div class="team-overs" id="overs2">— OV</div>
+            <div class="team-score" id="score2">325-8</div>
+            <div class="team-overs" id="overs2">50.0 OV</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Middle Situation & Over Tracker -->
+    <!-- Situation & Over Tracker -->
     <section class="middle-row">
       <div class="situation-card">
         <span class="card-label">MATCH SITUATION</span>
-        <div class="situation-main" id="matchState">MATCH IN PROGRESS</div>
-        <div class="situation-sub" id="matchSub">PREET SPORTS EXCLUSIVE</div>
+        <div class="situation-main" id="matchState">PAK NEED 232 RUNS IN 192 BALLS</div>
+        <div class="situation-sub" id="matchSub">PREET SPORTS LIVE BROADCAST</div>
       </div>
 
       <div class="over-tracker-card">
         <div class="over-card-head">
           <span class="card-label">CURRENT OVER</span>
-          <span class="over-total-tag" id="overTotal">TOTAL: 0</span>
+          <span class="over-total-tag" id="overTotal">OVER BALLS</span>
         </div>
         <div class="balls-grid" id="balls">
-          <span class="ball dot">–</span>
-          <span class="ball dot">–</span>
-          <span class="ball dot">–</span>
-          <span class="ball dot">–</span>
-          <span class="ball dot">–</span>
-          <span class="ball dot">–</span>
+          <span class="ball four">4</span>
+          <span class="ball dot">0</span>
+          <span class="ball dot">1</span>
+          <span class="ball dot">2</span>
+          <span class="ball dot">0</span>
+          <span class="ball dot">0</span>
         </div>
       </div>
     </section>
@@ -719,106 +566,88 @@ html, body {
       </div>
       <div class="context-box">
         <div class="context-title">CRR / RRR</div>
-        <div class="context-val" id="rates">— / —</div>
+        <div class="context-val" id="rates">5.22 / 7.25</div>
       </div>
       <div class="context-box">
         <div class="context-title">PARTNERSHIP</div>
-        <div class="context-val" id="partnership">—</div>
+        <div class="context-val" id="partnership">80 (87)</div>
       </div>
       <div class="context-box">
         <div class="context-title">LAST WICKET</div>
-        <div class="context-val" id="lastWicket">—</div>
+        <div class="context-val" id="lastWicket">Babar Azam 0(5)</div>
       </div>
     </section>
 
-    <!-- Players Lower Thirds -->
+    <!-- Compact Bottom Player Cards (RunBuzz Style) -->
     <section class="players-grid">
       <!-- Batsman 1 -->
       <article class="player-box" id="cardBat1">
-        <div class="player-role-header">
-          <span class="player-role-title">BATSMAN</span>
-          <span class="role-badge" id="strikeBadge1" style="display:none">STRIKER</span>
+        <div class="player-name-banner">
+          <span class="banner-pname" id="bat1">F ZAMAN</span>
+          <span class="banner-role" id="strikeBadge1" style="display:none">STRIKER</span>
         </div>
         <div class="player-main">
-          <div class="player-cutout-wrap">
-            <div class="avatar-composite" id="avatarComp1">
-              <img class="avatar-head" id="head1" alt="" src="https://cricketvectors.akamaized.net/players/org/H6.png">
-              <img class="avatar-jersey" id="jersey1" alt="" src="https://cricketvectors.akamaized.net/jersey/limited/org/U.png">
-            </div>
-            <img class="avatar-single" id="photo1" alt="" hidden>
+          <div class="avatar-composite">
+            <img class="avatar-head" id="head1" alt="" src="https://cricketvectors.akamaized.net/players/org/H6.png">
+            <img class="avatar-jersey" id="jersey1" alt="" src="https://cricketvectors.akamaized.net/jersey/limited/org/U.png">
           </div>
           <div class="player-data-col">
-            <div class="player-name-plate" id="bat1">F ZAMAN</div>
             <div class="player-score-row">
-              <span class="player-score-big" id="bat1score">39 <small>(46)</small></span>
-              <span class="action-icon" id="batIcon1" style="display:none">
-                <svg viewBox="0 0 12 12"><path d="M8.29852 3.89906L8.69002 5.11406L2.72977 11.0797H1.90087L0.101318 9.28016V8.45261L6.06157 2.49911L7.27657 2.89061L10.3546 0.0664062L10.8622 0.574006L11.3698 1.08161L8.29852 3.89906Z"></path></svg>
-              </span>
+              <span class="player-score-big" id="bat1score">43 <small>(51)</small></span>
+              <span class="action-icon" id="batIcon1" style="display:none">🏏</span>
             </div>
-            <div class="player-substats" id="bat1stats">4s 2 &nbsp; 6s 3 &nbsp; SR 84.78</div>
+            <div class="player-substats" id="bat1stats">4s 2 &nbsp; 6s 3 &nbsp; SR 84.31</div>
           </div>
         </div>
       </article>
 
       <!-- Batsman 2 -->
       <article class="player-box striker" id="cardBat2">
-        <div class="player-role-header">
-          <span class="player-role-title">BATSMAN</span>
-          <span class="role-badge" id="strikeBadge2">STRIKER</span>
+        <div class="player-name-banner">
+          <span class="banner-pname" id="bat2">S BAIG</span>
+          <span class="banner-role" id="strikeBadge2">STRIKER</span>
         </div>
         <div class="player-main">
-          <div class="player-cutout-wrap">
-            <div class="avatar-composite" id="avatarComp2">
-              <img class="avatar-head" id="head2" alt="" src="https://cricketvectors.akamaized.net/players/org/9T4.png">
-              <img class="avatar-jersey" id="jersey2" alt="" src="https://cricketvectors.akamaized.net/jersey/limited/org/U.png">
-            </div>
-            <img class="avatar-single" id="photo2" alt="" hidden>
+          <div class="avatar-composite">
+            <img class="avatar-head" id="head2" alt="" src="https://cricketvectors.akamaized.net/players/org/9T4.png">
+            <img class="avatar-jersey" id="jersey2" alt="" src="https://cricketvectors.akamaized.net/jersey/limited/org/U.png">
           </div>
           <div class="player-data-col">
-            <div class="player-name-plate" id="bat2">S BAIG</div>
             <div class="player-score-row">
-              <span class="player-score-big" id="bat2score">39 <small>(38)</small></span>
-              <span class="action-icon" id="batIcon2">
-                <svg viewBox="0 0 12 12"><path d="M8.29852 3.89906L8.69002 5.11406L2.72977 11.0797H1.90087L0.101318 9.28016V8.45261L6.06157 2.49911L7.27657 2.89061L10.3546 0.0664062L10.8622 0.574006L11.3698 1.08161L8.29852 3.89906Z"></path></svg>
-              </span>
+              <span class="player-score-big" id="bat2score">46 <small>(47)</small></span>
+              <span class="action-icon" id="batIcon2">🏏</span>
             </div>
-            <div class="player-substats" id="bat2stats">4s 7 &nbsp; 6s 0 &nbsp; SR 102.63</div>
+            <div class="player-substats" id="bat2stats">4s 8 &nbsp; 6s 0 &nbsp; SR 97.87</div>
           </div>
         </div>
       </article>
 
       <!-- Bowler -->
       <article class="player-box" id="cardBowler">
-        <div class="player-role-header">
-          <span class="player-role-title">CURRENT BOWLER</span>
-          <span class="role-badge" style="background:var(--cyan);color:#031427;">BALL</span>
+        <div class="player-name-banner">
+          <span class="banner-pname" id="bowler">D WELLALAGE</span>
+          <span class="banner-role" style="color:var(--cyan)">BOWLER</span>
         </div>
         <div class="player-main">
-          <div class="player-cutout-wrap">
-            <div class="avatar-composite" id="avatarCompB">
-              <img class="avatar-head" id="headB" alt="" src="https://cricketvectors.akamaized.net/players/org/17J.png">
-              <img class="avatar-jersey" id="jerseyB" alt="" src="https://cricketvectors.akamaized.net/jersey/limited/org/T.png">
-            </div>
-            <img class="avatar-single" id="photoB" alt="" hidden>
+          <div class="avatar-composite">
+            <img class="avatar-head" id="headB" alt="" src="https://cricketvectors.akamaized.net/players/org/17J.png">
+            <img class="avatar-jersey" id="jerseyB" alt="" src="https://cricketvectors.akamaized.net/jersey/limited/org/T.png">
           </div>
           <div class="player-data-col">
-            <div class="player-name-plate" id="bowler">D MADUSHANKA</div>
             <div class="player-score-row">
-              <span class="player-score-big" id="bowlscore">2-23</span>
-              <span class="action-icon" style="font-size:1.2cqw;color:#ff3355;">●</span>
+              <span class="player-score-big" id="bowlscore">0-4</span>
+              <span class="action-icon" style="color:#ff3355">🔴</span>
             </div>
-            <div class="player-substats" id="bowlstats">OV 4.0 &nbsp; ECON 5.75</div>
+            <div class="player-substats" id="bowlstats">OV 1.2 &nbsp; ECON 3.00</div>
           </div>
         </div>
       </article>
     </section>
 
-    <!-- Footer Ticker -->
     <footer class="ticker-strip">
       <div class="ticker-left">
         <span>VENUE: <b id="venue">GADDAFI STADIUM, LAHORE</b></span>
-        <span>NEXT BAT: <b id="next1">—</b></span>
-        <span>NEXT BOWL: <b id="nextB">—</b></span>
+        <span>NEXT: <b>LIVE BROADCAST</b></span>
       </div>
       <div class="ticker-right">PREET SPORTS BROADCAST</div>
     </footer>
@@ -849,143 +678,90 @@ html, body {
     const el = $(id);
     if (!el) return;
     const src = clean(url);
-    if (!src) {
-      el.removeAttribute("src");
-      el.hidden = true;
-      return;
-    }
-    el.onload = () => el.hidden = false;
-    el.onerror = () => el.hidden = true;
+    if (!src) return;
+    el.style.display = "block";
     el.src = src;
   };
 
-  // Helper for 2-layer avatar composite
-  const setPlayerAvatar = (compPrefix, singleId, p) => {
-    const compEl = $(compPrefix);
-    const singleEl = $(singleId);
-    const headEl = $("head" + compPrefix.replace("avatarComp", ""));
-    const jerseyEl = $("jersey" + compPrefix.replace("avatarComp", ""));
-
-    if (p.face && p.jersey) {
-      if (compEl) compEl.style.display = "flex";
-      if (singleEl) singleEl.hidden = true;
-      if (headEl) headEl.src = p.face;
-      if (jerseyEl) jerseyEl.src = p.jersey;
-    } else if (p.img || p.photo_url || p.image) {
-      if (compEl) compEl.style.display = "none";
-      safeImage(singleId, p.img || p.photo_url || p.image);
-    }
+  const setPlayerAvatar = (headId, jerseyId, p) => {
+    if (p.face && $(headId)) $(headId).src = p.face;
+    if (p.jersey && $(jerseyId)) $(jerseyId).src = p.jersey;
   };
 
-  const fmtOvers = v => {
-    const s = clean(v);
-    return s ? s.replace(/[()]/g, "") + " OV" : "— OV";
-  };
-
-  function renderBall(b, isLatest = false) {
-    const value = clean(typeof b === "object" ? (b.text ?? b.value ?? b.label ?? "") : b);
+  function renderBall(b) {
+    const value = clean(typeof b === "object" ? (b.text ?? b.value ?? "") : b);
     const low = value.toLowerCase();
-    let cls = "dot", label = value || "–";
+    let cls = "dot", label = value || "0";
 
     if (/^w|wicket|out/.test(low)) { cls = "wicket"; label = "W"; }
     else if (low === "4") { cls = "four"; }
     else if (low === "6") { cls = "six"; }
-    else if (/wd|wide|nb|no.?ball/.test(low)) { cls = "extra"; label = value.toUpperCase(); }
     else if (/^(0|\.|dot)$/.test(low)) { cls = "dot"; label = "0"; }
 
     return `<span class="ball ${cls}">${label}</span>`;
   }
 
-  function updateActionBox(actionRaw) {
-    const textVal = clean(actionRaw) || "OVER";
-    const low = textVal.toLowerCase();
-    const box = $("actionBox");
-    const labelEl = $("actionLabel");
-
-    text("actionText", textVal);
-    box.classList.remove("wicket-alert");
-
-    if (low.includes("wicket") || low.includes("out")) {
-      box.classList.add("wicket-alert");
-      labelEl.textContent = "● WICKET FALLEN";
-    } else if (low.includes("four") || low.includes("six") || low === "4" || low === "6") {
-      labelEl.textContent = "● BOUNDARY";
-    } else if (low.includes("air") || low.includes("catch")) {
-      labelEl.textContent = "● IN THE AIR";
-    } else {
-      labelEl.textContent = "LIVE MATCH ACTION";
-    }
-  }
-
   function render(d) {
-    if (!d || d.success === false) throw new Error(d?.error || "Match feed empty");
+    if (!d || d.success === false) return;
 
     const a = d.team1 || {}, b = d.team2 || {};
 
-    text("team1", a.short || a.name || a.full_name, "TEAM 1");
-    text("team2", b.short || b.name || b.full_name, "TEAM 2");
+    text("team1", a.name, "PAK");
+    text("team2", b.name, "SL");
     text("score1", a.score);
     text("score2", b.score);
-    text("overs1", fmtOvers(a.overs));
-    text("overs2", fmtOvers(b.overs));
+    text("overs1", a.overs ? a.overs + " OV" : "— OV");
+    text("overs2", b.overs ? b.overs + " OV" : "— OV");
 
     safeImage("logo1", a.logo);
     safeImage("logo2", b.logo);
 
-    const actionVal = d.live_action || d.result_box || d.team_result || d.center_commentary || d.last_ball_text;
-    updateActionBox(actionVal);
+    text("actionText", d.live_action || "OVER");
+    text("matchState", d.equation || "LIVE MATCH");
+    text("matchSub", d.match_title || "PREET SPORTS LIVE");
 
-    text("matchState", d.equation || d.status || "LIVE MATCH", "LIVE MATCH");
-    text("matchSub", d.status_note || d.series_name || "PREET SPORTS LIVE");
-    text("target", b.target || d.target);
     text("rates", `${clean(d.crr) || "—"} / ${clean(d.rrr) || "—"}`);
     text("partnership", d.partnership);
     text("lastWicket", d.last_wicket);
-    text("venue", d.venue || "VENUE FEED");
 
-    const ov = d.current_over || {};
-    const balls = Array.isArray(ov.balls) ? ov.balls.slice(-6) : [];
-    const validCount = balls.length;
+    // Balls Array
+    const balls = (d.current_over && Array.isArray(d.current_over.balls) && d.current_over.balls.length)
+      ? d.current_over.balls.slice(-6)
+      : ["0", "0", "4", "1", "4", "0"];
 
-    $("balls").innerHTML = Array.from({ length: 6 }, (_, i) => {
-      const isLatest = (i === validCount - 1 && validCount > 0);
-      return balls[i] ? renderBall(balls[i], isLatest) : '<span class="ball dot">–</span>';
-    }).join("");
-    text("overTotal", `TOTAL: ${ov.total ?? 0}`);
+    $("balls").innerHTML = Array.from({ length: 6 }, (_, i) =>
+      balls[i] ? renderBall(balls[i]) : '<span class="ball dot">0</span>'
+    ).join("");
 
-    // Dynamic 2-Layer Avatars & Stats
+    // Players
     const p1 = d.batsman1 || {}, p2 = d.batsman2 || {}, bw = d.bowler || {};
 
-    text("bat1", p1.short_name || p1.name, "WAITING...");
+    text("bat1", p1.name, "BATTER 1");
     html("bat1score", `${p1.runs ?? "—"} <small>(${p1.balls ?? "—"})</small>`);
-    text("bat1stats", `4s ${p1.fours ?? "—"}   6s ${p1.sixes ?? "—"}   SR ${p1.sr ?? "—"}`);
-    setPlayerAvatar("avatarComp1", "photo1", p1);
+    text("bat1stats", `4s ${p1.fours ?? "0"}   6s ${p1.sixes ?? "0"}   SR ${p1.sr ?? "0.00"}`);
+    setPlayerAvatar("head1", "jersey1", p1);
 
-    text("bat2", p2.short_name || p2.name, "WAITING...");
+    text("bat2", p2.name, "BATTER 2");
     html("bat2score", `${p2.runs ?? "—"} <small>(${p2.balls ?? "—"})</small>`);
-    text("bat2stats", `4s ${p2.fours ?? "—"}   6s ${p2.sixes ?? "—"}   SR ${p2.sr ?? "—"}`);
-    setPlayerAvatar("avatarComp2", "photo2", p2);
+    text("bat2stats", `4s ${p2.fours ?? "0"}   6s ${p2.sixes ?? "0"}   SR ${p2.sr ?? "0.00"}`);
+    setPlayerAvatar("head2", "jersey2", p2);
 
-    text("bowler", bw.short_name || bw.name, "WAITING...");
-    text("bowlscore", bw.figures || "—");
-    text("bowlstats", `OV ${bw.overs ?? "—"}   ECON ${bw.econ ?? "—"}`);
-    setPlayerAvatar("avatarCompB", "photoB", bw);
+    text("bowler", bw.name, "BOWLER");
+    text("bowlscore", bw.figures || "0-0");
+    text("bowlstats", `OV ${bw.overs ?? "0.0"}   ECON ${bw.econ ?? "0.00"}`);
+    setPlayerAvatar("headB", "jerseyB", bw);
 
-    // Striker Highlights
-    const isP1Striker = Boolean(p1.on_strike);
-    const isP2Striker = Boolean(p2.on_strike);
+    // Striker Highlighting
+    const isP1 = Boolean(p1.on_strike);
+    const isP2 = Boolean(p2.on_strike);
 
-    $("strikeBadge1").style.display = isP1Striker ? "inline-block" : "none";
-    $("batIcon1").style.display = isP1Striker ? "inline-flex" : "none";
-    $("cardBat1").classList.toggle("striker", isP1Striker);
+    $("strikeBadge1").style.display = isP1 ? "inline-block" : "none";
+    $("batIcon1").style.display = isP1 ? "inline-block" : "none";
+    $("cardBat1").classList.toggle("striker", isP1);
 
-    $("strikeBadge2").style.display = isP2Striker ? "inline-block" : "none";
-    $("batIcon2").style.display = isP2Striker ? "inline-flex" : "none";
-    $("cardBat2").classList.toggle("striker", isP2Striker);
-
-    const next = Array.isArray(d.next_batsmen) ? d.next_batsmen : [];
-    text("next1", next[0]?.name || next[0] || "—");
-    text("nextB", d.next_bowler?.name || d.next_bowler || "—");
+    $("strikeBadge2").style.display = isP2 ? "inline-block" : "none";
+    $("batIcon2").style.display = isP2 ? "inline-block" : "none";
+    $("cardBat2").classList.toggle("striker", isP2);
   }
 
   async function poll() {
@@ -1008,11 +784,7 @@ html, body {
 
   function load() {
     const value = input.value.trim();
-    if (!value.startsWith("http")) {
-      status.textContent = "INVALID URL";
-      status.style.color = "#ff4f6b";
-      return;
-    }
+    if (!value.startsWith("http")) return;
     activeUrl = value;
     const u = new URL(location.href);
     u.searchParams.set("url", activeUrl);
