@@ -424,6 +424,14 @@ def add_cors_headers(response):
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     return response
 
+@app.route("/mobile.html")
+def mobile_page():
+    """Serve the dedicated mobile-first 16:9 YouTube scoreboard page."""
+    response = send_from_directory(".", "mobile.html", max_age=0)
+    response.headers["Cache-Control"] = "no-store, max-age=0, must-revalidate"
+    return response
+
+
 @app.route("/")
 def index():
     return send_from_directory(".", "index.html")
