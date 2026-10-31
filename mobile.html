@@ -340,9 +340,7 @@ html, body {
   white-space: nowrap;
 }
 
-/* ========================================================
-   5. EQUALLY DIVIDED RUNBUZZ-STYLE BOTTOM ROW (IMAGE 14)
-   ======================================================== */
+/* 5. Equally Divided Bottom Row */
 .players-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -362,7 +360,6 @@ html, body {
   box-shadow: 0 0 14px rgba(255, 196, 0, 0.35);
 }
 
-/* Distinct Header Plates */
 .player-card-top {
   display: flex;
   align-items: center;
@@ -374,7 +371,6 @@ html, body {
 .card-top-tag { font-size: 0.8cqw; font-weight: 800; color: var(--muted); }
 .card-top-role { font-size: 0.75cqw; font-weight: 900; color: var(--gold); }
 
-/* Horizontal Split: Cutout on Left, Details on Right */
 .player-content-row {
   flex: 1;
   display: grid;
@@ -418,7 +414,6 @@ html, body {
   min-width: 0;
 }
 
-/* Name Tag Plate */
 .name-plate-bubble {
   background: linear-gradient(90deg, #ad1328, #690816);
   border: 1px solid #ff4763;
@@ -539,7 +534,7 @@ html, body {
         </div>
       </div>
 
-      <!-- CENTER ACTION BOX: Over / Ball In Air / Wicket -->
+      <!-- CENTER ACTION BOX -->
       <div class="center-action-box" id="actionBox">
         <span class="action-top-label" id="actionLabel">LIVE MATCH ACTION</span>
         <div class="action-live-text" id="actionText">OVER</div>
@@ -604,7 +599,7 @@ html, body {
       </div>
     </section>
 
-    <!-- 5. EQUALLY DIVIDED RUNBUZZ-STYLE BOTTOM ROW (IMAGE 14) -->
+    <!-- Bottom Row: 3 Equal Boxes -->
     <section class="players-grid">
       <!-- Batsman 1 -->
       <article class="player-box" id="cardBat1">
@@ -731,7 +726,6 @@ html, body {
     return `<span class="ball ${cls}">${label}</span>`;
   }
 
- // 1. Ensure "Caught and bowled", "LBW", and "Run out" trigger the red Wicket box:
   function updateActionBox(actionRaw) {
     const textVal = clean(actionRaw) || "OVER";
     const low = textVal.toLowerCase();
@@ -754,21 +748,45 @@ html, body {
     }
   }
 
-  // 2. In render(d), map the balls so unbowled deliveries stay as dashes:
-  const balls = (d.current_over && Array.isArray(d.current_over.balls)) ? d.current_over.balls : [];
-  const validCount = balls.length;
+  function render(d) {
+    if (!d || d.success === false) return;
 
-  $("balls").innerHTML = Array.from({ length: 6 }, (_, i) => {
-    if (i < validCount && balls[i] !== "") {
-      const isLatest = (i === validCount - 1);
-      return renderBall(balls[i], isLatest);
+    const a = d.team1 || {}, b = d.team2 || {};
+
+    text("team1", a.name, "PAK");
+    text("team2", b.name, "SL");
+    text("score1", a.score);
+    text("score2", b.score);
+    text("overs1", a.overs ? a.overs + " OV" : "— OV");
+    text("overs2", b.overs ? b.overs + " OV" : "— OV");
+
+    safeImage("logo1", a.logo);
+    safeImage("logo2", b.logo);
+
+    updateActionBox(d.live_action || "OVER");
+    text("matchState", d.equation || "LIVE MATCH");
+    text("matchSub", d.match_title || "PREET SPORTS LIVE BROADCAST");
+
+    text("rates", `${clean(d.crr) || "—"} / ${clean(d.rrr) || "—"}`);
+    text("partnership", d.partnership);
+    text("lastWicket", d.last_wicket);
+
+    // Precise Over Balls
+    const balls = (d.current_over && Array.isArray(d.current_over.balls)) ? d.current_over.balls : [];
+    const validCount = balls.length;
+
+    $("balls").innerHTML = Array.from({ length: 6 }, (_, i) => {
+      if (i < validCount && balls[i] !== "") {
+        const isLatest = (i === validCount - 1);
+        return renderBall(balls[i], isLatest);
+      }
+      return '<span class="ball dot">–</span>';
+    }).join("");
+
+    if (d.current_over && d.current_over.total !== undefined) {
+      text("overTotal", `TOTAL: ${d.current_over.total}`);
     }
-    return '<span class="ball dot">–</span>';
-  }).join("");
 
-  if (d.current_over && d.current_over.total !== undefined) {
-    text("overTotal", `TOTAL: ${d.current_over.total}`);
-  }
     // Players
     const p1 = d.batsman1 || {}, p2 = d.batsman2 || {}, bw = d.bowler || {};
 
