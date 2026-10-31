@@ -24,7 +24,7 @@ def index():
         return send_from_directory(".", "mobile.html")
     return jsonify({"status": "ready"})
 
-# High-resolution official flag fallbacks (never 404s)
+# High-resolution official flag CDN map (Guaranteed 200 OK)
 FLAG_MAP = {
     "PAK": "https://flagcdn.com/w160/pk.png",
     "SL": "https://flagcdn.com/w160/lk.png",
@@ -39,13 +39,7 @@ FLAG_MAP = {
     "ZIM": "https://flagcdn.com/w160/zw.png",
     "IRE": "https://flagcdn.com/w160/ie.png",
     "NED": "https://flagcdn.com/w160/nl.png",
-    "SCO": "https://flagcdn.com/w160/gb-sct.png",
-    "UAE": "https://flagcdn.com/w160/ae.png",
-    "OMA": "https://flagcdn.com/w160/om.png",
-    "NAM": "https://flagcdn.com/w160/na.png",
-    "NEP": "https://flagcdn.com/w160/np.png",
-    "USA": "https://flagcdn.com/w160/us.png",
-    "CAN": "https://flagcdn.com/w160/ca.png",
+    "SCO": "https://flagcdn.com/w160/gb-sct.png"
 }
 
 @app.route("/api/scrape", methods=["GET"])
@@ -70,7 +64,7 @@ def scrape_match():
     soup = BeautifulSoup(html, "html.parser")
     raw_text = soup.get_text()
 
-    # 1. Team Names & Logos
+    # 1. Team Names & Flags
     title_el = soup.select_one(".sub-title, .match-info-title, h1")
     match_title = title_el.get_text(strip=True) if title_el else "PAK vs SL Live"
     
@@ -81,10 +75,8 @@ def scrape_match():
         t1_name = teams_match.group(1).upper()
         t2_name = teams_match.group(2).upper()
 
-    # Scrape native team logo if present on CREX, else use high-res flagcdn
-    team_imgs = [img['src'] for img in soup.select("img[src*='Teams']") if 'src' in img.attrs]
-    t1_logo = team_imgs[0] if len(team_imgs) > 0 else FLAG_MAP.get(t1_name, f"https://flagcdn.com/w160/{t1_name[:2].lower()}.png")
-    t2_logo = team_imgs[1] if len(team_imgs) > 1 else FLAG_MAP.get(t2_name, f"https://flagcdn.com/w160/{t2_name[:2].lower()}.png")
+    t1_logo = FLAG_MAP.get(t1_name, f"https://flagcdn.com/w160/{t1_name[:2].lower()}.png")
+    t2_logo = FLAG_MAP.get(t2_name, f"https://flagcdn.com/w160/{t2_name[:2].lower()}.png")
 
     # 2. Extract Scores and Overs cleanly
     t1_score, t1_overs = "—", "—"
@@ -181,20 +173,24 @@ def scrape_match():
     batsman2 = parse_card(cards[1], False) if len(cards) > 1 else {}
     bowler = parse_card(cards[2], True) if len(cards) > 2 else {}
 
-    # 6. CURRENT OVER BALLS: Precise extraction of the active over
+    # 6. Current Over Balls: Scrapes the live over timeline
     current_balls = []
-    over_blocks = re.findall(r"Over\s+\d+[:\s]+([0-9\sWwNnBbDd/=]+)", raw_text, re.IGNORECASE)
-    if over_blocks:
-        last_block = over_blocks[-1]
-        raw_balls = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", last_block, re.IGNORECASE)
-        current_balls = [b.upper() for b in raw_balls if b != "="]
-
-    if not current_balls:
-        ball_tags = soup.select(".circle-ball, div[class*='ball']")
-        for b in ball_tags[-6:]:
+    
+    # Check for direct over-balls DOM container
+    ball_elements = soup.select(".over-balls span, .recent-overs span, .circle-ball")
+    if ball_elements:
+        for b in ball_elements[-6:]:
             val = b.get_text(strip=True)
             if re.match(r"^([0-6]|W|WD|NB|B|LB)$", val, re.IGNORECASE):
                 current_balls.append(val.upper())
+
+    # Fallback: Parse the last over string from raw text
+    if not current_balls:
+        over_matches = re.findall(r"Over\s+\d+[:\s]+([0-9\sWwNnBbDd/=]+)", raw_text, re.IGNORECASE)
+        if over_matches:
+            last_over = over_matches[-1]
+            raw_balls = re.findall(r"\b([0-6]|W|WD|NB|B|LB)\b", last_over, re.IGNORECASE)
+            current_balls = [b.upper() for b in raw_balls if b != "="]
 
     return jsonify({
         "success": True,
